@@ -29,7 +29,7 @@ DEFAULTS = {
 @lru_cache
 def get_profile() -> dict:
     path = SEED_DIR / "profile.json"
-    loaded = json.loads(path.read_text()) if path.exists() else {}
+    loaded = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
     return {**DEFAULTS, **loaded}
 
 

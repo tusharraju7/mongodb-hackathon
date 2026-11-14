@@ -196,7 +196,7 @@ def write_report(path: str, details: list[dict], demo: list[dict], totals: dict)
     ]
     differing = [d for d in details if d["mark"] != "same"]
     lines += [f"- **{d['name']}** — recorded {d['recorded'].replace('_', ' ')}, agent says {(d['now'] or '').replace('_', ' ')}. {d['summary']}" for d in differing] or ["Nothing differs."]
-    pathlib.Path(path).write_text("\n".join(lines) + "\n")
+    pathlib.Path(path).write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def main() -> None:

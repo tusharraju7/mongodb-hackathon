@@ -18,3 +18,5 @@ pillow
 pytest
 mongomock
 httpx
+
+langchain-openai

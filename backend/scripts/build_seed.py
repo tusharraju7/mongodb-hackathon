@@ -94,7 +94,7 @@ def write(name: str, data) -> None:
 
 def clauses() -> list[dict]:
     out = []
-    for r in json.loads((SRC / "regulations" / "regulations.json").read_text()):
+    for r in json.loads((SRC / "regulations" / "regulations.json").read_text(encoding="utf-8")):
         key = r["rule_id"]
         checks = r["check_for"] if isinstance(r["check_for"], list) else [r["check_for"]]
         clause = {
@@ -117,7 +117,7 @@ def clauses() -> list[dict]:
 
 def ads_and_precedents(by_key: dict, readings: dict) -> tuple[list[dict], list[dict]]:
     ads, memories = [], []
-    for a in json.loads((SRC / "historical_ads" / "historical_ads.json").read_text()):
+    for a in json.loads((SRC / "historical_ads" / "historical_ads.json").read_text(encoding="utf-8")):
         verdict, route, status = VERDICT[a["status"]]
         cited = [c["rule_id"] for c in a["rules_cited"]]
         violations = [] if verdict == "pass" else [
@@ -159,13 +159,13 @@ def ads_and_precedents(by_key: dict, readings: dict) -> tuple[list[dict], list[d
 
 def slack_memories() -> tuple[list[dict], list[dict]]:
     root = SRC / "slack" / "slack_export"
-    people = {u["id"]: u for u in json.loads((root / "users.json").read_text())}
+    people = {u["id"]: u for u in json.loads((root / "users.json").read_text(encoding="utf-8"))}
     logins = {u["slack_id"]: u["email"] for u in USERS if u.get("slack_id")}
     memories, raw = [], []
-    for channel in json.loads((root / "channels.json").read_text()):
+    for channel in json.loads((root / "channels.json").read_text(encoding="utf-8")):
         name = channel["name"]
         for day in sorted((root / name).glob("*.json")):
-            messages = json.loads(day.read_text())
+            messages = json.loads(day.read_text(encoding="utf-8"))
             lines, authors, titles = [], [], []
             for m in messages:
                 person = people.get(m["user"], {})
@@ -201,7 +201,7 @@ def slack_memories() -> tuple[list[dict], list[dict]]:
 def deck_memories() -> tuple[list[dict], list[dict]]:
     memories, raw = [], []
     for path in sorted((SRC / "strategy_decks").glob("*.md")):
-        text = path.read_text()
+        text = path.read_text(encoding="utf-8")
         title = re.search(r"^# (.+)$", text, re.M).group(1).strip()
         found = re.search(r"(\w+ \d{1,2}, \d{4})", text[:600])
         date = datetime.strptime(found.group(1), "%B %d, %Y").date().isoformat() if found else None
@@ -220,10 +220,10 @@ def deck_memories() -> tuple[list[dict], list[dict]]:
 def read_images(force: bool) -> dict:
     """What a vision model sees in each past ad. Kept in the seed folder so it is done once."""
     cache = OUT / "image_readings.json"
-    readings = json.loads(cache.read_text()) if cache.exists() else {}
+    readings = json.loads(cache.read_text(encoding="utf-8")) if cache.exists() else {}
     from app.services import media
 
-    for a in json.loads((SRC / "historical_ads" / "historical_ads.json").read_text()):
+    for a in json.loads((SRC / "historical_ads" / "historical_ads.json").read_text(encoding="utf-8")):
         if a["ad_id"] in readings and not force:
             continue
         data = (SRC / "historical_ads" / "images" / a["file"]).read_bytes()
@@ -241,12 +241,12 @@ def main() -> None:
     args = p.parse_args()
 
     write("profile", PROFILE)
-    readings = read_images(args.force) if args.read_images else (json.loads((OUT / "image_readings.json").read_text()) if (OUT / "image_readings.json").exists() else {})
+    readings = read_images(args.force) if args.read_images else (json.loads((OUT / "image_readings.json").read_text(encoding="utf-8")) if (OUT / "image_readings.json").exists() else {})
     rules = clauses()
     ads, precedents = ads_and_precedents({c["key"]: c for c in rules}, readings)
     slack, raw_slack = slack_memories()
     decks, raw_decks = deck_memories()
-    policies = json.loads((BACKEND_ROOT / "tests" / "fixtures" / "tamarack" / "policies.json").read_text())
+    policies = json.loads((BACKEND_ROOT / "tests" / "fixtures" / "tamarack" / "policies.json").read_text(encoding="utf-8"))
 
     write("users", USERS)
     write("policies", policies)

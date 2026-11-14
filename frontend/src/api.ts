@@ -1,4 +1,4 @@
-import type {AdContext, Campaign, ChatResult, CheckResult, FullCampaign, Offer, Session} from './types';
+import type {AdContext, Campaign, ChatResult, CheckResult, FullCampaign, Message, Offer, Session} from './types';
 export class ApiError extends Error {constructor(public status: number, message: string) {super(message);}}
 export function normalizeBase(raw: string): string {
   const url = new URL(raw.trim());
@@ -28,6 +28,7 @@ export class Backend {
   private post<T>(path: string, body: unknown, signal?: AbortSignal) {return this.request<T>(path,{method:'POST',body:JSON.stringify(body),signal});}
   login(email: string,password: string) {return this.post<Session>('/auth/login',{email,password});}
   offers() {return this.request<Offer[]>('/offers');}
+  chatHistory(thread: string) {return this.request<{messages: Message[];retained_turns: number}>(`/chat/${encodeURIComponent(thread)}`);}
   campaigns() {return this.request<Campaign[]>('/campaigns');}
   campaign(id: string) {return this.request<FullCampaign>(`/campaigns/${encodeURIComponent(id)}`);}
   upload(file: File,signal?: AbortSignal) {const body=new FormData();body.append('file',file);return this.request<{file_id: string; type: string}>('/assets',{method:'POST',body,signal});}

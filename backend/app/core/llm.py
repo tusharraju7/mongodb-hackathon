@@ -9,6 +9,7 @@ Notes for Claude 5.5 models, which shape this file:
 from __future__ import annotations
 
 import base64
+import os
 from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Any, Optional, Type, TypeVar
@@ -55,18 +56,42 @@ class TokenUsage:
         return {"in": self.input, "out": self.output, **({"cached": self.cached} if self.cached else {})}
 
 
+def build_model(name: str, effort: str):
+    if name.startswith("openai:"):
+        if not os.environ.get("OPENAI_API_KEY"):
+            raise ModelFailed("OpenAI is not configured. Add OPENAI_API_KEY to the server environment and restart the backend.")
+        from langchain_openai import ChatOpenAI
+        return ChatOpenAI(model=name.split(":", 1)[1], use_responses_api=True,
+                          reasoning={"effort": effort}, max_tokens=MAX_TOKENS,
+                          timeout=90, max_retries=1, store=False)
+    return init_chat_model(name, max_tokens=MAX_TOKENS, output_config={"effort": effort})
+
+
+def provider_content(value: Any, openai: bool):
+    if not openai or not isinstance(value, list):
+        return value
+    out = []
+    for block in value:
+        b = {k: v for k, v in block.items() if k != "cache_control"}
+        if b.get("type") == "image" and b.get("source", {}).get("type") == "base64":
+            source = b["source"]
+            b = {"type": "image_url", "image_url": {"url": f"data:{source['media_type']};base64,{source['data']}"}}
+        out.append(b)
+    return out
+
+
 @lru_cache
 def main_model():
     """Compliance verdict and, when needed, one repair of corrected copy."""
     s = get_settings()
-    return init_chat_model(s.llm_model, max_tokens=MAX_TOKENS, output_config={"effort": s.llm_effort})
+    return build_model(s.llm_model, s.llm_effort)
 
 
 @lru_cache
 def fast_model():
     """Router, claim extraction, image reading, Q&A, drafting. Accepts image input."""
     s = get_settings()
-    return init_chat_model(s.llm_fast_model, max_tokens=MAX_TOKENS, output_config={"effort": s.llm_fast_effort})
+    return build_model(s.llm_fast_model, s.llm_fast_effort)
 
 
 def cached_system(stable: list[str]) -> list[dict]:
@@ -110,12 +135,13 @@ def call_structured(
         "tags": [t for t in ("greenlight", intent) if t],
         "metadata": {k: v for k, v in {"run_id": run_id, "intent": intent, "step": label}.items() if v},
     }
-    result = runnable.invoke([SystemMessage(content=system), HumanMessage(content=user)], config=config)
+    is_openai = model.__class__.__module__.startswith("langchain_openai")
+    result = runnable.invoke([SystemMessage(content=provider_content(system, is_openai)), HumanMessage(content=provider_content(user, is_openai))], config=config)
     raw = result.get("raw")
     if usage is not None and raw is not None:
         usage.add(label, getattr(raw, "usage_metadata", None))
     stop_reason = (getattr(raw, "response_metadata", None) or {}).get("stop_reason")
-    if stop_reason == "refusal":
+    if stop_reason == "refusal" or (getattr(raw, "additional_kwargs", None) or {}).get("refusal") or any(isinstance(b, dict) and b.get("type") == "refusal" for b in (getattr(raw, "content", None) or []) if isinstance(getattr(raw, "content", None), list)):
         raise ModelRefused(f"{label}: the model declined this request")
     parsed = result.get("parsed")
     if parsed is None:

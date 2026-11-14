@@ -7,6 +7,7 @@ kept per thread by the MongoDB checkpointer.
 from __future__ import annotations
 
 from functools import lru_cache
+from datetime import datetime, timezone
 from typing import Any, Literal, Optional, TypedDict
 
 from langgraph.graph import END, START, StateGraph
@@ -126,7 +127,7 @@ def act(state: ChatState) -> dict:
     except gate.RunStopped:
         result = {"reply": "This run was stopped. The step that was about to start did not run.", "cards": [], "memories_used": [], "status": "stopped"}
 
-    history = (state.get("history") or []) + [{"role": "user", "text": state["message"]}, {"role": "assistant", "text": result["reply"]}]
+    history = (state.get("history") or []) + [{"role": "user", "text": state["message"], "createdAt": datetime.now(timezone.utc).isoformat()}, {"role": "assistant", "text": result["reply"], "createdAt": datetime.now(timezone.utc).isoformat()}]
     update: dict[str, Any] = {"result": result, "tokens": usage.as_dict(), "history": history[-HISTORY_TURNS * 2 :]}
     if result.get("campaign_id"):
         update["last_campaign_id"] = result["campaign_id"]
@@ -164,3 +165,8 @@ def run_turn(identity: Identity, *, thread_id: str, run_id: str, message: str, f
     result = dict(state["result"])
     result.update({"intent": state.get("intent"), "tokens": state.get("tokens") or {"in": 0, "out": 0}, "run_id": run_id})
     return result
+
+def read_history(identity: Identity, thread_id: str, graph=None) -> list[dict]:
+    graph = graph or chat_graph()
+    snapshot = graph.get_state({"configurable": {"thread_id": f"{identity.user_id}:{thread_id}"}})
+    return (snapshot.values or {}).get("history", [])

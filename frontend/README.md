@@ -41,29 +41,26 @@ npm run preview
 
 `build` produces the Next.js static export in `out/`, then bundles the same React components into `dist/index.html` and `share/greenlight-demo.html`. `preview` serves the portable production build at the same local URL. Stop the dev server before starting preview on port 3000. No Node server is needed after static deployment.
 
-## Connect the existing backend
+## Connected backend setup
 
-The integration is pinned to `agent/ai-flows` at commit `b13050505cb59fb9f5a74de07078dd87aa439e25` in `tusharraju7/mongodb-hackathon`, inspected November 14, 2026. The UI lives on local branch `codex/chat-review-ui`, based on GitHub `main` at `1a4cd407c78321a49384b9b1282055339aa6a149`. That base does not yet contain the backend implementation. Frontend changes are intentionally uncommitted and unpushed for review; backend code is unchanged.
+The current branch includes `main` at d6ca6c6 and `agent/round-two` at 9949bca. The preserved Claude baseline is `docs/RESULTS.md`: prompt version 2026-11-14.3, 14/15 historical outcomes matched, and all three demo outcomes matched.
 
-1. Run the Python backend from that branch using its setup instructions. Keep MongoDB, Voyage, LLM and JWT secrets in its ignored repo-root `.env`.
-2. Add the frontend origins to that backend `.env` and restart FastAPI:
+1. Put `OPENAI_API_KEY` and the existing NorthPlay account password (`SEED_PASSWORD`) in the ignored repo-root `.env`. JWT signing is configured locally. Never commit these values.
+2. Configure `LLM_MODEL=openai:gpt-5.4-mini`, `LLM_FAST_MODEL=openai:gpt-5.4-mini`, `LLM_EFFORT=low`, `LLM_FAST_EFFORT=none`. The adapter also retains Anthropic support.
+3. From `backend/`, run `.venv/Scripts/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000`. Windows dependency installation skips uvloop.
+4. Open the React preview, choose **Connect backend**, and use `http://127.0.0.1:8000`. User: `amira.haddad@northplay.test`. Lawyer: `ethan.cho@northplay.test`. Both require their existing database passwords; fake offline demo credentials do not work here.
+5. Choose Ontario and an actual channel (for example Instagram paid social), upload an image or paste copy, then **Review ad**. Submission rechecks and files the project. The library is shared by team; the server enforces roles and only permits approval of passing, pending projects.
+6. Project chat IDs persist across navigation. `GET /chat/{thread_id}` restores the latest six turns, scoped by the authenticated user. Model confidence remains evidence confidence, never a fabricated risk score. Live coordinates/readiness are shown only if returned by the backend.
 
-   ```dotenv
-   CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
-   ```
+In VS Code, use **Terminal → Run Task** for Backend: run, Backend: tests, or Services: check. Stop a running backend before starting another on port 8000. Services: check makes one tiny Voyage request and prints configuration presence and MongoDB counts; it cannot report remaining billing credits.
 
-3. From the backend directory, after installing its requirements and configuring the database:
+To compare using the same fixture data and prompts, run from `backend/`:
 
-   ```powershell
-   python -m uvicorn app.main:app --reload --port 8000
-   ```
+```powershell
+.venv/Scripts/python -m scripts.dry_run --suite --report ../docs/RESULTS_OPENAI.md
+```
 
-4. Serve this React app with `npm run dev` or `npm run preview`. Choose **Connect backend**, enter `http://localhost:8000`, and sign in with an existing backend account. The standalone file uses demo mode directly; live mode requires an HTTP(S) origin for CORS.
-5. Select **User** for marketer/sales accounts or **Lawyer** for manager accounts. The backend account role is authoritative. Selecting Lawyer never grants manager permissions. Sales accounts remain subject to backend restrictions.
-6. Select an offer, region and channel. Paste copy or attach an image. **Review ad** calls the review endpoint without filing. **Submit for legal review** rechecks and files it. This second review may incur another API charge; a dedicated submit-existing-assessment endpoint is not available yet.
-7. A manager can load saved reviews from the conversation sidebar and approve or reject. Approval is enabled only for a pending ad that passed, matching the current backend. No release/publication action is wired.
-
-For a deployed live app, use an HTTPS backend URL and add the exact frontend HTTPS origin to CORS. The backend must be reachable from each user's browser. `localhost` on a colleague's computer refers to **their** machine, not yours. CORS controls browser access; it is not a spending quota or authentication substitute.
+This incurs model and Voyage usage. Do not overwrite `docs/RESULTS.md`, the Claude baseline. It runs against local seed fixtures rather than modifying the shared campaign database. Generated OpenAI results are not available until credentials are supplied and this run succeeds.
 
 ## How the pieces connect
 
@@ -89,15 +86,15 @@ Node.js runs the frontend toolchain. NestJS and an extra Node API server are unn
 | Lawyer decision | `POST /campaigns/{id}/approve` or `/reject` with feedback |
 | Stop between agent steps | `POST /runs/{run_id}/stop` |
 
-The bearer token stays in React memory and is cleared on sign-out/reload. Protected image URLs never contain the token. Live results are not stored in localStorage. This frontend does not restore server chat transcripts because no transcript-read endpoint was found; it loads campaign history and keeps current-session messages.
+The bearer token stays in React memory and is cleared on sign-out/reload. Protected image URLs never contain the token. Live results are not stored in localStorage. The frontend restores the latest six backend chat turns per project and authenticated user.
 
 ## Demo versus live behavior
 
 - **Demo:** Hockey Night Live has readiness 92; Big game bonus has 75 and two red rectangles. Play Smart — Breaks has 64: it passes sample regulatory checks but is blocked by the October 30 internal legal guidance terminating Jake Moreau’s rights; its name and quote are highlighted. These are fixtures, not AI results. Below 80, explicit acknowledgement enables **Submit anyway**. Pending reviews can be examined in Lawyer view; passing ads can be approved, blocked ads can be rejected with feedback.
 - **Live:** Existing report confidence means evidence strength. It is never converted into risk/readiness. Missing readiness and coordinate fields stay absent. See `BACKEND_HANDOFF.md` for the proposed optional output fields.
 - **Uploads:** New image/PDF/video attachments can be selected locally in demo mode, but receive no invented assessment. PDF/video are attachments only, with no analysis or video playback. Live upload is limited here to PNG/JPEG/WebP/GIF up to 20 MB. The backend requires PDF/video processing work before those formats can be analysed.
-- **Policies:** The current live backend uses credit-card rules and offers; the NorthPlay examples do not automatically replace its policy database. Seed/adapt the backend explicitly before claiming live NorthPlay reviews.
-- **History:** Existing backend history contains version snapshots with partial analysis. Full per-version reports and persistent transcript retrieval require backend extensions.
+- **Policies:** NorthPlay sportsbook rules are loaded in the shared MongoDB database. The old credit-card dataset is used only by offline tests.
+- **History:** Shared project versions and decisions; separate per-user chat with six-turn server retention. Older messages are not retained by the current graph.
 - **Spending:** The inspected branch records token usage, limits per-call output and handles Voyage rate-limit errors. No application-wide hard cost cap, per-user quota, or remaining-credit cutoff was verified. Keep live accounts restricted until server-side controls are committed and tested. The offline demo makes no AI calls.
 
 ## Source map

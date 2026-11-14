@@ -312,3 +312,13 @@ def test_audit_is_scoped_to_the_caller(api):
     assert len(api.get(f"/audit?run_id={reviewed['run_id']}", headers=api.as_["manager_national"]).json()) == len(mine)
     assert api.get(f"/audit?run_id={reviewed['run_id']}", headers=api.as_["manager_quebec"]).json() == []
     assert api.get("/audit", headers=api.as_["sales_national"]).status_code == 403
+
+def test_authenticated_transcripts_are_private_and_timestamped(api):
+    chat(api, "marketer_national", message="Hello")
+    mine=api.get("/chat/t1", headers=api.as_["marketer_national"])
+    assert mine.status_code == 200
+    assert len(mine.json()["messages"]) == 2
+    assert all(m.get("createdAt") for m in mine.json()["messages"])
+    other=api.get("/chat/t1", headers=api.as_["manager_national"])
+    assert other.json()["messages"] == []
+    assert api.get("/chat/t1").status_code == 401
