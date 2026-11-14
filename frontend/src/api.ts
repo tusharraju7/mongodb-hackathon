@@ -1,4 +1,4 @@
-import type {AdContext, Campaign, ChatResult, CheckResult, FullCampaign, Message, Offer, Session} from './types';
+import type {AdContext, Campaign, ChatResult, CheckResult, FullCampaign, Message, MemoryChange, Offer, Session} from './types';
 export class ApiError extends Error {constructor(public status: number, message: string) {super(message);}}
 export function normalizeBase(raw: string): string {
   const url = new URL(raw.trim());
@@ -23,6 +23,7 @@ export class Backend {
       const message = typeof detail === 'string' ? detail : Array.isArray(detail) ? detail.map(d=>d.msg ?? 'Invalid request').join('; ') : `Request failed (${response.status}).`;
       throw new ApiError(response.status,message);
     }
+    if(response.status===204)return undefined as T;
     return response.json() as Promise<T>;
   }
   private post<T>(path: string, body: unknown, signal?: AbortSignal) {return this.request<T>(path,{method:'POST',body:JSON.stringify(body),signal});}
@@ -36,6 +37,16 @@ export class Backend {
   chat(input: {thread_id: string; run_id: string; message: string; ad?: AdContext & {text?: string}; use_memory: boolean},signal?: AbortSignal) {return this.post<ChatResult>('/chat',input,signal);}
   decision(id: string,decision: 'approve'|'reject',feedback: string) {return this.post<Campaign>(`/campaigns/${encodeURIComponent(id)}/${decision}`,{feedback});}
   stop(id: string) {return this.post<{stop_requested: boolean}>(`/runs/${encodeURIComponent(id)}/stop`,{});}
+  applyMemoryChange(change: MemoryChange,reason: string,password: string) {
+    const body={text:change.after,reason,password:password||undefined,run_id:crypto.randomUUID()};
+    if(change.target==='fundamental'&&change.id)return this.request(`/fundamentals/${encodeURIComponent(change.id)}`,{method:'PUT',body:JSON.stringify(body)});
+    if(change.target!=='memory')throw new Error('Unsupported memory change.');
+    if(change.action==='create')return this.post('/memories',{...body,kind:change.kind,scope:change.scope});
+    if(!change.id)throw new Error('This change needs a memory identifier.');
+    if(change.action==='correct')return this.request(`/memories/${encodeURIComponent(change.id)}`,{method:'PATCH',body:JSON.stringify(body)});
+    if(change.action==='forget')return this.request(`/memories/${encodeURIComponent(change.id)}`,{method:'DELETE',body:JSON.stringify({reason,password:password||undefined,run_id:body.run_id})});
+    throw new Error('Unsupported memory action.');
+  }
   async asset(fileId: string): Promise<string> {
     const response=await this.transport(`${this.base}/assets/${encodeURIComponent(fileId)}`,{headers:{Authorization:`Bearer ${this.token}`},redirect:'error'});
     if(!response.ok) throw new ApiError(response.status,'Could not load the protected image.');

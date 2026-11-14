@@ -61,8 +61,8 @@ def review_lane(
         existing = campaigns.get(identity, ctx["campaign_id"], db)
         text, modality = existing["text"], existing.get("modality", "text")
         # The stored ad's own context rules; a form default must not turn a Quebec ad into a national one.
-        for key in ("product", "offer_id", "region", "channel", "language", "budget", "visual_notes"):
-            ctx[key] = existing.get(key) or ctx.get(key)
+        for key in ("product", "offer_id", "region", "channel", "language", "budget", "visual_notes", "fine_print_legible"):
+            ctx[key] = existing[key] if key in existing and existing[key] is not None else ctx.get(key)
         ctx["name"] = ctx.get("name") or existing.get("name")
 
     # A file is turned into text once. The file itself is never sent to a model again.
@@ -120,7 +120,7 @@ def review_lane(
             identity, run_id, name=ctx.get("name"), text=text, ctx=ctx, facts=ex.facts().model_dump(), summary=ex.summary,
             description=ex.description, modality=modality, file_id=file_id or _first_asset(existing), mime=mime or _first_mime(existing),
             compliance=report, cache_key=result.cache_key, campaign_id=ctx.get("campaign_id"), vector=ad_vector, db=db,
-        ) if not existing or existing.get("text") != text else _refresh_report(existing, report, result.cache_key, db)
+        ) if not existing or existing.get("text") != text else gate.guarded(identity,"campaign.submit",{"campaign_id":str(existing["_id"]),"step":"refresh_assessment"},run_id,lambda: _refresh_report(existing, report, result.cache_key, db),db=db)
         if report.verdict != "pass" and use_memory:
             memory.remember(
                 identity, run_id, kind="episodic", text=episodic, scope={"team": identity.team, "user_id": None},

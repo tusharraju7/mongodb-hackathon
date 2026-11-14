@@ -16,3 +16,13 @@ test('default transport never binds browser fetch to the Backend instance',async
   try {await new Backend('http://127.0.0.1:3000/api').campaigns();}
   finally {globalThis.fetch=original;}
 });
+
+
+test('memory changes use dedicated authenticated endpoints and support empty delete responses',async()=>{
+  const seen:{url:string;method?:string;body:any}[]=[];
+  const api=new Backend('http://127.0.0.1:3000/api','jwt',async(url,init)=>{seen.push({url:String(url),method:init?.method,body:JSON.parse(String(init?.body))});return init?.method==='DELETE'?new Response(null,{status:204}):Response.json({id:'m1'});});
+  await api.applyMemoryChange({target:'memory',action:'create',kind:'semantic',scope:{team:'ontario',user_id:null},after:'A note',requires_password:true,status:'proposed'},'Test reason','step-up');
+  await api.applyMemoryChange({target:'memory',action:'forget',id:'m1',requires_password:true,status:'proposed'},'Remove test','step-up');
+  assert.equal(seen[0].url,'http://127.0.0.1:3000/api/memories');assert.equal(seen[0].body.password,'step-up');
+  assert.equal(seen[1].method,'DELETE');assert.ok(seen.every(s=>!s.url.includes('/chat')));
+});

@@ -18,3 +18,5 @@ export type Message = {id: string; role: 'user' | 'assistant' | 'lawyer'; text: 
 export type TrailEntry = {at: string; text: string};
 export type Review = {assessmentKey?: string; savedResult?: {model: string; generatedAt: string; claudeDecision: string; seconds: number}; key: string; name: string; image?: string; text?: string; fileName?: string; report?: Report; readiness?: number; status: Status; campaignId?: string; version: number; demoId?: 'hockey' | 'bonus' | 'breaks'; trail: TrailEntry[]; chats?: Partial<Record<ViewRole,Message[]>>; messages: Message[]};
 export type Region = {left: number; top: number; width: number; height: number};
+
+export type MemoryChange = {target:'memory'|'fundamental'; id?:string|null; key?:string; kind?:string; action?:'create'|'correct'|'forget'; scope?:{team:string;user_id:string|null}; before?:string|null; after?:string|null; requires_password:boolean; status:'proposed'};
