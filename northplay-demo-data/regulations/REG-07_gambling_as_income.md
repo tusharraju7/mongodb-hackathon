@@ -1,10 +1,10 @@
 # REG-07: No Gambling as Income, Investment or Solution to Problems
 
-> Demo policy document for the NorthPlay legal approver agent (NorthPlay is a fictional operator). Paraphrased from Ontario's AGCO Registrar's Standards for Internet Gaming for hackathon use only; not legal advice and not the official text.
+> Demo policy document for the NorthPlay legal approver agent (NorthPlay is a fictional operator). Fictional rules modelled on Ontario-style internet gaming advertising standards, written for hackathon use only; not legal advice and not any regulator's official text.
 
 - **Rule ID:** REG-07
 - **Category:** Truthful Advertising
-- **Source:** AGCO Registrar's Standards for Internet Gaming (Ontario), Standard 2.04, Req. 1 and Req. 2
+- **Source:** NorthPlay Advertising Policy (modelled on Ontario-style iGaming advertising standards), Section 2.04, Req. 1 and Req. 2
 - **Severity:** blocker
 - **Jurisdiction:** Ontario, Canada
 

@@ -35,11 +35,11 @@ Leadership Team | Confidential | v1.2 | October 14, 2026
 
 - **1. Trust-first brand**: Responsible gambling is our brand differentiator, not a disclaimer. Every touchpoint is factual, calm and compliant.
 - **2. Product-led growth**: Invest in live betting, same-game parlays and micro-markets. Let features, not offers, sell the app.
-- **3. Hockey-first**: Own NHL betting in Ontario. Hockey is ~40% of our handle and our strongest brand association.
+- **3. Hockey-first**: Own hockey betting in Ontario. Hockey is ~40% of our handle and our strongest brand association.
 
 ## Slide 6: Who we serve
 
-- Core: sports fans aged 25-54 in Ontario who already watch NHL, NFL and NBA
+- Core: sports fans aged 25-54 in Ontario who already watch pro hockey, football and basketball
 - We do not build campaigns aimed at 19-24 year olds; minimum targeting age is 25 on all paid channels
 - We do not target lapsed players with re-activation offers
 - Messaging assumes an experienced, entertainment-minded fan, not someone looking to make money
@@ -59,15 +59,15 @@ Leadership Team | Confidential | v1.2 | October 14, 2026
 
 - Launch 'NorthPlay Limits', a single hub for deposit, time and loss limits (Q1 2027)
 - Target: 40% of active players with a limit set by Dec 2027
-- Retired CFL lineman Marcus Doyle stays on as Play Smart ambassador, for responsible gambling messaging only
+- Retired pro football lineman Marcus Doyle stays on as Play Smart ambassador, for responsible gambling messaging only
 - Publish an annual Player Protection Report
 
 ## Slide 9: 2027 roadmap
 
 | Quarter | Product | Marketing |
 |---|---|---|
-| Q1 | NorthPlay Limits hub, faster live odds | Hockey Night Live; NFL playoffs; Play Smart refresh |
-| Q2 | Micro-markets for NHL playoffs | NHL playoff campaign; NBA playoffs |
+| Q1 | NorthPlay Limits hub, faster live odds | Puck Drop Live; football playoffs; Play Smart refresh |
+| Q2 | Micro-markets for hockey playoffs | Hockey playoff campaign; basketball playoffs |
 | Q3 | Personalized odds feed | Football kickoff; brand platform refresh |
 | Q4 | Parlay builder v2 | Holiday hockey; Player Protection Report |
 

@@ -1,6 +1,6 @@
 # NorthPlay Demo Data: Legal Approver Agent
 
-Demo data for the MongoDB "Agents in Context" hackathon. **NorthPlay is a fictional Ontario sportsbook.** All people, figures and decisions are made up. The regulations are paraphrased from Ontario's AGCO Registrar's Standards for Internet Gaming for demo use only; they are not legal advice and not the official text.
+Demo data for the MongoDB "Agents in Context" hackathon. **NorthPlay is a fictional Ontario sportsbook.** All people, figures and decisions are made up. The regulations are fictional rules modelled on Ontario-style internet gaming advertising standards, for demo use only; they are not legal advice and not any regulator's official text.
 
 ## What's in here
 
@@ -36,7 +36,7 @@ Demo data for the MongoDB "Agents in Context" hackathon. **NorthPlay is a fictio
 
 ## Context hierarchy (important for the agent)
 
-The strategy decks are **slightly out of date**. Slack holds newer decisions that are **stricter than the regulations**. As the 2027 strategy deck states, decisions in #legal-marketing are binding and take effect immediately. The agent should treat the most recent Slack decision as overriding the decks, and internal decisions as stacking on top of AGCO rules.
+The strategy decks are **slightly out of date**. Slack holds newer decisions that are **stricter than the regulations**. As the 2027 strategy deck states, decisions in #legal-marketing are binding and take effect immediately. The agent should treat the most recent Slack decision as overriding the decks, and internal decisions as stacking on top of the regulations.
 
 ## Live demo ads (3)
 
