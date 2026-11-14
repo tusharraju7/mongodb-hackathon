@@ -1,0 +1,63 @@
+[
+  {
+    "type": "message",
+    "user": "U07KT",
+    "text": "Idea for holiday: World Juniors creative over Boxing Day? Huge hockey moment in Ontario.",
+    "ts": "1794337200.000040",
+    "user_profile": {
+      "real_name": "Kevin Tran",
+      "display_name": "kevin.tran",
+      "title": "Growth Marketing Manager"
+    },
+    "thread_ts": "1794337200.000040",
+    "reply_count": 2,
+    "replies": [
+      {
+        "user": "U03EC",
+        "ts": "1794338520.000041"
+      },
+      {
+        "user": "U07KT",
+        "ts": "1794338700.000042"
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U03EC",
+    "text": "No. World Juniors and all junior hockey (OHL/CHL, U18, World Juniors) are off-limits in any NorthPlay creative. Most of those players are under 19, so it puts minors at the centre of a gambling ad. That includes odds graphics, game previews and 'watch with us' posts. Senior national team and NHL only.",
+    "ts": "1794338520.000041",
+    "user_profile": {
+      "real_name": "Ethan Cho",
+      "display_name": "ethan.cho",
+      "title": "Senior Counsel, Legal & Compliance"
+    },
+    "thread_ts": "1794337200.000040",
+    "parent_user_id": "U07KT",
+    "reactions": [
+      {
+        "name": "pushpin",
+        "users": [
+          "U02PN",
+          "U04DO",
+          "U05SM",
+          "U06AH"
+        ],
+        "count": 4
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U07KT",
+    "text": "Got it, scrapping.",
+    "ts": "1794338700.000042",
+    "user_profile": {
+      "real_name": "Kevin Tran",
+      "display_name": "kevin.tran",
+      "title": "Growth Marketing Manager"
+    },
+    "thread_ts": "1794337200.000040",
+    "parent_user_id": "U07KT"
+  }
+]

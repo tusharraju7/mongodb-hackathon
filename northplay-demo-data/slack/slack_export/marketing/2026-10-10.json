@@ -1,0 +1,43 @@
+[
+  {
+    "type": "message",
+    "user": "U07KT",
+    "text": "Tonight's picks TikTok (H11) got rejected for 'lock' and 'easy money'. Fair. I'll rework it.",
+    "ts": "1791658920.000009",
+    "user_profile": {
+      "real_name": "Kevin Tran",
+      "display_name": "kevin.tran",
+      "title": "Growth Marketing Manager"
+    },
+    "thread_ts": "1791658920.000009",
+    "reply_count": 1,
+    "replies": [
+      {
+        "user": "U05SM",
+        "ts": "1791659340.000010"
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U05SM",
+    "text": "Brand note: 'lock', 'easy money', 'guaranteed' and 'can't lose' are off-brand regardless of what the agent says. Adding them to the voice guide.",
+    "ts": "1791659340.000010",
+    "user_profile": {
+      "real_name": "Sofia Marchetti",
+      "display_name": "sofia.marchetti",
+      "title": "Brand Manager"
+    },
+    "thread_ts": "1791658920.000009",
+    "parent_user_id": "U07KT",
+    "reactions": [
+      {
+        "name": "white_check_mark",
+        "users": [
+          "U06AH"
+        ],
+        "count": 1
+      }
+    ]
+  }
+]

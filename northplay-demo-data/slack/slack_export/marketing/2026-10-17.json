@@ -1,0 +1,60 @@
+[
+  {
+    "type": "message",
+    "user": "U06AH",
+    "text": "Okay, the Pucky mascot test (H12) got destroyed by the agent. Cartoon + slang = minors. Pucky is retired.",
+    "ts": "1792268520.000013",
+    "user_profile": {
+      "real_name": "Amira Haddad",
+      "display_name": "amira.haddad",
+      "title": "Creative Lead"
+    },
+    "reactions": [
+      {
+        "name": "joy",
+        "users": [
+          "U07KT",
+          "U04DO"
+        ],
+        "count": 2
+      },
+      {
+        "name": "skull",
+        "users": [
+          "U05SM"
+        ],
+        "count": 1
+      }
+    ],
+    "thread_ts": "1792268520.000013",
+    "reply_count": 1,
+    "replies": [
+      {
+        "user": "U05SM",
+        "ts": "1792269000.000014"
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U05SM",
+    "text": "Retired permanently please. No mascots at all, and no orange/pink gradient palettes either. Navy, rink green and mint only.",
+    "ts": "1792269000.000014",
+    "user_profile": {
+      "real_name": "Sofia Marchetti",
+      "display_name": "sofia.marchetti",
+      "title": "Brand Manager"
+    },
+    "thread_ts": "1792268520.000013",
+    "parent_user_id": "U06AH",
+    "reactions": [
+      {
+        "name": "+1",
+        "users": [
+          "U02PN"
+        ],
+        "count": 1
+      }
+    ]
+  }
+]

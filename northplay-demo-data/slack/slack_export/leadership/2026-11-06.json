@@ -1,0 +1,45 @@
+[
+  {
+    "type": "message",
+    "user": "U02PN",
+    "text": "Decision: we are pausing ALL paid TikTok and Snapchat activity, effective today, until further notice. Even with 25+ targeting we can't verify audience age to our standard, and it doesn't fit trust-first. Moving the $0.3M to CTV and podcast.",
+    "ts": "1793981400.000033",
+    "user_profile": {
+      "real_name": "Priya Nair",
+      "display_name": "priya.nair",
+      "title": "Chief Marketing Officer"
+    },
+    "reactions": [
+      {
+        "name": "+1",
+        "users": [
+          "U01RB",
+          "U03EC",
+          "U08LF"
+        ],
+        "count": 3
+      }
+    ],
+    "thread_ts": "1793981400.000033",
+    "reply_count": 1,
+    "replies": [
+      {
+        "user": "U01RB",
+        "ts": "1793981880.000034"
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U01RB",
+    "text": "Agreed. The Q1 deck still lists TikTok/Snap. Treat this message as overriding it.",
+    "ts": "1793981880.000034",
+    "user_profile": {
+      "real_name": "Rachel Bouchard",
+      "display_name": "rachel.bouchard",
+      "title": "CEO"
+    },
+    "thread_ts": "1793981400.000033",
+    "parent_user_id": "U02PN"
+  }
+]
