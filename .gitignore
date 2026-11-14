@@ -1,0 +1,38 @@
+# Local secrets — this repo is public
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Logs and OS files
+*.log
+.DS_Store
+
+# Local agent and client configuration that can hold a connection string
+.codex/config.toml
+mcp.local.json
+.claude/settings.local.json
+
+# Database exports and generated media (media lives in GridFS, never in git)
+exports/
+*.mp3
+*.wav
+*.m4a
+backend/seed/media/

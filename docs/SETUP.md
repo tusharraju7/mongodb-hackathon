@@ -15,7 +15,7 @@ Before kickoff the repo owner confirms that this project was created from the ha
 
 ### Repo owner, once (Stream 0, task S0.1)
 
-1. **Database user for the app and the team.** Atlas → Database Access → Add New Database User. Username `greenlight_app`, a generated password, built-in role *Read and write to any database* restricted to this cluster, or a custom role with `readWrite` on `greenlight`. Do not share the existing admin user.
+1. **Database user for the app and the team.** Atlas → Database Access → Add New Database User. Username `greenlight_app`, a generated password, and under *Specific Privileges* the roles `readWrite` and `dbAdmin` on the database `greenlight` only. `dbAdmin` is needed so `setup_db.py` can update a validator on an existing collection. Do not share the existing admin user.
 2. **Network access.** Atlas → Network Access → add each teammate's IP (each person runs `curl ifconfig.me`). If the venue network keeps changing addresses, add a temporary `0.0.0.0/0` entry with an expiry and delete it after the demo.
 3. **Share the connection string privately** (team chat DM or a password manager), never in the repo, an issue or a PR:
    `mongodb+srv://greenlight_app:<password>@<cluster-host>/?retryWrites=true&w=majority`
@@ -36,7 +36,7 @@ Before kickoff the repo owner confirms that this project was created from the ha
 | MongoDB connection string | repo owner, privately | everyone |
 | LLM key (Anthropic or OpenAI) | your own or the team's | streams B, C; anyone running the backend |
 | Voyage AI key | Atlas (AI model API keys) or the Voyage dashboard; one shared team key is fine | streams A, B, C |
-| ElevenLabs key | hackathon credits; one shared team key | stream C; anyone reviewing audio ads or running the seed script |
+| ElevenLabs key | hackathon credits; one shared team key | stream C; anyone reviewing or regenerating audio ads, or running the seed script |
 
 ## 3. Environment variables
 
@@ -55,7 +55,7 @@ VOYAGE_API_KEY=
 VOYAGE_MODEL=voyage-3.5      # do not change: indexes are 1024-dimensional
 
 ELEVENLABS_API_KEY=
-ELEVENLABS_VOICE_ID=         # stock voice used by the seed script for the sample ads
+ELEVENLABS_VOICE_ID=         # stock voice for regenerated audio ads and the seeded samples
 
 JWT_SECRET=                  # same value for the whole team so tokens work across laptops
 SEED_PASSWORD=               # password given to all seeded demo users
@@ -73,12 +73,12 @@ Created by `scripts/seed.py`, all with `SEED_PASSWORD`.
 
 | Email | Role | Team |
 |---|---|---|
-| `manager.national@solstice.test` | manager | national |
-| `marketer.national@solstice.test` | marketer | national |
-| `sales.national@solstice.test` | sales | national |
-| `manager.quebec@solstice.test` | manager | quebec |
-| `marketer.quebec@solstice.test` | marketer | quebec |
-| `sales.quebec@solstice.test` | sales | quebec |
+| `manager.national@tamarack.test` | manager | national |
+| `marketer.national@tamarack.test` | marketer | national |
+| `sales.national@tamarack.test` | sales | national |
+| `manager.quebec@tamarack.test` | manager | quebec |
+| `marketer.quebec@tamarack.test` | marketer | quebec |
+| `sales.quebec@tamarack.test` | sales | quebec |
 
 ## 5. Let your coding agent see the database (MongoDB MCP, read-only)
 

@@ -1,0 +1,8 @@
+[
+  { "email": "manager.national@tamarack.test",  "name": "Dana Whitfield",   "role": "manager",  "team": "national" },
+  { "email": "marketer.national@tamarack.test", "name": "Marcus Oyelaran",  "role": "marketer", "team": "national" },
+  { "email": "sales.national@tamarack.test",    "name": "Tessa Lindqvist",  "role": "sales",    "team": "national" },
+  { "email": "manager.quebec@tamarack.test",    "name": "Élodie Tremblay",  "role": "manager",  "team": "quebec" },
+  { "email": "marketer.quebec@tamarack.test",   "name": "Mathieu Gagnon",   "role": "marketer", "team": "quebec" },
+  { "email": "sales.quebec@tamarack.test",      "name": "Camille Roy",      "role": "sales",    "team": "quebec" }
+]

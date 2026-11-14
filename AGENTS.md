@@ -7,11 +7,12 @@ This file is the single source of guidance for Claude Code, Codex, and any other
 **Greenlight**: a governed marketing agent for an organisation, built in a 4-hour hackathon by a team of 4.
 
 - Three use cases, in priority order:
-  - **UC1** Review existing ad creative (pasted copy, or audio transcribed with ElevenLabs) against company rules.
+  - **UC1** Review existing ad creative against policy clauses and the approved offer record; route it; on request regenerate a compliant version; a manager approves; release is gated on that approval still being current.
   - **UC4** Let the marketing manager update what the agent knows and remembers.
   - **UC5** Answer questions about an ad, returning the ad itself.
-- Out of scope: creating new creative from a prompt (was UC2) and comparing campaigns (was UC3). Do not build them.
-- Examples and seed data are Canadian: Solstice Coffee Co., a fictional Canadian roaster with a `national` team and a `quebec` team; ad regions `CA` and `CA-QC`; budgets in CAD.
+- Ads are text, audio or image, in and out. Audio in: ElevenLabs Scribe. Image in: the fast model with image input. Audio out: ElevenLabs text-to-speech. Image out: a brand template rendered in code.
+- Out of scope: creating creative from a blank prompt (was UC2) and comparing campaigns (was UC3). Do not build them.
+- Setting: Tamarack Bank, a fictional Canadian bank advertising the Tamarack Cashback Card, with a `national` team and a `quebec` team; ad regions `CA` and `CA-QC`; amounts in CAD. One ad is followed end to end in [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md).
 - Every action is tied to an identity, checked against policy **before** it runs, and recorded in a ledger. Runs can be stopped and rolled back. (Problem statement 1: *Agents You Can Audit*.)
 - Memory is stored in MongoDB Atlas with Vector Search, scoped per team and role, expires, can be corrected or forgotten, and provably changes the next run. (Problem statement 2: *Memory You Can Govern*.)
 
@@ -22,7 +23,9 @@ This file is the single source of guidance for Claude Code, Codex, and any other
 | Your tasks, time boxes, checks | [docs/PLAN.md](docs/PLAN.md) |
 | Tech stack, infrastructure diagram, core mechanisms | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | The three use-case flows, auth, memory, token rules | [docs/FLOWS.md](docs/FLOWS.md) |
+| One credit card ad followed end to end, with sample JSON | [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md) |
 | Collection schemas, indexes, RBAC, API, service signatures | [docs/CONTRACTS.md](docs/CONTRACTS.md) |
+| What to create in MongoDB, in what order, and the seed data | [docs/MONGODB_SETUP.md](docs/MONGODB_SETUP.md) |
 | Shared Atlas access, env vars, MCP setup | [docs/SETUP.md](docs/SETUP.md) |
 | Demo script and rules checklist | [docs/DEMO.md](docs/DEMO.md) |
 
@@ -35,7 +38,7 @@ This file is the single source of guidance for Claude Code, Codex, and any other
 
 ## Repo map
 
-The repo currently holds documentation only. Stream 0 creates this layout; do not invent a different one.
+The repo currently holds documentation and the seed data in `backend/seed/`. Stream 0 creates the rest of this layout; do not invent a different one.
 
 ```
 AGENTS.md  CLAUDE.md  README.md  .env.example  .gitignore  .mcp.json
@@ -47,7 +50,7 @@ backend/
   app/routers/   auth.py  chat.py  compliance.py  campaigns.py  assets.py
                  fundamentals.py  memories.py  audit.py  runs.py
   app/agent/     graph.py  tools.py  prompts.py
-  app/services/  compliance.py  audio.py  campaigns.py  memory.py  fundamentals.py
+  app/services/  compliance.py  media.py  campaigns.py  offers.py  memory.py  fundamentals.py
   scripts/       setup_db.py  seed.py  smoke.py
   seed/          *.json
 frontend/        Next.js app: app/{login,chat,library,fundamentals,memory,audit}/page.tsx
@@ -63,7 +66,7 @@ Edit only the files your stream owns.
 | 0 | Bootstrap | Initial scaffold of everything above, then hands off |
 | A | Identity, policy, audit | `backend/app/core/{security,gate}.py`, `backend/app/routers/{auth,fundamentals,audit,runs}.py`, `backend/app/services/fundamentals.py`, `backend/scripts/setup_db.py` |
 | B | Agent and compliance | `backend/app/agent/*`, `backend/app/services/compliance.py`, `backend/app/routers/{chat,compliance}.py`, `backend/app/core/llm.py` |
-| C | Memory, ad library, audio | `backend/app/services/{memory,campaigns,audio}.py`, `backend/app/routers/{campaigns,assets,memories}.py`, `backend/app/core/embeddings.py`, `backend/scripts/seed.py`, `backend/seed/*` |
+| C | Memory, ad library, offers, media | `backend/app/services/{memory,campaigns,offers,media}.py`, `backend/app/routers/{campaigns,assets,memories}.py`, `backend/app/core/embeddings.py`, `backend/scripts/seed.py`, `backend/seed/*` |
 | D | Web app | `frontend/**`, `docs/DEMO.md` |
 
 **Shared files** change only in a tiny dedicated PR announced in team chat: `docs/CONTRACTS.md`, `backend/app/core/config.py`, `backend/app/core/db.py`, `backend/app/main.py`, `backend/requirements.txt`, `.env.example`, `AGENTS.md`.
@@ -79,9 +82,16 @@ Edit only the files your stream owns.
 7. **Do not change the embedding model or its dimensions** (`voyage-3.5`, 1024). The vector indexes depend on it.
 8. **Follow the token rules** in `docs/FLOWS.md`: deny before spending, one intent → one small tool set, filter before retrieving, summaries not documents, code before model, fast model for everything except the compliance verdict.
 9. **No Streamlit, no new frameworks, no extra services.** The stack in `docs/ARCHITECTURE.md` is fixed.
-10. **Original work only.** Do not paste code from other projects. Use only the fictional brand (Solstice Coffee Co.) and stock ElevenLabs voices; no real people's names, voices or likenesses in seed data or demos.
+10. **Original work only.** Do not paste code from other projects. Use only the fictional bank and card (Tamarack Bank, Tamarack Cashback Card) and stock ElevenLabs voices; no real institutions, card networks, people, voices or likenesses in seed data or demos.
 11. **P0 before anything else.** Do not start a P1 or P2 task while a P0 task in your stream is open. Nothing new after the feature freeze at T+3:15.
 12. **The model never sees a password.** UC4 changes are drafted by the agent and written by the web app calling the write endpoint with the password.
+13. **Never invent offer terms.** Rates, fees, bonus amounts and conditions come only from the ad or the `offers` record. No offer record → stop and ask.
+14. **Policy outranks memory.** Memory can add a team instruction or show a past verdict; it cannot waive a policy clause. Findings cite a policy key and version, the offer, or a memory id.
+15. **Routing and release are code.** The route comes from the findings' materiality, never from a similarity score. Release re-checks the approval against current ad, policy and offer versions.
+16. **Regeneration fails closed.** Review the corrected copy first; render audio or an image only from copy that has passed; one repair attempt at most; otherwise produce nothing and return the remaining findings.
+17. **No image-generation model.** Regenerated images come from the brand template rendered in code, so rates and fine print are exact. Review always runs on text: transcribe audio and read images once, store the text on the ad, and reuse it.
+18. **Build text first, then audio, then image.** Each must work end to end before the next is started.
+19. **Confidence is computed in code.** Never ask the model for a confidence number. The judge labels each finding `clear`, `likely` or `unclear`; the score comes from the formula in `docs/CONTRACTS.md`. Drop any finding whose quote is not in the ad. Confidence may send a result to human review; it may never loosen a verdict or a route.
 
 ## Branching
 
