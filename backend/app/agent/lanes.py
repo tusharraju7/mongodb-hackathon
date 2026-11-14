@@ -78,7 +78,7 @@ def review_lane(
         else:
             reading = gate.guarded(
                 identity, "compliance.check", {"step": "read_image", "file_id": file_id, "bytes": len(data)}, run_id,
-                lambda: media.read_image_and_claims(data, mime, ctx, usage=usage, run_id=run_id), thread_id=thread_id, db=db,
+                lambda: media.read_image_and_claims(data, mime, ctx, usage=usage, run_id=run_id, scope=identity.model_dump()), thread_id=thread_id, db=db,
                 summarize=lambda r: {"status": "ok", "summary": f"Read {len(r['text'].split())} words from the image"},
             )
             extraction = Extraction.model_validate(reading["extraction"])

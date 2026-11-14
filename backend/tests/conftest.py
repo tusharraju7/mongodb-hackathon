@@ -66,3 +66,10 @@ def offline_model_factories(monkeypatch):
     from app.core import llm
     monkeypatch.setattr(llm, "main_model", lambda: object())
     monkeypatch.setattr(llm, "fast_model", lambda: object())
+
+@pytest.fixture(autouse=True)
+def clear_review_caches():
+    from app.core import review_cache
+    for cache in (review_cache.readings,review_cache.extractions,review_cache.reports):cache.clear()
+    yield
+    for cache in (review_cache.readings,review_cache.extractions,review_cache.reports):cache.clear()

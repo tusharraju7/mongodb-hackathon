@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from typing import Optional, Protocol
 
 from app.agent import prompts
-from app.core import embeddings, llm
+from app.core import embeddings, llm, review_cache
 from app.core.profile import channel_class, get_profile
 from app.models import (
     ComplianceReport,
@@ -167,15 +167,16 @@ def _missing_offer_report(offer_id: Optional[str]) -> ComplianceReport:
     )
 
 
-def _cache_key(text: str, offer: Optional[dict], clauses: list[dict], memories: list[dict], ctx: dict) -> str:
-    payload = {
-        "text": rules.norm(text),
-        "offer": [offer["_id"], offer.get("version", 1)] if offer else None,
-        "clauses": sorted([c["key"], c.get("version", 1)] for c in clauses),
-        "memories": sorted(m["id"] for m in memories),
-        "ctx": [ctx.get("region"), ctx.get("channel"), ctx.get("language"), ctx.get("team"), (ctx.get("budget") or {}).get("amount"), ctx.get("visual_notes")],
-    }
-    return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
+def _cache_key(text, offer, clauses, memories, ctx, identity=None, extraction=None, use_memory=True):
+    # Hash complete current evidence, not only IDs or nominal versions. Retrieval and hard rules
+    # still run on every request, so expiry, forgetting, corrections and new retrieved memories count.
+    def stable(doc):
+        return {k:v for k,v in doc.items() if k not in {"embedding","use_count","last_used_at"}}
+    return review_cache.digest({"text":text,"offer":stable(offer) if offer else None,
+        "clauses":sorted([stable(c) for c in clauses],key=lambda c:c["key"]),
+        "memories":memories,"context":{k:v for k,v in ctx.items() if k not in {"name","campaign_id"}},
+        "identity":identity.model_dump() if identity else None,"extraction":extraction.model_dump() if extraction else None,
+        "memory_enabled":use_memory,"configuration":review_cache.configuration()})
 
 
 def review(
@@ -205,7 +206,13 @@ def review(
             return ReviewResult(report=_missing_offer_report(ctx["offer_id"]))
 
     # 2. Claims, once.
-    extraction = extraction or extract_claims(text, ctx, usage=usage, run_id=run_id)
+    extraction_key=review_cache.digest([text,ctx.get("channel"),ctx.get("modality"),identity.model_dump(),review_cache.configuration()])
+    extraction = extraction or review_cache.extractions.get(extraction_key)
+    if extraction is None:
+        extraction=extract_claims(text, ctx, usage=usage, run_id=run_id)
+    extraction=extraction.model_copy(deep=True)
+    extraction.claims=[c for c in extraction.claims if rules.quote_in_text(c.quote,text)]
+    review_cache.extractions.put(extraction_key,extraction)
     ctx["language"] = ctx.get("language") or extraction.language
     claims = [c.model_dump() for c in extraction.facts().claims]
 
@@ -257,7 +264,8 @@ def review(
     )
 
     # 6. A stored verdict for exactly this text, offer, clause versions and memories skips the judge.
-    key = _cache_key(text, offer, consulted, memories, ctx)
+    key = _cache_key(text, offer, applicable, memories, ctx, identity, extraction, use_memory)
+    cached_report = cached_report or review_cache.reports.get
     if cached_report is not None:
         hit = cached_report(key)
         if hit is not None:
@@ -384,6 +392,7 @@ def review(
         # The ones a finding rests on are also named on that finding as `memory_id`.
         memories_used=[m["id"] for m in memories],
     )
+    review_cache.reports.put(key,report)
     return ReviewResult(report=report, extraction=extraction, offer=offer, cache_key=key, code_clauses=code_clauses)
 
 

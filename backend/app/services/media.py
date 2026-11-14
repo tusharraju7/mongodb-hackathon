@@ -129,10 +129,16 @@ def read_image_bytes(data: bytes, mime: str, *, usage: Optional[llm.TokenUsage] 
     return reading.model_dump()
 
 
-def read_image_and_claims(data: bytes, mime: str, ctx: dict, *, usage=None, run_id=None) -> dict:
+def read_image_and_claims(data: bytes, mime: str, ctx: dict, *, usage=None, run_id=None, scope=None) -> dict:
     """Read pixels and extract grounded claims in a single fast-model call."""
     from app.models import Extraction
     from app.services.compliance_rules import quote_in_text
+
+    from app.core import review_cache
+    import hashlib
+    key=review_cache.digest([hashlib.sha256(data).hexdigest(),mime,ctx.get("channel"),scope,review_cache.configuration()])
+    hit=review_cache.readings.get(key)
+    if hit is not None:return hit
 
     class ImageAssessmentInput(ImageReading):
         extraction: Extraction
@@ -145,7 +151,9 @@ def read_image_and_claims(data: bytes, mime: str, ctx: dict, *, usage=None, run_
         label="read_image_and_claims", usage=usage, run_id=run_id, intent="review",
     )
     reading.extraction.claims = [c for c in reading.extraction.claims if quote_in_text(c.quote, reading.text)]
-    return reading.model_dump()
+    result=reading.model_dump()
+    review_cache.readings.put(key,result)
+    return result
 
 
 def read_image(file_id: str, db=None, **kw) -> dict:

@@ -322,3 +322,18 @@ def test_authenticated_transcripts_are_private_and_timestamped(api):
     other=api.get("/chat/t1", headers=api.as_["manager_national"])
     assert other.json()["messages"] == []
     assert api.get("/chat/t1").status_code == 401
+
+
+def test_repeated_assessment_reuses_models_but_checks_current_policy(api):
+    body={**AD,"text":FIXED,"save":False}
+    def check():
+        response=api.post("/compliance/check",headers=api.as_["marketer_national"],json=body)
+        assert response.status_code==200,response.text
+        return response.json()
+    first=check()
+    assert first["tokens"]["in"]>0 and not first["cached"]
+    second=check()
+    assert second["cached"] and second["tokens"]["in"]==0
+    api.db.fundamentals.update_one({"key":"credit.bonus_conditions"},{"$set":{"text":"A changed policy with the same version"}})
+    third=check()
+    assert not third["cached"] and third["tokens"]["in"]>0
