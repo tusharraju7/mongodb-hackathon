@@ -8,3 +8,11 @@ test('structured backend denial is surfaced, never treated as success',async()=>
 test('expired login and provider rate limit retain their status',async()=>{for(const status of [401,429]){const api=new Backend('http://localhost:8000','t',async()=>Response.json({detail:'Try later'},{status}));await assert.rejects(api.campaigns(),e=>e instanceof ApiError&&e.status===status);}});
 test('remote HTTP and credential-bearing addresses are rejected',()=>{assert.equal(normalizeBase('http://127.0.0.1:8000/'),'http://127.0.0.1:8000');assert.equal(normalizeBase('https://api.example.com'),'https://api.example.com');assert.throws(()=>normalizeBase('http://api.example.com'));assert.throws(()=>normalizeBase('https://secret:password@api.example.com'));assert.throws(()=>normalizeBase('javascript:alert(1)'));});
 test('API paths cannot redirect credentials to another origin',async()=>{const api=new Backend('http://localhost:8000','t',async()=>{throw new Error('Must not fetch');});await assert.rejects(api.request('//example.com'));});
+
+
+test('default transport never binds browser fetch to the Backend instance',async()=>{
+  const original=globalThis.fetch;
+  globalThis.fetch=async function(this: unknown){assert.ok(!(this instanceof Backend));return Response.json([]);};
+  try {await new Backend('http://127.0.0.1:3000/api').campaigns();}
+  finally {globalThis.fetch=original;}
+});

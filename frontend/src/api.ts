@@ -8,7 +8,7 @@ export function normalizeBase(raw: string): string {
 }
 export class Backend {
   readonly base: string;
-  constructor(base: string, private token = '', private transport: typeof fetch = fetch) {this.base = normalizeBase(base);}
+  constructor(base: string, private token = '', private transport: typeof fetch = (input,init)=>fetch(input,init)) {this.base = normalizeBase(base);}
   async request<T>(path: string, init: RequestInit = {}): Promise<T> {
     if (!path.startsWith('/') || path.startsWith('//') || path.includes('://')) throw new Error('Invalid API path.');
     const headers = new Headers(init.headers);
