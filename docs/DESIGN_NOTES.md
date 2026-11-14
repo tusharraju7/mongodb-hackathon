@@ -24,6 +24,8 @@ Three things follow from putting it in one place:
 - **The rules are data.** `policies` and `action_rules` are collections in Atlas. A reviewer can read them, and a rule can be tightened there without a deploy. The defaults in `gate.py` apply where a rule has no document.
 - **Nothing starts on a plan that would fail.** A lane declares the steps it intends to take; all are checked before the first one runs, and the plan is stored on the run. Each step is still checked again when it executes, because a user's standing and an ad's state can change in between.
 
+**The agent loop shows this working.** In `POST /agent` the model picks its own tools. Nothing in its prompt can widen what it may do: each turn and each tool call goes through the same five checks, and approve and release are offered to it precisely so the gate can be seen refusing them. The refusal is returned to the model as a fact it has to report, and it is on the ledger with `initiator: agent`.
+
 `POST /authorize` answers "could this be done, and which check decides" without doing it or writing anything. It calls the same function as the real action.
 
 ## The audit trail

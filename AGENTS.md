@@ -50,6 +50,7 @@ backend/
   app/models.py      shared shapes (docs/CONTRACTS.md section 6)
   app/core/          config.py  db.py  security.py  gate.py  llm.py  embeddings.py
   app/agent/         graph.py (route -> lane)  lanes.py (review, regenerate, memory update, ask)  prompts.py
+                     agent_loop.py (POST /agent: the model picks gated tools until it replies)
   app/services/      compliance.py  compliance_rules.py  confidence.py   the review; the last two are pure
                      fundamentals.py  offers.py  memory.py  campaigns.py  media.py
                      mongo_sources.py  fixture_sources.py                where a review reads from
@@ -84,7 +85,7 @@ Edit only the files your area owns.
 5. **Shared database.** Everyone works against the same Atlas cluster. Never drop collections or indexes. Never run an unfiltered delete or update. Schema, validator and index changes go only through `backend/scripts/setup_db.py`, which must stay idempotent. For destructive experiments set `MONGODB_DB=greenlight_<yourname>`.
 6. **The repo is public. Never commit secrets.** No keys, passwords or connection strings in code, docs, tests, PR text or commit messages. `.env` is gitignored.
 7. **Do not change the embedding model or its dimensions** (`voyage-3.5`, 1024). The vector indexes depend on it.
-8. **Follow the token rules** in `docs/FLOWS.md`: deny before spending, one intent → one lane with no tool schemas sent to the model, filter before retrieving, summaries not documents, code before model, fast model for everything except the compliance verdict.
+8. **Follow the token rules** in `docs/FLOWS.md`: deny before spending, one intent → one lane with no tool schemas sent to the model, filter before retrieving, summaries not documents, code before model, fast model for everything except the compliance verdict. **The one exception is `POST /agent`** (`app/agent/agent_loop.py`): there the model chooses among a fixed set of tools, each of which is an existing gated lane or service run as the agent; tool results are summaries, and the loop is capped by turns and by the run budget.
 9. **No Streamlit, no new frameworks, no extra services.** The stack in `docs/ARCHITECTURE.md` is fixed.
 10. **Original work only.** Do not paste code from other projects. Use only the fictional bank and card (Tamarack Bank, Tamarack Cashback Card) and stock ElevenLabs voices; no real institutions, card networks, people, voices or likenesses in seed data or demos.
 11. **P0 before anything else.** Do not start a P1 or P2 task while a P0 task in your stream is open. Nothing new after the feature freeze at T+3:15.
@@ -121,7 +122,7 @@ Trunk-based. `main` must always start.
 ```bash
 # backend (Python 3.12 or later; the system python3 on macOS is too old)
 cd backend && python3.13 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
-pytest                           # 77 offline tests, no keys or database needed
+pytest                           # 81 offline tests, no keys or database needed
 python -m scripts.dry_run --suite   # live: every past ad against its recorded decision, no database needed
 python -m scripts.dry_run --image ../northplay-demo-data/demo_ads/demo_03_play_smart_breaks.png --channel "Instagram (paid social)"
 python -m scripts.dry_run --video ../northplay-demo-data/demo_ads/demo_04_hockey_night_video.mp4 --channel "YouTube (paid video)"

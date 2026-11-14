@@ -43,7 +43,7 @@ RUN_STALE_SECONDS = int(os.environ.get("RUN_STALE_SECONDS", "120"))
 DEFAULT_LIMITS = {"steps": 60, "model_calls": 20, "tokens": 200000, "external_calls": 8}
 RESUMABLE = ("interrupted", "error")
 # Only these appear in the default audit view; the rest are detail (`/audit?detail=true`).
-CORE_EVENTS = ["decision", "outcome", "stop", "rollback", "checkpoint", "crash_detected", "resume"]
+CORE_EVENTS = ["decision", "outcome", "stop", "rollback", "checkpoint", "crash_detected", "resume", "tool_call"]
 
 # The rule for each action beyond "which roles hold it". These are the defaults; a document in
 # `action_rules` with the same _id replaces the default for that action, so the rules can be read
@@ -66,6 +66,7 @@ DEFAULT_RULES: dict[str, dict] = {
     "run.stop": {"initiators": HUMAN},
     "run.rollback": {"initiators": HUMAN},
     "audit.read": {"initiators": HUMAN},
+    "agent.run": {"initiators": ["human", "agent"], "note": "One turn of the agent loop: the model reads the results so far and picks its next tool. Each tool it picks is authorised on its own."},
     "user.access": {"initiators": HUMAN, "preconditions": ["same_team"], "step_up": "always", "note": "Disable or re-enable a team member. Takes effect at the next step of anything they have running."},
 }
 
@@ -233,6 +234,26 @@ class _Context:
 
 
 _current: contextvars.ContextVar[Optional[_Context]] = contextvars.ContextVar("gate_context", default=None)
+_step_prefix: contextvars.ContextVar[str] = contextvars.ContextVar("gate_step_prefix", default="")
+
+
+class step_scope:
+    """Namespaces step keys, so a lane run twice in one run (an agent reviewing the original and
+    then the corrected ad) checkpoints each pass separately instead of reusing the first."""
+
+    def __init__(self, prefix: str):
+        self.prefix = prefix
+
+    def __enter__(self):
+        self._token = _step_prefix.set(_step_prefix.get() + self.prefix)
+        return self
+
+    def __exit__(self, *exc):
+        _step_prefix.reset(self._token)
+
+
+def _key(step_key: Optional[str]) -> Optional[str]:
+    return _step_prefix.get() + step_key if step_key else step_key
 _initiator: contextvars.ContextVar[str] = contextvars.ContextVar("gate_initiator", default="human")
 
 
@@ -549,6 +570,7 @@ def preflight(identity: Identity, run_id: str, actions: list[str], *, thread_id:
 def step_result(run_id: str, step_key: str, db=None) -> Any:
     """The stored result of a step this run has completed, or None. For steps that only compute."""
     db = db if db is not None else get_db()
+    step_key = _key(step_key)
     run = db.runs.find_one({"_id": run_id}, {f"steps.{step_key}": 1})
     step = ((run or {}).get("steps") or {}).get(step_key) or {}
     return step.get("result") if step.get("status") == "done" else None
@@ -557,11 +579,12 @@ def step_result(run_id: str, step_key: str, db=None) -> Any:
 def steps_done(run_id: str, db=None) -> set[str]:
     db = db if db is not None else get_db()
     run = db.runs.find_one({"_id": run_id}, {"steps": 1}) or {}
-    return {k for k, v in (run.get("steps") or {}).items() if v.get("status") == "done"}
+    prefix = _step_prefix.get()
+    return {k[len(prefix):] for k, v in (run.get("steps") or {}).items() if v.get("status") == "done" and k.startswith(prefix)}
 
 
 def save_step(run_id: str, step_key: str, result: Any, db=None) -> None:
-    _checkpoint(db if db is not None else get_db(), run_id, step_key, result, None)
+    _checkpoint(db if db is not None else get_db(), run_id, _key(step_key), result, None)
 
 
 # ---------------------------------------------------------------- the gate
@@ -606,6 +629,7 @@ def guarded(
       - otherwise it runs, and its result is stored (`dump` and `load` convert it to and from storage).
     """
     db = db if db is not None else get_db()
+    step_key = _key(step_key)
     safe_params = redact(params)
     span_id = uuid.uuid4().hex[:16]
     base = {"thread_id": thread_id, "auth_method": auth_method}

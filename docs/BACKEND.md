@@ -90,11 +90,25 @@ A lane declares its steps up front; all are checked before the first runs, and t
 
 **Video** goes through the same flow: speech is transcribed, six frames are read for on-screen text, and the review runs on that. Nothing is marked on a video and a video is not regenerated.
 
+## The agent (`POST /agent`)
+
+Everything else in the backend is a fixed flow: code picks the steps, the model fills them in. `POST /agent` is the one place the model picks its own next step. It is given a goal and eight tools: find an ad, review an ad, review pasted copy, read a regulation, search memory, regenerate (update) an ad, approve, release. It calls them one at a time until it replies, for at most 8 turns.
+
+- **Each turn is a gated step** (`agent.run`): the user is re-read, the run budget is checked and a stop request takes effect before the model is asked.
+- **Each tool is an existing lane or service, run as the agent**, so the five checks apply to every call. Approve and release are offered on purpose: the gate refuses them (`decided_by: initiator`), the refusal goes back to the model as the tool's result, and the model has to say so.
+- **When the review calls for changes, the agent updates the ad.** `regenerate_ad` files the next version only after the corrected copy has passed the same review, renders the banner in code, and with `voice: true` records a voice-over of the passing copy with an ElevenLabs stock voice. An ad that passes as it is is left alone.
+- **Verdicts are still computed in code** inside `review_ad`; the model reports them.
+- Each tool call is a `tool_call` event on the ledger; `/runs/{id}/trace`, `/audit/verify` and `/runs/{id}/rollback` work on agent runs as on any other. Agent runs are not resumable after a crash (the lanes inside them keep their own checkpoints).
+
+Request `{ goal, campaign_id?, run_id?, max_turns? }`. Response `{ reply, status, steps: [{ turn, tool, input, status, summary }], turns, campaign, report, voiceover_url, run_id, tokens }`. `status` is `completed`, `denied`, `stopped` or `incomplete` (turn cap reached). `AGENT_MODEL=main` runs the loop on the verdict model instead of the fast one.
+
+`POST /campaigns/{id}/regenerate` also accepts `voice: true`. The ad card gains `voiceover: { url, mime }`.
+
 ## Verified
 
 | Check | Result |
 |---|---|
-| Offline tests (`pytest`) | 77 pass: the original 52, and 25 for round two (`tests/test_round_two.py`). They run on the earlier fictional-bank fixtures in `tests/fixtures/`, which exercise every code path including offer records |
+| Offline tests (`pytest`) | 81 pass: the original 52, 25 for round two (`tests/test_round_two.py`) and 4 for the agent (`tests/test_agent.py`). They run on the earlier fictional-bank fixtures in `tests/fixtures/`, which exercise every code path including offer records |
 | The 15 past ads (`scripts/dry_run.py --suite`), each reviewed without the memory of its own decision | 14 match the recorded decision. `NP-H05` comes back stricter (below) |
 | The 3 demo ads, uploaded as images through the API | Demo 1 approved. Demo 2 rejected on `REG-12`, `REG-13` and a Slack decision. Demo 3 rejected on the Jake Moreau decision alone, with no regulation cited; replayed without memory it is not rejected |
 | Live end to end on Atlas (`scripts/smoke.py`, on a scratch copy) | The 39 checks from before round two: 39 of 39 with round two in place, script unchanged. With the 15 round-two checks added: 54 of 54 |
@@ -105,6 +119,7 @@ A lane declares its steps up front; all are checked before the first runs, and t
 | Flaw highlights, by eye | Demo 2, demo 3 and `NP-H12`: each box sat on the words or element the finding is about. Three ads is a small sample |
 | Video (a 7-second test clip made for this, with speech and on-screen text) | Speech transcribed (21 words), 6 frames read, rejected on `REG-12` twice, `REG-13` and the Slack ban on "risk-free"; filed as a video; a follow-up question answered from it; regenerate declined as designed. 35 s |
 | The demo video `demo_04_hockey_night_video.mp4` (15 s, `scripts/dry_run.py --video`, no database) | 6 frames read, the voice-over transcribed, approved with no findings. Confidence 75 because of the video discount, which is under the bar of 80, so it is routed to a person. 12 s after reading. The frames show the word "Honda" on the rink boards; worth a look by the data owner, since the data set is meant to carry no real brands |
+| The agent, live (`POST /agent` as a manager, demo 3 in the library) | Goal: "Review the Play Smart breaks ad. If the policy calls for changes, update it, and then approve it for release." It chose: find the ad, review it (rejected on the Jake Moreau Slack decision, with the `REG-03` exception noted as overridden), regenerate with a voice-over (version 2 passed), approve (refused by the gate, `decided_by: initiator`). The reply cited the decision, its authors and date, the new version and the voice-over, and pointed to the Approve button. 5 turns, 109 s, 47,000 input tokens. The voice-over, transcribed back with ElevenLabs, says exactly the passing copy. Ledger chain intact (51 events) |
 | The agent asked to approve (a manager, in chat, live) | Refused, with `decided_by: initiator` on the ledger |
 | Consolidation (live) | Four drafts from the seeded past verdicts (`REG-14` from 7, `REG-12` from 5, `REG-09` from 4, `REG-06` from 3). Each read as a fair summary; none was saved |
 | Regenerate | Demo 3 is regenerated as a new banner without the athlete and passes the same review |

@@ -51,6 +51,7 @@ def card(c: dict) -> dict:
         "offer_id": c.get("offer_id"), "region": c.get("region"), "channel": c.get("channel"), "language": c.get("language"),
         "version": c.get("version", 1), "status": c.get("status"), "modality": c.get("modality", "text"), "text": c.get("text"),
         "asset": {"type": assets[0]["type"], "url": f"/assets/{assets[0]['file_id']}"} if assets else None,
+        "voiceover": next(({"url": f"/assets/{a['file_id']}", "mime": a.get("mime")} for a in assets if a.get("role") == "voiceover"), None),
         "summary": c.get("summary"), "facts": c.get("facts"), "source": c.get("source"), "derived_from": c.get("derived_from"),
         "compliance_verdict": compliance.get("verdict"), "confidence_band": (compliance.get("confidence") or {}).get("band"),
         "route": compliance.get("route"), "approved": bool(c.get("approval")), "created_at": c.get("created_at"),
@@ -107,7 +108,7 @@ def submit(
     identity: Identity, run_id: str, *, name: Optional[str], text: str, ctx: dict, facts: dict, summary: str, description: str,
     modality: str, file_id: Optional[str], mime: Optional[str], compliance: ComplianceReport, cache_key: Optional[str] = None,
     campaign_id: Optional[str] = None, source: str = "submitted", derived_from: Optional[int] = None,
-    vector: Optional[list[float]] = None, step_key: Optional[str] = None, db=None,
+    vector: Optional[list[float]] = None, step_key: Optional[str] = None, extra_assets: Optional[list[dict]] = None, db=None,
 ) -> dict:
     """File an ad, or the next version of one. A new version always clears the approval.
 
@@ -120,6 +121,7 @@ def submit(
     def apply() -> dict:
         report = {**compliance.model_dump(), "checked_at": _now(), "cache_key": cache_key}
         assets = [{"type": modality, "file_id": file_id, "mime": mime}] if file_id and modality in ("audio", "image", "video") else []
+        assets += extra_assets or []  # e.g. a spoken version of an image or text ad
         fields = {
             "text": text, "visual_notes": ctx.get("visual_notes"), "summary": summary, "description": description, "facts": facts,
             "assets": assets, "modality": modality, "language": ctx.get("language") or facts.get("language") or "en",
@@ -285,7 +287,7 @@ def rollback(ref: dict, db=None) -> str:
         return "a later version exists; nothing undone"
     for asset in c.get("assets") or []:
         if c.get("source") == "regenerated":
-            media.delete(asset["file_id"], db)
+            media.delete(asset["file_id"], db)  # the rendering and any voice-over
     history = c.get("history") or []
     if not history:
         db.campaigns.update_one({"_id": c["_id"]}, {"$set": {"status": "rolled_back"}, "$unset": {"approval": ""}})

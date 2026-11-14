@@ -74,7 +74,7 @@ Dates must be stored as BSON dates, not strings. The TTL index and the effective
     "actions": { "bsonType": "array", "items": { "enum": [
       "compliance.check", "campaign.submit", "asset.regenerate", "campaign.approve", "campaign.release",
       "campaign.search", "campaign.ask", "fundamentals.read", "fundamentals.update", "fundamentals.review",
-      "memory.read", "memory.write", "memory.forget", "run.stop", "run.rollback", "audit.read", "user.access" ] } },
+      "memory.read", "memory.write", "memory.forget", "run.stop", "run.rollback", "audit.read", "user.access", "agent.run" ] } },
     "updated_at": { "bsonType": "date" } } }
 ```
 
@@ -218,7 +218,7 @@ Optional fields added in round two: `strength` (1.0 when absent; see `docs/DESIG
                       "role": { "enum": ["manager", "marketer", "sales"] },
                       "team": { "bsonType": "string" } } },
     "event": { "enum": ["decision", "outcome", "stop", "rollback", "checkpoint", "crash_detected", "resume",
-                        "model_call", "retrieval", "finding", "conflict", "attribution"] },
+                        "model_call", "retrieval", "finding", "conflict", "attribution", "tool_call"] },
     "action": { "bsonType": "string" },
     "decision": { "enum": ["allow", "deny"] },
     "seq": { "bsonType": ["int", "long"], "minimum": 0 },
@@ -233,9 +233,9 @@ Optional fields added in round two: `strength` (1.0 when absent; see `docs/DESIG
 { "bsonType": "object", "required": ["_id", "actor", "status", "started_at"],
   "properties": {
     "_id": { "bsonType": "string" },
-    "intent": { "enum": ["review", "regenerate", "memory_update", "ask", "approve", "release"] },
+    "intent": { "enum": ["review", "regenerate", "memory_update", "ask", "approve", "release", "agent"] },
     "status": { "enum": ["running", "completed", "blocked", "needs_input", "denied",
-                         "stop_requested", "stopped", "rolled_back", "error", "interrupted"] },
+                         "stop_requested", "stopped", "rolled_back", "error", "interrupted", "incomplete"] },
     "started_at": { "bsonType": "date" } } }
 ```
 

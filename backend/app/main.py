@@ -37,7 +37,7 @@ class RequestStartsAsHuman:
 
 app.add_middleware(RequestStartsAsHuman)
 
-for name in ("auth", "chat", "compliance", "campaigns", "assets", "fundamentals", "memories", "audit", "runs", "governance"):
+for name in ("auth", "chat", "compliance", "campaigns", "assets", "fundamentals", "memories", "audit", "runs", "governance", "agent"):
     app.include_router(importlib.import_module(f"app.routers.{name}").router)
 
 

@@ -18,7 +18,8 @@
       "run.stop",
       "run.rollback",
       "audit.read",
-      "user.access"
+      "user.access",
+      "agent.run"
     ]
   },
   {
@@ -35,7 +36,8 @@
       "memory.write",
       "memory.forget",
       "run.stop",
-      "audit.read"
+      "audit.read",
+      "agent.run"
     ]
   },
   {

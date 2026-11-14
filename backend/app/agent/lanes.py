@@ -279,13 +279,17 @@ def _memory_chips(ids: list[str], db) -> list[dict]:
 AD_SNAPSHOT = ("_id", "name", "text", "version", "modality", "language", "product", "offer_id", "region", "channel", "budget", "compliance", "team")
 
 
-def regenerate_lane(identity: Identity, run_id: str, *, campaign_id: str, usage: Optional[llm.TokenUsage] = None, thread_id: Optional[str] = None, sources: Optional[Sources] = None, db=None) -> dict:
-    """Produce the next version of an ad that passes the same review, in the ad's own form. Fails closed."""
+def regenerate_lane(identity: Identity, run_id: str, *, campaign_id: str, usage: Optional[llm.TokenUsage] = None, thread_id: Optional[str] = None, sources: Optional[Sources] = None, voice: bool = False, db=None) -> dict:
+    """Produce the next version of an ad that passes the same review, in the ad's own form. Fails closed.
+
+    With `voice`, an image or text ad also gets a spoken version of the corrected copy, made with
+    ElevenLabs from the copy that passed (an audio ad is already re-recorded with ElevenLabs).
+    """
     with gate.acting_as("agent"):
-        return _regenerate(identity, run_id, campaign_id=campaign_id, usage=usage, thread_id=thread_id, sources=sources, db=db)
+        return _regenerate(identity, run_id, campaign_id=campaign_id, usage=usage, thread_id=thread_id, sources=sources, voice=voice, db=db)
 
 
-def _regenerate(identity, run_id, *, campaign_id, usage, thread_id, sources, db) -> dict:
+def _regenerate(identity, run_id, *, campaign_id, usage, thread_id, sources, voice, db) -> dict:
     db = db if db is not None else get_db()
     sources = sources or default_sources()
     usage = usage or llm.TokenUsage()
@@ -354,6 +358,23 @@ def _regenerate(identity, run_id, *, campaign_id, usage, thread_id, sources, db)
             summarize=lambda r: {"status": "ok", "summary": "Rendered the corrected copy on the brand template", "ref": {"collection": "fs.files", "id": r[0]}},
         )
 
+    # 2b. A spoken version, only of copy that has passed, never instead of the ad's own form.
+    extra_assets = []
+    if voice and modality in ("image", "text"):
+        voice_tag = {**tag, "kind": "voiceover"}
+
+        def adopt_voice() -> Optional[str]:
+            made = media.run_files(run_id, "voiceover", db)
+            return str(made[0]["_id"]) if made else None
+
+        voice_id = gate.guarded(
+            identity, "asset.regenerate", {**params, "step": "voiceover", "language": language, "text": outcome.copy}, run_id,
+            lambda: media.synthesize_speech(outcome.copy, language, db, metadata=voice_tag), thread_id=thread_id, db=db,
+            step_key="voiceover", adopt=adopt_voice,
+            summarize=lambda f: {"status": "ok", "summary": "Recorded the corrected copy with an ElevenLabs stock voice", "ref": {"collection": "fs.files", "id": f}},
+        )
+        extra_assets.append({"type": "audio", "file_id": voice_id, "mime": "audio/mpeg", "role": "voiceover"})
+
     # 3. File it as the next version, with the passing report. It still needs approval.
     ex = outcome.review.extraction
     episodic = f"The corrected version of the {identity.team} {ad.get('channel')} ad '{ad.get('name')}' for {ad.get('offer_id')} passed review."
@@ -364,7 +385,8 @@ def _regenerate(identity, run_id, *, campaign_id, usage, thread_id, sources, db)
     new = campaigns.submit(
         identity, run_id, name=ad.get("name"), text=outcome.copy, ctx=ctx, facts=ex.facts().model_dump(), summary=ex.summary,
         description=ex.description, modality=modality, file_id=file_id, mime=mime, compliance=passing, cache_key=outcome.review.cache_key,
-        campaign_id=campaign_id, source="regenerated", derived_from=ad.get("version", 1), vector=ad_vector, step_key="file", db=db,
+        campaign_id=campaign_id, source="regenerated", derived_from=ad.get("version", 1), vector=ad_vector, step_key="file",
+        extra_assets=extra_assets, db=db,
     )
     memory.remember(identity, run_id, kind="episodic", text=episodic, scope={"team": identity.team, "user_id": None}, ttl_days=EPISODIC_TTL_DAYS, source_type="agent", vector=memory_vector, step_key="remember", db=db)
     return {

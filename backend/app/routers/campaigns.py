@@ -17,6 +17,7 @@ router = APIRouter(tags=["library"])
 class Feedback(BaseModel):
     feedback: Optional[str] = None
     run_id: Optional[str] = None
+    voice: bool = False  # regenerate only: also record the corrected copy with ElevenLabs
 
 
 def _run(identity: Identity, intent: str, run_id: Optional[str], summary: str) -> str:
@@ -80,7 +81,7 @@ def execute_regenerate(identity: Identity, run_id: str, request: dict) -> dict:
     """Regenerate an ad. Also what a resumed run calls, with the request it stored."""
     usage = llm.TokenUsage()
     try:
-        out = lanes.regenerate_lane(identity, run_id, campaign_id=request["campaign_id"], usage=usage)
+        out = lanes.regenerate_lane(identity, run_id, campaign_id=request["campaign_id"], usage=usage, voice=request.get("voice", False))
     except gate.SimulatedCrash:
         raise
     except Exception:
@@ -93,7 +94,7 @@ def execute_regenerate(identity: Identity, run_id: str, request: dict) -> dict:
 @router.post("/campaigns/{campaign_id}/regenerate")
 def regenerate(campaign_id: str, body: Feedback = Feedback(), identity: Identity = Depends(security.current_identity), x_crash_after: Optional[str] = Header(None)) -> dict:
     run_id = body.run_id or str(uuid.uuid4())
-    request = {"kind": "regenerate", "campaign_id": campaign_id}
+    request = {"kind": "regenerate", "campaign_id": campaign_id, "voice": body.voice}
     gate.open_run(identity, run_id, intent="regenerate", input_summary=campaign_id, request=request, crash_after=x_crash_after)
     return execute_regenerate(identity, run_id, request)
 
