@@ -5,7 +5,7 @@ import importlib
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 
 from app.core import gate, llm, security
 from app.core.config import get_settings
@@ -26,6 +26,10 @@ app.add_middleware(
 for name in ("auth", "chat", "compliance", "campaigns", "assets", "fundamentals", "memories", "audit", "runs"):
     app.include_router(importlib.import_module(f"app.routers.{name}").router)
 
+
+@app.get("/", include_in_schema=False)
+def website():
+    return RedirectResponse("http://127.0.0.1:3000/", status_code=307)
 
 @app.get("/health")
 def health() -> dict:

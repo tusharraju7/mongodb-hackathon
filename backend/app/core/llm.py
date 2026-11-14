@@ -57,6 +57,9 @@ class TokenUsage:
 
 
 def build_model(name: str, effort: str):
+    if name.startswith("codex:"):
+        from app.core.codex_cli import CodexModel
+        return CodexModel(name.split(":", 1)[1], effort)
     if name.startswith("openai:"):
         if not os.environ.get("OPENAI_API_KEY"):
             raise ModelFailed("OpenAI is not configured. Add OPENAI_API_KEY to the server environment and restart the backend.")
@@ -129,6 +132,9 @@ def call_structured(
     The run id and intent are attached as trace metadata so a ledger entry can be matched to its
     LangSmith trace. Never pass a password or a raw audio file through here.
     """
+    from app.core.codex_cli import CodexModel
+    if isinstance(model, CodexModel):
+        return model.call(schema, system=system, user=user, label=label, usage=usage)
     runnable = model.with_structured_output(schema, method="json_schema", include_raw=True)
     config = {
         "run_name": label,

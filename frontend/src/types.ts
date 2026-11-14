@@ -16,5 +16,5 @@ export type CheckResult = Partial<Report> & {run_id: string; campaign: Campaign 
 export type ChatResult = {reply: string; run_id: string; status: string; cards: ({type: 'compliance_report'; data: Report} | {type: 'campaign'; data: Campaign} | {type: string; data: unknown})[]; memories_used?: {id: string; kind: string; text: string}[]};
 export type Message = {id: string; role: 'user' | 'assistant' | 'lawyer'; text: string; createdAt?: string};
 export type TrailEntry = {at: string; text: string};
-export type Review = {key: string; name: string; image?: string; text?: string; fileName?: string; report?: Report; readiness?: number; status: Status; campaignId?: string; version: number; demoId?: 'hockey' | 'bonus' | 'breaks'; trail: TrailEntry[]; chats?: Partial<Record<ViewRole,Message[]>>; messages: Message[]};
+export type Review = {savedResult?: {model: string; generatedAt: string; claudeDecision: string; seconds: number}; key: string; name: string; image?: string; text?: string; fileName?: string; report?: Report; readiness?: number; status: Status; campaignId?: string; version: number; demoId?: 'hockey' | 'bonus' | 'breaks'; trail: TrailEntry[]; chats?: Partial<Record<ViewRole,Message[]>>; messages: Message[]};
 export type Region = {left: number; top: number; width: number; height: number};
