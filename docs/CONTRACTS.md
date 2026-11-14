@@ -4,21 +4,33 @@ Frozen interfaces between streams. Change this file only in a tiny dedicated PR 
 
 Database: `greenlight` on the shared Atlas Sandbox cluster. Ids are ObjectIds unless stated; over the API they are strings. Timestamps are UTC datetimes.
 
+Scope: UC1 review existing creative, UC4 memory updates, UC5 questions about an ad. See [FLOWS.md](FLOWS.md).
+
 ## 1. Identity
 
 ```
-Identity = { user_id: str, email: str, name: str, role: "manager" | "marketer" | "sales", team: "emea" | "us" }
+Identity = { user_id: str, email: str, name: str, role: "manager" | "marketer" | "sales", team: "national" | "quebec" }
 ```
 Built from the JWT by `core/security.py::current_identity`. Never taken from a request body or model output.
 
-## 2. Collections
+## 2. Regions
+
+Ads carry `region: "CA" | "CA-QC"`. Rules carry `region: "global" | "CA" | "CA-QC"`.
+
+```python
+def regions_for(ad_region: str) -> list[str]
+#   "CA"    → ["global", "CA"]
+#   "CA-QC" → ["global", "CA", "CA-QC"]
+```
+
+## 3. Collections
 
 ### `users`
 ```
 { _id, email (unique), name, role, team, password_hash, created_at }
 ```
 
-### `policies` — the RBAC matrix
+### `policies` — the role permission matrix
 ```
 { _id: "<role>", actions: ["compliance.check", ...], updated_at }
 ```
@@ -26,9 +38,8 @@ Built from the JWT by `core/security.py::current_identity`. Never taken from a r
 | Action | manager | marketer | sales |
 |---|---|---|---|
 | `compliance.check` | yes | yes | |
-| `asset.generate` | yes | yes | |
+| `campaign.submit` | yes | yes | |
 | `campaign.search` | yes | yes | yes (approved only) |
-| `campaign.compare` | yes | yes | yes (approved only) |
 | `campaign.ask` | yes | yes | yes (approved only) |
 | `campaign.approve` | yes | | |
 | `fundamentals.read` | yes | yes | |
@@ -45,36 +56,37 @@ Built from the JWT by `core/security.py::current_identity`. Never taken from a r
 
 ### `fundamentals` — company rules (semantic memory)
 ```
-{ _id, key (unique, e.g. "regional.de.superlatives"),
+{ _id, key (unique, e.g. "regional.ca.origin_claims"),
   category: "brand" | "company_policy" | "budget" | "regional" | "consent" | "legal",
-  region: "global" | "DE" | "US" | ...,
+  region: "global" | "CA" | "CA-QC",
   title, text, summary (<= 60 words),
-  rule?: { type: "budget_cap", team, max, currency }
-       | { type: "voice_allowlist", voice_ids: [str] }
+  rule?: { type: "budget_cap", team, max, currency: "CAD" }
        | { type: "banned_terms", terms: [str] }
        | { type: "required_line", region, channel, line },
   version: int, embedding: [float x 1024],
   updated_by: user_id, updated_at }
 ```
 
-Seed set (fictional company policy for Solstice Coffee Co.; illustrative, not legal advice):
+Seed set. This is fictional company policy for Solstice Coffee Co., loosely modelled on Canadian advertising practice. It is illustrative and not legal advice.
 
-| key | category | region | hard rule |
-|---|---|---|---|
-| `brand.voice_tone` | brand | global | |
-| `brand.naming_and_tagline` | brand | global | |
-| `brand.voice_allowlist` | brand | global | `voice_allowlist` |
-| `policy.claims_substantiation` | company_policy | global | |
-| `policy.competitor_mentions` | company_policy | global | `banned_terms` |
-| `budget.cap.emea` | budget | global | `budget_cap` |
-| `budget.cap.us` | budget | global | `budget_cap` |
-| `regional.de.superlatives` | regional | DE | |
-| `regional.de.price_indication` | regional | DE | |
-| `regional.us.endorsement_disclosure` | regional | US | |
-| `consent.voice_and_likeness` | consent | global | |
-| `consent.customer_testimonials` | consent | global | |
-| `legal.health_claims` | legal | global | |
-| `legal.ai_generated_disclosure` | legal | global | |
+| key | category | region | hard rule | In one line |
+|---|---|---|---|---|
+| `brand.voice_tone` | brand | global | | Warm, plain, unhurried; no hype |
+| `brand.naming_and_tagline` | brand | global | | How the brand name and taglines are written |
+| `policy.claims_substantiation` | company_policy | global | | No "best", "number one" or similar without evidence on file |
+| `policy.competitor_mentions` | company_policy | global | `banned_terms` | Do not name competitors |
+| `budget.cap.national` | budget | global | `budget_cap` | Per-campaign cap for the national team, in CAD |
+| `budget.cap.quebec` | budget | global | `budget_cap` | Per-campaign cap for the Quebec team, in CAD |
+| `regional.ca.origin_claims` | regional | CA | | Do not say "Product of Canada" or "Made in Canada"; say "Roasted in Canada from imported beans" |
+| `regional.ca.all_in_pricing` | regional | CA | | Advertised prices include all mandatory fees |
+| `regional.ca.contests` | regional | CA | | Contest ads state "No purchase necessary" and point to the rules |
+| `regional.ca.email_consent` | regional | CA | `required_line` | Email ads go only to consenting recipients and carry an unsubscribe line |
+| `regional.qc.french_language` | regional | CA-QC | | Quebec ads are in French, or French is clearly predominant |
+| `regional.qc.children_under_13` | regional | CA-QC | | No advertising directed at children under 13 in Quebec |
+| `consent.voice_and_likeness` | consent | global | | No real person's name, voice or likeness without written consent on file |
+| `consent.customer_testimonials` | consent | global | | Testimonials are genuine, current and used with permission |
+| `legal.health_claims` | legal | global | | No health benefit claims for coffee |
+| `legal.environmental_claims` | legal | CA | | No "green", "carbon neutral" or similar without evidence on file |
 
 ### `fundamentals_versions`
 ```
@@ -87,13 +99,13 @@ Seed set (fictional company policy for Solstice Coffee Co.; illustrative, not le
 { _id, ts, run_id, thread_id,
   actor: { user_id, email, role, team },
   event: "decision" | "outcome" | "stop" | "rollback",
-  action: "<action from the RBAC matrix>",
+  action: "<action from the permission matrix>",
   params: { ...redacted summary, never passwords or raw audio... },
   decision?: "allow" | "deny", reason?: str,
   policy_refs?: [ { key, version } ],
   memories_used?: [ memory_id ],
   result?: { status: "ok" | "blocked" | "error", summary, ref?: { collection, id } },
-  undo?: { type: "campaign.rollback" | "memory.forget" | "fundamental.restore", ref },
+  undo?: { type: "fundamental.restore" | "memory.revert" | "campaign.rollback", ref },
   auth: { method: "jwt" | "jwt+password" },
   tokens?: { in, out } }
 ```
@@ -101,21 +113,25 @@ Validator (`$jsonSchema`): `ts`, `run_id`, `actor.user_id`, `actor.role`, `event
 
 ### `runs`
 ```
-{ _id: run_id (uuid string, generated by the client), thread_id, actor, input, intent,
+{ _id: run_id (uuid string, generated by the client), thread_id, actor, input,
+  intent: "review" | "memory_update" | "ask",
   status: "running" | "completed" | "blocked" | "denied" | "stop_requested" | "stopped" | "rolled_back" | "error",
   memory_enabled: bool, memories_used: [memory_id], tokens: { in, out },
   started_at, ended_at }
 ```
 
-### `campaigns`
+### `campaigns` — the ad library
 ```
-{ _id, team, name, brief, region, channel, budget: { amount, currency },
-  script, summary (<= 60 words), description (what a viewer or listener would remember),
-  facts: { cta, claims: [str], tone, duration_seconds, voice_id },
-  assets: [ { type: "audio", file_id, mime: "audio/mpeg", voice_id } ],
+{ _id, team, name, region: "CA" | "CA-QC", channel: "radio" | "podcast" | "social" | "email",
+  language: "en" | "fr", budget: { amount, currency: "CAD" },
+  text (ad copy, or the transcript of an audio ad),
+  summary (<= 60 words), description (what a listener or viewer would remember),
+  facts: { cta, offer, claims: [str], tone, language },
+  assets: [ { type: "audio", file_id, mime: "audio/mpeg" } ],
+  source: "seed" | "submitted",
   status: "pending_review" | "approved" | "rejected" | "rolled_back",
   compliance: { verdict, violations: [...], checked_at, cache_key },
-  embedding: [float x 1024]   // of description + summary
+  embedding: [float x 1024],   // of description + summary
   created_by, approved_by?, review_feedback?, run_id, created_at }
 ```
 
@@ -136,7 +152,7 @@ Validator (`$jsonSchema`): `ts`, `run_id`, `actor.user_id`, `actor.role`, `event
 - `checkpoints`, `checkpoint_writes` — LangGraph `MongoDBSaver`.
 - `fs.files`, `fs.chunks` — GridFS audio.
 
-## 3. Indexes
+## 4. Indexes
 
 Vector indexes (type `vectorSearch`, cosine, 1024 dimensions, path `embedding`):
 
@@ -156,7 +172,7 @@ Vector indexes (type `vectorSearch`, cosine, 1024 dimensions, path `embedding`):
 
 Regular indexes: `users.email` unique; `fundamentals.key` unique; `ledger {run_id: 1, ts: 1}`; `ledger {"actor.user_id": 1, ts: -1}`; `memories.expires_at` TTL with `expireAfterSeconds: 0`; `campaigns {team: 1, status: 1, created_at: -1}`.
 
-## 4. Service signatures (cross-stream calls)
+## 5. Service signatures (cross-stream calls)
 
 ```python
 # core/gate.py  (A)
@@ -175,58 +191,68 @@ def embed_documents(texts: list[str]) -> list[list[float]]
 def embed_query(text: str) -> list[float]
 
 # core/llm.py  (B)
-def main_model()   # script writing
-def fast_model()   # router, judge, Q&A, extraction
+def main_model()   # compliance verdict only
+def fast_model()   # router, Q&A, extraction, drafting
 
 # services/compliance.py  (B)
-def check(text: str, ctx: dict, identity, run_id: str) -> ComplianceReport
-#   ctx = { region, channel, budget: {amount, currency}, voice_id?, campaign_id? }
+def check(text: str, ctx: dict, identity, run_id: str, *, use_memory: bool = True) -> ComplianceReport
+#   ctx = { region, channel, language?, budget?: {amount, currency}, campaign_id? }
 
 # services/memory.py  (C)
 def recall(identity, query: str, *, kinds: list[str], k: int = 3) -> list[Memory]
-def remember(identity, run_id, *, kind, text, scope, ttl_days: int | None, source_type) -> Memory
-def correct(identity, run_id, memory_id, new_text: str) -> Memory
-def forget(identity, run_id, memory_id, reason: str) -> None
+def remember(identity, run_id, *, kind, text, scope, ttl_days: int | None, source_type,
+             auth_method: str = "jwt") -> Memory
+def correct(identity, run_id, memory_id, new_text: str, *, auth_method: str = "jwt") -> Memory
+def forget(identity, run_id, memory_id, reason: str, *, auth_method: str = "jwt") -> None
 
 # services/campaigns.py  (C)
-def create(identity, run_id, *, name, brief, ctx, script, file_id, compliance) -> Campaign
-def search(identity, query: str, *, k: int = 4) -> list[CampaignCard]   # role/team/status filtered
+def submit(identity, run_id, *, name, text, ctx, file_id: str | None, compliance) -> Campaign
+def search(identity, query: str, *, k: int = 1) -> list[CampaignCard]   # role/team/status filtered
 def get(identity, campaign_id) -> Campaign
 def set_status(identity, run_id, campaign_id, status, feedback: str | None) -> Campaign
 
-# services/generation.py  (C)
-def create_voiceover(script: str, voice_id: str) -> str   # returns GridFS file_id
+# services/audio.py  (C)
+def store_audio(data: bytes, mime: str) -> str      # returns GridFS file_id
+def transcribe(file_id: str) -> str                 # ElevenLabs Scribe
 
 # services/fundamentals.py  (A)
 def list_all(identity) -> list[Fundamental]
-def retrieve(query_vector, *, region: str, k: int = 5) -> list[FundamentalSummary]   # used by compliance
-def hard_rules() -> list[Fundamental]                                                  # all docs with `rule`
+def retrieve(query_vector, *, regions: list[str], k: int = 5) -> list[FundamentalSummary]   # used by compliance
+def hard_rules(regions: list[str]) -> list[Fundamental]                                      # docs with `rule`
 def update(identity, run_id, fundamental_id, *, text, rule, reason, password) -> Fundamental
 ```
 
-## 5. Shared shapes
+## 6. Shared shapes
 
 ```
 ComplianceReport = {
   verdict: "pass" | "needs_changes" | "blocked",
-  violations: [ { fundamental_key, version, severity: "low" | "medium" | "high",
+  violations: [ { source: "fundamental" | "memory",
+                  fundamental_key?, version?,      // when source = fundamental
+                  memory_id?,                      // when source = memory
+                  severity: "low" | "medium" | "high",
                   quote, explanation, fix } ],
   checked_fundamentals: [ { key, version } ],
+  memories_used: [ memory_id ],
   cached: bool }
 
-CampaignCard = { id, name, team, region, channel, status, summary, facts,
+cache_key = hash(ad text + consulted rule keys and versions + recalled memory ids)
+
+CampaignCard = { id, name, team, region, channel, language, status, summary, facts,
                  audio_url: "/assets/<file_id>" | null, compliance_verdict, created_at }
 
 Card = { type: "compliance_report", data: ComplianceReport }
      | { type: "campaign", data: CampaignCard }
-     | { type: "comparison", data: { columns: [str], rows: [[str]], takeaway: str, campaigns: [CampaignCard] } }
-     | { type: "memory_change", data: { memory_id | fundamental_key, before, after, version } }
+     | { type: "memory_change", data: { target: "fundamental" | "memory",
+                                        id?, key?, kind?, scope?,
+                                        before, after,
+                                        status: "proposed" | "applied", version? } }
      | { type: "fundamentals_review", data: { gaps: [str], conflicts: [str], suggestions: [str] } }
 
 MemoryChip = { id, kind, text }
 ```
 
-## 6. HTTP API
+## 7. HTTP API
 
 All endpoints except `/auth/login` require `Authorization: Bearer <jwt>`. Errors: `401` bad or missing token or failed step-up, `403` denied by policy (a `deny` event is in the ledger), `404` not found or out of scope.
 
@@ -234,25 +260,28 @@ All endpoints except `/auth/login` require `Authorization: Bearer <jwt>`. Errors
 POST /auth/login           { email, password }                       → { token, user: Identity }
 GET  /me                                                             → Identity
 
-POST /chat                 { thread_id, run_id, message, use_memory: true }
+POST /chat                 { thread_id, run_id, message, file_id?, use_memory: true }
                            → { reply, cards: [Card], memories_used: [MemoryChip],
                                run_id, intent, status, tokens: { in, out } }
 
-POST /compliance/check     { text? , campaign_id?, region, channel, budget? }   → ComplianceReport
+POST /assets               multipart audio file                       → { file_id }
+GET  /assets/{file_id}     ?token=<jwt>                               → audio/mpeg stream
+
+POST /compliance/check     { text?, file_id?, campaign_id?, name?, region, channel, budget?,
+                             save: false, use_memory: true }          → ComplianceReport
 
 GET  /campaigns            ?status=&q=                                → [CampaignCard]
 GET  /campaigns/{id}                                                  → Campaign (no embedding)
 POST /campaigns/{id}/approve   { feedback? }                          → CampaignCard      (manager)
 POST /campaigns/{id}/reject    { feedback }                           → CampaignCard      (manager)
-GET  /assets/{file_id}     ?token=<jwt>                               → audio/mpeg stream
 
 GET  /fundamentals                                                    → [Fundamental (no embedding)]
 GET  /fundamentals/{id}/history                                       → [FundamentalVersion]
 PUT  /fundamentals/{id}    { text, rule?, reason, password }          → Fundamental       (manager, step-up)
 
 GET  /memories             ?kind=&status=                             → [Memory (no embedding)]   (scoped to caller)
-POST /memories             { kind, text, scope, ttl_days?, password? } → Memory
-PATCH /memories/{id}       { text, password? }                        → Memory (the new one)
+POST /memories             { kind, text, scope, ttl_days?, reason?, password? } → Memory
+PATCH /memories/{id}       { text, reason?, password? }               → Memory (the new one)
 DELETE /memories/{id}      { reason, password? }                      → 204
 
 GET  /audit                ?run_id=&actor=&action=&limit=             → [LedgerEvent]
@@ -264,5 +293,7 @@ POST /runs/{id}/rollback                                              → Run   
 
 Notes for the web app:
 - The client generates `run_id` (uuid) before `POST /chat`, opens `/audit/stream?run_id=…` at the same time, and can call `/runs/{id}/stop` while the chat request is in flight.
+- **UC4 is a two-step write.** `/chat` returns a `memory_change` card with `status: "proposed"`. The web app collects the password and reason and calls `PUT /fundamentals/{id}` or the `/memories` endpoints directly. The password never goes through `/chat` or the model.
 - `password` on memory endpoints is required when the change is team-scoped.
+- To review an audio ad: `POST /assets`, then send the returned `file_id` with the chat message or to `/compliance/check`.
 - `<audio>` and `EventSource` cannot send headers, so those two endpoints accept the JWT as a `token` query parameter.

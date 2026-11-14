@@ -6,7 +6,12 @@ This file is the single source of guidance for Claude Code, Codex, and any other
 
 **Greenlight**: a governed marketing agent for an organisation, built in a 4-hour hackathon by a team of 4.
 
-- It reviews existing ad creative, creates new creative from a prompt (script + ElevenLabs voiceover), compares campaigns, answers questions about ads, and lets the marketing manager update what the agent remembers.
+- Three use cases, in priority order:
+  - **UC1** Review existing ad creative (pasted copy, or audio transcribed with ElevenLabs) against company rules.
+  - **UC4** Let the marketing manager update what the agent knows and remembers.
+  - **UC5** Answer questions about an ad, returning the ad itself.
+- Out of scope: creating new creative from a prompt (was UC2) and comparing campaigns (was UC3). Do not build them.
+- Examples and seed data are Canadian: Solstice Coffee Co., a fictional Canadian roaster with a `national` team and a `quebec` team; ad regions `CA` and `CA-QC`; budgets in CAD.
 - Every action is tied to an identity, checked against policy **before** it runs, and recorded in a ledger. Runs can be stopped and rolled back. (Problem statement 1: *Agents You Can Audit*.)
 - Memory is stored in MongoDB Atlas with Vector Search, scoped per team and role, expires, can be corrected or forgotten, and provably changes the next run. (Problem statement 2: *Memory You Can Govern*.)
 
@@ -16,7 +21,7 @@ This file is the single source of guidance for Claude Code, Codex, and any other
 |---|---|
 | Your tasks, time boxes, checks | [docs/PLAN.md](docs/PLAN.md) |
 | Tech stack, infrastructure diagram, core mechanisms | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
-| The five use-case flows, auth, memory, token rules | [docs/FLOWS.md](docs/FLOWS.md) |
+| The three use-case flows, auth, memory, token rules | [docs/FLOWS.md](docs/FLOWS.md) |
 | Collection schemas, indexes, RBAC, API, service signatures | [docs/CONTRACTS.md](docs/CONTRACTS.md) |
 | Shared Atlas access, env vars, MCP setup | [docs/SETUP.md](docs/SETUP.md) |
 | Demo script and rules checklist | [docs/DEMO.md](docs/DEMO.md) |
@@ -42,7 +47,7 @@ backend/
   app/routers/   auth.py  chat.py  compliance.py  campaigns.py  assets.py
                  fundamentals.py  memories.py  audit.py  runs.py
   app/agent/     graph.py  tools.py  prompts.py
-  app/services/  compliance.py  generation.py  campaigns.py  memory.py  fundamentals.py
+  app/services/  compliance.py  audio.py  campaigns.py  memory.py  fundamentals.py
   scripts/       setup_db.py  seed.py  smoke.py
   seed/          *.json
 frontend/        Next.js app: app/{login,chat,library,fundamentals,memory,audit}/page.tsx
@@ -58,7 +63,7 @@ Edit only the files your stream owns.
 | 0 | Bootstrap | Initial scaffold of everything above, then hands off |
 | A | Identity, policy, audit | `backend/app/core/{security,gate}.py`, `backend/app/routers/{auth,fundamentals,audit,runs}.py`, `backend/app/services/fundamentals.py`, `backend/scripts/setup_db.py` |
 | B | Agent and compliance | `backend/app/agent/*`, `backend/app/services/compliance.py`, `backend/app/routers/{chat,compliance}.py`, `backend/app/core/llm.py` |
-| C | Memory, retrieval, generation | `backend/app/services/{memory,campaigns,generation}.py`, `backend/app/routers/{campaigns,assets,memories}.py`, `backend/app/core/embeddings.py`, `backend/scripts/seed.py`, `backend/seed/*` |
+| C | Memory, ad library, audio | `backend/app/services/{memory,campaigns,audio}.py`, `backend/app/routers/{campaigns,assets,memories}.py`, `backend/app/core/embeddings.py`, `backend/scripts/seed.py`, `backend/seed/*` |
 | D | Web app | `frontend/**`, `docs/DEMO.md` |
 
 **Shared files** change only in a tiny dedicated PR announced in team chat: `docs/CONTRACTS.md`, `backend/app/core/config.py`, `backend/app/core/db.py`, `backend/app/main.py`, `backend/requirements.txt`, `.env.example`, `AGENTS.md`.
@@ -72,10 +77,11 @@ Edit only the files your stream owns.
 5. **Shared database.** Everyone works against the same Atlas cluster. Never drop collections or indexes. Never run an unfiltered delete or update. Schema, validator and index changes go only through `backend/scripts/setup_db.py`, which must stay idempotent. For destructive experiments set `MONGODB_DB=greenlight_<yourname>`.
 6. **The repo is public. Never commit secrets.** No keys, passwords or connection strings in code, docs, tests, PR text or commit messages. `.env` is gitignored.
 7. **Do not change the embedding model or its dimensions** (`voyage-3.5`, 1024). The vector indexes depend on it.
-8. **Follow the token rules** in `docs/FLOWS.md`: deny before spending, one intent → one small tool set, filter before retrieving, summaries not documents, code before model, fast model unless writing a script.
+8. **Follow the token rules** in `docs/FLOWS.md`: deny before spending, one intent → one small tool set, filter before retrieving, summaries not documents, code before model, fast model for everything except the compliance verdict.
 9. **No Streamlit, no new frameworks, no extra services.** The stack in `docs/ARCHITECTURE.md` is fixed.
 10. **Original work only.** Do not paste code from other projects. Use only the fictional brand (Solstice Coffee Co.) and stock ElevenLabs voices; no real people's names, voices or likenesses in seed data or demos.
 11. **P0 before anything else.** Do not start a P1 or P2 task while a P0 task in your stream is open. Nothing new after the feature freeze at T+3:15.
+12. **The model never sees a password.** UC4 changes are drafted by the agent and written by the web app calling the write endpoint with the password.
 
 ## Branching
 

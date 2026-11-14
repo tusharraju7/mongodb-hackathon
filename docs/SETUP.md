@@ -36,7 +36,7 @@ Before kickoff the repo owner confirms that this project was created from the ha
 | MongoDB connection string | repo owner, privately | everyone |
 | LLM key (Anthropic or OpenAI) | your own or the team's | streams B, C; anyone running the backend |
 | Voyage AI key | Atlas (AI model API keys) or the Voyage dashboard; one shared team key is fine | streams A, B, C |
-| ElevenLabs key | hackathon credits; one shared team key | stream C; anyone running generation |
+| ElevenLabs key | hackathon credits; one shared team key | stream C; anyone reviewing audio ads or running the seed script |
 
 ## 3. Environment variables
 
@@ -46,8 +46,8 @@ Copy `.env.example` to `.env` in the repo root. `.env` is gitignored.
 MONGODB_URI=                 # shared connection string
 MONGODB_DB=greenlight
 
-LLM_MODEL=anthropic:claude-opus-5-5        # script writing
-LLM_FAST_MODEL=anthropic:claude-haiku-5-5  # router, judge, Q&A, extraction
+LLM_MODEL=anthropic:claude-opus-5-5        # compliance verdict
+LLM_FAST_MODEL=anthropic:claude-haiku-5-5  # router, Q&A, extraction, drafting
 ANTHROPIC_API_KEY=
 OPENAI_API_KEY=              # only if you set the two models to openai:<model>
 
@@ -55,7 +55,7 @@ VOYAGE_API_KEY=
 VOYAGE_MODEL=voyage-3.5      # do not change: indexes are 1024-dimensional
 
 ELEVENLABS_API_KEY=
-ELEVENLABS_VOICE_ID=         # a stock voice on the brand allow-list
+ELEVENLABS_VOICE_ID=         # stock voice used by the seed script for the sample ads
 
 JWT_SECRET=                  # same value for the whole team so tokens work across laptops
 SEED_PASSWORD=               # password given to all seeded demo users
@@ -73,12 +73,12 @@ Created by `scripts/seed.py`, all with `SEED_PASSWORD`.
 
 | Email | Role | Team |
 |---|---|---|
-| `manager.emea@solstice.test` | manager | emea |
-| `marketer.emea@solstice.test` | marketer | emea |
-| `sales.emea@solstice.test` | sales | emea |
-| `manager.us@solstice.test` | manager | us |
-| `marketer.us@solstice.test` | marketer | us |
-| `sales.us@solstice.test` | sales | us |
+| `manager.national@solstice.test` | manager | national |
+| `marketer.national@solstice.test` | marketer | national |
+| `sales.national@solstice.test` | sales | national |
+| `manager.quebec@solstice.test` | manager | quebec |
+| `marketer.quebec@solstice.test` | marketer | quebec |
+| `sales.quebec@solstice.test` | sales | quebec |
 
 ## 5. Let your coding agent see the database (MongoDB MCP, read-only)
 
