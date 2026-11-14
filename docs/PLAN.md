@@ -1,5 +1,7 @@
 # Execution plan (4 hours, 4 people)
 
+> **Archived: bank example.** The event-day plan (streams A to D, time boxes, task checks), written before the switch to NorthPlay. The mechanisms still match the code; the names, rules, users and offers do not. For the system as built, read [BACKEND.md](BACKEND.md).
+
 Read [AGENTS.md](../AGENTS.md) first. Times are T+h:mm from kickoff. **P0** must be merged by T+3:00. Every task ends with a check; the task is done when the check passes.
 
 ## Team

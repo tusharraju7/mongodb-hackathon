@@ -1,5 +1,7 @@
 # Operational flows
 
+> **Archived: bank example.** Written before the switch to NorthPlay. The mechanisms still match the code; the names, rules, users and offers do not. The access and token rules below are current. For the system as built, read [BACKEND.md](BACKEND.md).
+
 Three use cases, in build priority order. For each: the flow, how it authenticates, what memory it reads and writes, and how it keeps token use low. A full worked example with sample JSON is in [WORKED_EXAMPLE.md](WORKED_EXAMPLE.md).
 
 > UC2 (create new creative from a blank prompt) and UC3 (compare campaigns) were dropped from scope. The remaining ids are kept as UC1, UC4, UC5. Regenerating a compliant version of a reviewed ad is part of UC1.

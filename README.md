@@ -20,7 +20,7 @@ Every step is tied to an identity, checked against policy before it runs, and wr
 
 ## Two screens
 
-| Marketer | Lawyer (lawyer role only) |
+| Marketer | Lawyer (the `manager` role, e.g. Senior Counsel) |
 |---|---|
 | Upload on the left; the agent's live step trace, findings and recommendation on the right; confidence and Submit at the bottom | The same view of the submitted ad and the agent's analysis, plus **Approve** / **Reject** of the final recommendation |
 
@@ -59,16 +59,16 @@ Checked so far: 52 offline tests pass; 14 of the 15 past ads come back with thei
 
 | | |
 |---|---|
+| [docs/BACKEND.md](docs/BACKEND.md) | **Start here.** The backend as built: the NorthPlay data, how to run it, what is verified, API notes for the web app |
 | [AGENTS.md](AGENTS.md) | Guidance for every coding agent: ownership, rules, branching |
-| [docs/PLAN.md](docs/PLAN.md) | Execution plan: streams, tasks, time boxes, checks |
-| [docs/BACKEND.md](docs/BACKEND.md) | The backend as built: the NorthPlay data, how to run it, what is verified, API notes for the web app |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Tech stack, infrastructure diagram, core mechanisms |
-| [docs/FLOWS.md](docs/FLOWS.md) | Operational flows: auth, memory, token use |
-| [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md) | One ad followed from policy to release, with sample JSON |
 | [docs/CONTRACTS.md](docs/CONTRACTS.md) | Schemas, indexes, RBAC matrix, API, service signatures |
-| [docs/MONGODB_SETUP.md](docs/MONGODB_SETUP.md) | Collections, validators, indexes, creation order, seed data |
-| [docs/SETUP.md](docs/SETUP.md) | Shared Atlas Sandbox access, environment, MCP |
+| [docs/MONGODB_SETUP.md](docs/MONGODB_SETUP.md) | Collections, validators and indexes; how to load the database |
+| [docs/SETUP.md](docs/SETUP.md) | Shared Atlas Sandbox access, environment, users, MCP |
 | [docs/DEMO.md](docs/DEMO.md) | Demo script and rules checklist |
+| [docs/PLAN.md](docs/PLAN.md) | *Archived (bank example):* event-day plan, streams and task checks |
+| [docs/FLOWS.md](docs/FLOWS.md) | *Archived (bank example):* the use-case flows and token rules |
+| [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md) | *Archived (bank example):* one ad followed from policy to release |
 
 ## Built during the hackathon
 

@@ -1,8 +1,8 @@
 # Worked example: reviewing a credit card ad
 
-One ad, followed from policy document to release. This builds on the credit card example drafted on the `Chelsea-setup` branch, moved to a Canadian setting and mapped to the collections and flows in this repo.
+> **Archived: bank example.** Written before the switch to NorthPlay. The mechanisms still match the code; the names, rules, users and offers do not. For the system as built, read [BACKEND.md](BACKEND.md).
 
-Everything here is fictional. Tamarack Bank and the Tamarack Cashback Card do not exist. The policies are invented internal policy, loosely modelled on Canadian practice; they are not legal requirements. Similarity scores are illustrative, not measured.
+One ad, followed from policy document to release. Everything here is fictional. Tamarack Bank and the Tamarack Cashback Card do not exist. The policies are invented internal policy, loosely modelled on Canadian practice; they are not legal requirements. Similarity scores are illustrative, not measured.
 
 ## The ad
 

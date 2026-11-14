@@ -13,9 +13,9 @@ Hackathon rule: finalists must build on the MongoDB Atlas Sandbox provided for t
 
 Before kickoff the repo owner confirms that this project was created from the hackathon email link.
 
-### Repo owner, once (Stream 0, task S0.1)
+### Repo owner, once
 
-1. **Database user for the app and the team.** Atlas → Database Access → Add New Database User. Username `greenlight_app`, a generated password, and under *Specific Privileges* the roles `readWrite` and `dbAdmin` on the database `greenlight` only. `dbAdmin` is needed so `setup_db.py` can update a validator on an existing collection. Do not share the existing admin user.
+1. **Database user for the app and the team.** Atlas → Database Access → Add New Database User. Username `greenlight_app`, a generated password, and under *Specific Privileges* the roles `readWrite` and `dbAdmin` on the database `greenlight` only. `dbAdmin` is needed so `load_db.py` can update a validator on an existing collection. Do not share the existing admin user.
 2. **Network access.** Atlas → Network Access → add each teammate's IP (each person runs `curl ifconfig.me`). If the venue network keeps changing addresses, add a temporary `0.0.0.0/0` entry with an expiry and delete it after the demo.
 3. **Share the connection string privately** (team chat DM or a password manager), never in the repo, an issue or a PR:
    `mongodb+srv://greenlight_app:<password>@<cluster-host>/?retryWrites=true&w=majority`
@@ -24,10 +24,10 @@ Before kickoff the repo owner confirms that this project was created from the ha
 ### Working together in one database
 
 - Everyone points at `greenlight`. Seed data is shared, so the app looks the same on every laptop.
-- Collections, validators and indexes are created only by `backend/scripts/setup_db.py`. It is idempotent; run it again after pulling a change to it.
+- Collections, validators and indexes are created only by `backend/scripts/load_db.py` (see [MONGODB_SETUP.md](MONGODB_SETUP.md)). It is safe to run again after pulling a change.
 - Never drop collections or indexes, and never run an unfiltered delete or update.
-- For a destructive experiment, set `MONGODB_DB=greenlight_<yourname>` locally and run `setup_db` + `seed` there.
-- Audio lives in GridFS in the same database, so there is no shared file storage to set up.
+- For a destructive experiment, load your own copy: `python -m scripts.load_db --db greenlight_<yourname> --password "$SEED_PASSWORD"`, and set `MONGODB_DB` to that name.
+- Audio and image files live in GridFS in the same database, so there is no shared file storage to set up.
 
 ## 2. Keys each person needs
 
@@ -69,20 +69,23 @@ LANGSMITH_API_KEY=
 
 ## 4. Seeded demo users
 
-Created by `scripts/seed.py`, all with `SEED_PASSWORD`.
+Created by `scripts/load_db.py`, all with `SEED_PASSWORD`.
 
 | Email | Role | Team |
 |---|---|---|
-| `manager.national@tamarack.test` | manager | national |
-| `marketer.national@tamarack.test` | marketer | national |
-| `sales.national@tamarack.test` | sales | national |
-| `manager.quebec@tamarack.test` | manager | quebec |
-| `marketer.quebec@tamarack.test` | marketer | quebec |
-| `sales.quebec@tamarack.test` | sales | quebec |
+| `ethan.cho@northplay.test` (Senior Counsel) | manager | ontario |
+| `priya.nair@northplay.test` (CMO) | manager | ontario |
+| `amira.haddad@northplay.test` (Creative Lead) | marketer | ontario |
+| `kevin.tran@northplay.test` (Growth Marketing) | marketer | ontario |
+| `jordan.blake@northplay.test` (Player Support) | sales | ontario |
+| `manager.alberta@northplay.test` | manager | alberta |
+| `marketer.alberta@northplay.test` | marketer | alberta |
+
+The Alberta team exists only to show that one team's memory never reaches another's.
 
 ## 5. Let your coding agent see the database (MongoDB MCP, read-only)
 
-**Claude Code** — `.mcp.json` in the repo root (created in Stream 0). It reads the connection string from your shell environment, so nothing secret is committed. Export `MONGODB_URI` before starting Claude Code.
+**Claude Code** — `.mcp.json` in the repo root. It reads the connection string from your shell environment, so nothing secret is committed. Export `MONGODB_URI` before starting Claude Code.
 
 ```json
 {
@@ -107,11 +110,12 @@ env = { MDB_MCP_CONNECTION_STRING = "<your connection string>" }
 
 Other agents: any MCP client can run the same command. Keep `--readOnly`.
 
-## 6. Run locally (after Stream 0)
+## 6. Run locally
 
 ```bash
-cd backend && python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+# Python 3.12 or later; on macOS the system python3 is 3.9, so use python3.13
+cd backend && python3.13 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000     # API docs at http://localhost:8000/docs
 
 cd frontend && npm install && npm run dev     # http://localhost:3000
 ```

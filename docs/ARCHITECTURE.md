@@ -123,9 +123,9 @@ guarded(identity, action, params, run_id, fn, undo=None)
 | Type | Stored in | Marketing example | Lifetime | Written by |
 |---|---|---|---|---|
 | Short-term | `checkpoints` | The current conversation; "the ad" means the last ad discussed | Thread | LangGraph checkpointer |
-| Semantic | `fundamentals`, `memories` (kind `semantic`) | Policy clauses such as "do not promise guaranteed approval"; team facts such as "the Quebec team runs radio in French only" | Clauses: their effective dates. Facts: until corrected | Manager (clauses, team facts); marketer (own notes) |
-| Episodic | `memories` (kind `episodic`) | "A national email ad was blocked for 'Guaranteed approval'; the version saying 'Subject to credit approval' was approved" | 30 days | The agent, after each review |
-| Procedural | `memories` (kind `procedural`) | "Quebec card ads must include 'Sous réserve de l'approbation du crédit.'" | Until corrected | Manager instruction or reject feedback |
+| Semantic | `fundamentals`, `memories` (kind `semantic`) | Regulations such as REG-12 "no public advertising of bonuses"; background such as a strategy deck slide | Clauses: their effective dates. Facts: until corrected | Manager (clauses, team facts); marketer (own notes) |
+| Episodic | `memories` (kind `episodic`) | "NP-H08 was rejected under REG-03: a paid athlete ambassador promoted betting" | 30 days | The agent, after each review |
+| Procedural | `memories` (kind `procedural`) | Legal's Slack decision "never use the word 'free' in any marketing, including opted-in emails" | Until corrected | Manager instruction or reject feedback |
 
 ### Policy and memory are separate
 

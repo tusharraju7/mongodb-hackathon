@@ -1,10 +1,10 @@
 # The backend as built
 
-Everything under `backend/`. This page says what exists, what data it runs on, how to run it, what has and has not been verified, and what the data and web app owners need to know.
+Everything under `backend/`.
 
 ## Data set: NorthPlay
 
-The backend now runs on `northplay-demo-data/`: NorthPlay, a fictional Ontario sportsbook. The shared `greenlight` database on the sandbox cluster holds it.
+The backend runs on `northplay-demo-data/`: NorthPlay, a fictional Ontario sportsbook. The shared `greenlight` database on the sandbox cluster holds it.
 
 | Source | Becomes | Count |
 |---|---|---|

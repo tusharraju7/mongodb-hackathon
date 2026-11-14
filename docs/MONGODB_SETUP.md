@@ -1,14 +1,8 @@
 # MongoDB setup: collections, schema, indexes, example data
 
-> **Current data set: NorthPlay.** The database is built from `northplay-demo-data/` in two steps:
-> `python -m scripts.build_seed` turns that folder into `backend/seed/*.json`, and
-> `python -m scripts.load_db --db greenlight --shared --password <SEED_PASSWORD>` creates the collections,
-> validators and indexes below and loads the seed. It holds 7 users, 15 policy clauses, 15 past ads with
-> their images, 60 memories (Slack decisions, deck slides, past decisions) and the raw Slack, deck, regulation
-> and ad-decision records they came from. The "Example data" section at the end of this page still describes
-> the earlier fictional-bank fixtures, which the offline tests use; the validators and indexes are current.
+The collections, validators and indexes in the shared `greenlight` database, and how to build them. Field-by-field shapes are in [CONTRACTS.md](CONTRACTS.md).
 
-What to create in the shared Atlas cluster, in what order, and the data that has to be in it before anyone can build or demo. Field-by-field shapes are in [CONTRACTS.md](CONTRACTS.md); this file is the execution plan.
+> `backend/scripts/load_db.py` reads the validators (Step 2) and vector index definitions (Step 4) straight from this file. Edit those JSON blocks only to change the database.
 
 Database: **`greenlight`** on the hackathon sandbox `Cluster0`.
 
@@ -17,32 +11,31 @@ Database: **`greenlight`** on the hackathon sandbox `Cluster0`.
 | # | Collection | Holds | Validation | Seeded | Source file |
 |---|---|---|---|---|---|
 | 1 | `policies` | What each role may do | strict | 3 | `backend/seed/policies.json` |
-| 2 | `users` | Who can sign in, with role and team | strict | 6 | `backend/seed/users.json` |
-| 3 | `offers` | Approved promotion terms | strict | 2 | `backend/seed/offers.json` |
-| 4 | `fundamentals` | Policy clauses, with embeddings | strict | 18 (17 approved, 1 retired) | `backend/seed/fundamentals.json` |
-| 5 | `fundamentals_versions` | Earlier versions of clauses | strict | 3 | derived from `previous_texts` |
-| 6 | `campaigns` | The ad library: text, audio and image ads, with embeddings | warn | 9 | `backend/seed/campaigns.json` |
-| 7 | `memories` | Team instructions, facts and past verdicts, with embeddings | strict | 9 | `backend/seed/memories.json` |
-| 8 | `ledger` | Audit events | strict | one pair per seeded approval and release | written by the seed script |
+| 2 | `users` | Who can sign in, with role and team | strict | 7 | `backend/seed/users.json` |
+| 3 | `offers` | Approved promotion terms (NorthPlay has none) | strict | 0 | `backend/seed/offers.json` |
+| 4 | `fundamentals` | The 15 regulations (`REG-01` to `REG-15`), with embeddings | strict | 15 | `backend/seed/fundamentals.json` |
+| 5 | `fundamentals_versions` | Earlier versions of regulations | strict | one per edit | written on each edit |
+| 6 | `campaigns` | The ad library, with embeddings | warn | 15 | `backend/seed/campaigns.json` |
+| 7 | `memories` | Slack decisions, deck slides and past verdicts, with embeddings | strict | 60 | `backend/seed/memories.json` |
+| 8 | `ledger` | Audit events | strict | one pair per seeded approval | written by `load_db.py` |
 | 9 | `runs` | One document per request | warn | 0 | |
-| 10 | `fs.files`, `fs.chunks` | Audio and image files (GridFS) | none | 4 files | produced by the seed script |
+| 10 | `fs.files`, `fs.chunks` | Audio and image files (GridFS) | none | 15 ad images | `northplay-demo-data/historical_ads/images/` |
 | 11 | `checkpoints`, `checkpoint_writes` | Conversation state | none | 0 | created by LangGraph on first use |
+| 12 | `regulations`, `ad_decisions`, `slack_messages`, `strategy_docs` | The source records, unchanged, so every memory traces back to its source | none | 15, 15, 49, 2 | `northplay-demo-data/`, `backend/seed/raw_*.json` |
 
 "Strict" rejects a document that breaks the schema. "Warn" logs it and lets it through; `campaigns` and `runs` change shape fastest during the build, so they warn until the feature freeze and can be switched to strict then.
 
 ## Steps
 
-| Step | What | Who | Time |
-|---|---|---|---|
-| 1 | Database user and network access | Repo owner | 5 min |
-| 2 | Create the nine collections with validators | Stream 0 (`setup_db.py`), finished by A2 | 10 min |
-| 3 | Create regular and TTL indexes | Stream 0 (`setup_db.py`) | 2 min |
-| 4 | Create the three vector search indexes and wait for READY | Stream 0 (`setup_db.py`) | 3 min + about 1 min to build |
-| 5 | Load reference data: `policies`, `users`, `offers`, `fundamentals` | Stream 0 (`seed.py`) | 5 min |
-| 6 | Load demo data: media files, `campaigns`, `memories`, seeded ledger events | Stream C, task C1 (`seed.py`) | 20 min |
-| 7 | Run the verification queries | Whoever ran step 6 | 3 min |
+Step 1 is done once by the repo owner. Two commands do steps 2 to 6:
 
-Both scripts must be safe to run again. `setup_db.py` creates what is missing and updates validators in place. `seed.py` upserts on the natural key (`_id`, `email`, `key`, `ref`) and never deletes anything it did not create.
+```bash
+cd backend
+python -m scripts.build_seed      # northplay-demo-data/ -> backend/seed/*.json
+python -m scripts.load_db --db greenlight --shared --password "$SEED_PASSWORD"
+```
+
+`load_db.py` is safe to run again: it creates what is missing, updates validators in place, upserts on the natural key (`_id`, `email`, `key`, `ref`) and never deletes. It refuses the shared `greenlight` database without `--shared`; use `--db greenlight_scratch` to experiment.
 
 ### Step 1 — Database user and network access
 
@@ -63,7 +56,7 @@ def ensure(db, name, schema, action="error"):
         db.create_collection(name, **opts)
 ```
 
-Dates must be stored as BSON dates, not strings. The TTL index and the effective-date filters do not work on strings. The seed files hold ISO strings; `seed.py` converts them.
+Dates must be stored as BSON dates, not strings. The TTL index and the effective-date filters do not work on strings. The seed files hold ISO strings; `load_db.py` converts them.
 
 **`policies`** (strict)
 ```json
@@ -273,43 +266,27 @@ Skip creation when `list_search_indexes()` already shows the name. Poll until `q
 
 What is embedded: `fundamentals` → `title` + `text`; `campaigns` → `description` + `summary`; `memories` → `text`. Documents use `input_type="document"`; searches use `input_type="query"`.
 
-### Step 5 — Reference data
+### Steps 5 and 6 — Load the data
 
-Load in this order, because later documents refer to earlier ones.
+`load_db.py` loads, in order: `policies`; `users` (with a bcrypt `password_hash` of `SEED_PASSWORD`); `offers`; `fundamentals` (embedded); `campaigns` with their images in GridFS (embedded); `memories` (embedded); a `decision` and `outcome` ledger event for every seeded approval, so no approval lacks an audit trail; and the source records. How each NorthPlay source becomes a document is in [BACKEND.md](BACKEND.md).
 
-1. **`policies`** — insert the three documents as they are.
-2. **`users`** — for each entry add `password_hash` (bcrypt of `SEED_PASSWORD`) and `created_at`.
-3. **`offers`** — convert `valid_from` and `valid_to` to dates.
-4. **`fundamentals`** — for each entry: convert the dates, embed `title` + `text`, set `updated_by` to the national manager and `updated_at` to now. Remove `previous_texts` before inserting.
-5. **`fundamentals_versions`** — for each entry of `previous_texts`, insert one snapshot (version 1, 2, …) with `reason: "seed"`. This gives `credit.approval_claims` one earlier version and `credit.intro_rate_disclosure` two.
+### Step 7 — Verify
 
-### Step 6 — Demo data
-
-1. **Media files into GridFS.** Nothing binary is committed to the repo.
-   - Audio ads (`nat-radio-slow-mornings`, `qc-radio-remises`): send `text` to ElevenLabs text-to-speech, store the mp3.
-   - Image ads (`nat-banner-fall-cashback`, `qc-banner-remises`): render `text` on the brand template, store the PNG.
-   - Until `services/media.py` exists, seed these four ads without `assets` and re-run the seed after task C4/C5.
-2. **`campaigns`** — for each entry: resolve `created_by` / `approved_by` / `rejected_by` emails to user ids; set `version: 1`, `source: "seed"`, `created_at`; attach `assets`; embed `description` + `summary`. For `approved` and `released` ads, build `approval` from the current versions of the clauses that apply to the ad and the offer's version. For `released` ads set `released_at`.
-3. **`memories`** — for each entry: build `scope` from `team` and `user_email`; set `status: "active"`; set `expires_at` from `ttl_days` or `ttl_minutes` (null when neither is set); set `source: { type, run_id: "seed" }`; embed `text`.
-4. **`ledger`** — for every seeded approval and release, insert a `decision` and an `outcome` event with the approving manager as actor, `run_id: "seed-<ref>"` and `params.seeded: true`. A seeded approval with no audit trail would be the one gap in the ledger.
-
-### Step 7 — Verification
+`load_db.py` prints the document counts and waits until the three vector indexes are queryable. Then check:
 
 | Check | Expected |
 |---|---|
-| Document counts | `policies` 3, `users` 6, `offers` 2, `fundamentals` 18, `fundamentals_versions` 3, `campaigns` 9, `memories` 9 |
+| Document counts | `policies` 3, `users` 7, `fundamentals` 15, `campaigns` 15, `memories` 60 |
 | Search indexes | `fundamentals_vec`, `campaigns_vec`, `memories_vec` all queryable |
 | Every `fundamentals`, `campaigns`, `memories` document has an `embedding` of length 1024 | 0 without |
 | Insert `{ "event": "decision" }` into `ledger` | Rejected by the validator |
 | Insert a memory with `kind: "rumour"` | Rejected by the validator |
-| Vector search on `fundamentals` for "guaranteed approval", filter `status: approved`, `region` in `global`, `CA`, `product` in `credit_card`, `all` | `credit.approval_claims` is the top result; the retired holiday clause never appears |
-| Vector search on `campaigns` for "email about 300 dollars cash back", filter `team: national`, `status: released` | `nat-email-fall-cashback` or `nat-banner-fall-cashback`; never a pending or Quebec ad |
-| Vector search on `memories` for "credit approval wording", filter `scope.team: quebec` | No national memories returned |
-| Five minutes after seeding | `nat-epi-rewards-hold` is gone |
 
-## Example data
+## Example data (bank fixtures)
 
-The full data is in `backend/seed/`. What it contains and why each piece is there:
+> **Bank example.** This section describes the earlier Tamarack Bank fixtures, which the offline tests in `backend/tests/fixtures/` still use. The NorthPlay data is described in [BACKEND.md](BACKEND.md).
+
+What the fixtures contain and why each piece is there:
 
 ### Users (6)
 
@@ -480,6 +457,6 @@ Empty apart from the seeded approvals and releases. One event as stored:
 ## Rules for the shared database
 
 - Never drop a collection or an index. Never run an unfiltered delete or update.
-- Change a validator or an index only by editing `setup_db.py` and re-running it.
+- Change a validator or an index only by editing its JSON block in this file and re-running `load_db.py`.
 - Reseeding upserts; it does not wipe. To start clean, use your own database: `MONGODB_DB=greenlight_<yourname>`.
 - Do not change the embedding model or its dimensions after step 4.

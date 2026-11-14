@@ -4,12 +4,12 @@ Demo data for the MongoDB "Agents in Context" hackathon. **NorthPlay is a fictio
 
 ## What's in here
 
-| Folder | Contents | Load into MongoDB? | Suggested collection |
+| Folder | Contents | Load into MongoDB? | Loaded as (see [docs/BACKEND.md](../docs/BACKEND.md)) |
 |---|---|---|---|
-| `regulations/` | 15 regulation docs (REG-01 to REG-15), each as `.md` + `.pdf`, plus `regulations.json` (all 15, structured) | Yes | `policies` |
-| `historical_ads/` | 15 past ads (`images/*.png`) + `historical_ads.json` with status, rationale, cited rules, required changes, extracted text | Yes | `ad_decisions` |
-| `strategy_decks/` | 2 decks as `.pdf` + `.md`: 2027 Business Strategy (Oct 14, 2026) and Q1 2027 Marketing & Brand Plan (Oct 28, 2026) | Yes | `strategy_docs` |
-| `slack/slack_export/` | Slack export: `users.json`, `channels.json`, and one JSON file per channel per day (#leadership, #marketing, #legal-marketing; 49 messages, Oct 1 - Nov 13, 2026) | Yes | `slack_messages` |
+| `regulations/` | 15 regulation docs (REG-01 to REG-15), each as `.md` + `.pdf`, plus `regulations.json` (all 15, structured) | Yes | `fundamentals` (the policy clauses), plus `regulations` (source) |
+| `historical_ads/` | 15 past ads (`images/*.png`) + `historical_ads.json` with status, rationale, cited rules, required changes, extracted text | Yes | `campaigns` and past-verdict `memories`, plus `ad_decisions` (source) |
+| `strategy_decks/` | 2 decks as `.pdf` + `.md`: 2027 Business Strategy (Oct 14, 2026) and Q1 2027 Marketing & Brand Plan (Oct 28, 2026) | Yes | background `memories` (one per slide), plus `strategy_docs` (source) |
+| `slack/slack_export/` | Slack export: `users.json`, `channels.json`, and one JSON file per channel per day (#leadership, #marketing, #legal-marketing; 49 messages, Oct 1 - Nov 13, 2026) | Yes | `memories` (one per channel per day), plus `slack_messages` (source) |
 | `slack/NorthPlay_Slack_Transcript.md` | Human-readable version of the same Slack history | Optional (for people) | n/a |
 | `demo_ads/` | The 3 ads uploaded live during the demo | **No.** Upload through the UI | n/a |
 | (answer keys) | Expected demo outcomes + the 6 planted Slack decisions are deliberately **not** in this repo so the agent can never read them. Ask Alton. | n/a | n/a |
