@@ -1,0 +1,44 @@
+[
+  {
+    "type": "message",
+    "user": "U07KT",
+    "text": "Growth idea for the Big Game: 'Deposit $50, get a $100 bonus bet' on Instagram stories to drive sign-ups?",
+    "ts": "1794433200.000043",
+    "user_profile": {
+      "real_name": "Kevin Tran",
+      "display_name": "kevin.tran",
+      "title": "Growth Marketing Manager"
+    },
+    "thread_ts": "1794433200.000043",
+    "reply_count": 1,
+    "replies": [
+      {
+        "user": "U04DO",
+        "ts": "1794433920.000044"
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U04DO",
+    "text": "Can't run offers on public social, that's the H06/H07 lesson. Opted-in email/SMS only, and no 'free'.",
+    "ts": "1794433920.000044",
+    "user_profile": {
+      "real_name": "Daniel Okafor",
+      "display_name": "daniel.okafor",
+      "title": "Head of Performance Marketing"
+    },
+    "thread_ts": "1794433200.000043",
+    "parent_user_id": "U07KT",
+    "reactions": [
+      {
+        "name": "+1",
+        "users": [
+          "U03EC",
+          "U05SM"
+        ],
+        "count": 2
+      }
+    ]
+  }
+]

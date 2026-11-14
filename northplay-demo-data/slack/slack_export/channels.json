@@ -1,0 +1,78 @@
+[
+  {
+    "id": "C01LEAD",
+    "name": "leadership",
+    "created": 1735707600,
+    "creator": "U01RB",
+    "is_archived": false,
+    "is_general": false,
+    "members": [
+      "U01RB",
+      "U02PN",
+      "U03EC",
+      "U08LF"
+    ],
+    "topic": {
+      "value": "",
+      "creator": "",
+      "last_set": 0
+    },
+    "purpose": {
+      "value": "Exec team decisions and company direction",
+      "creator": "U01RB",
+      "last_set": 0
+    }
+  },
+  {
+    "id": "C02MKTG",
+    "name": "marketing",
+    "created": 1735707600,
+    "creator": "U01RB",
+    "is_archived": false,
+    "is_general": false,
+    "members": [
+      "U02PN",
+      "U04DO",
+      "U05SM",
+      "U06AH",
+      "U07KT",
+      "U03EC"
+    ],
+    "topic": {
+      "value": "",
+      "creator": "",
+      "last_set": 0
+    },
+    "purpose": {
+      "value": "Campaign planning, creative and media",
+      "creator": "U01RB",
+      "last_set": 0
+    }
+  },
+  {
+    "id": "C03LGMK",
+    "name": "legal-marketing",
+    "created": 1735707600,
+    "creator": "U01RB",
+    "is_archived": false,
+    "is_general": false,
+    "members": [
+      "U03EC",
+      "U02PN",
+      "U04DO",
+      "U05SM",
+      "U06AH",
+      "U07KT"
+    ],
+    "topic": {
+      "value": "",
+      "creator": "",
+      "last_set": 0
+    },
+    "purpose": {
+      "value": "Legal and compliance guidance for marketing. Decisions here are binding.",
+      "creator": "U01RB",
+      "last_set": 0
+    }
+  }
+]

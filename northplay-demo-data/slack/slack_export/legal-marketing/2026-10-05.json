@@ -1,0 +1,61 @@
+[
+  {
+    "type": "message",
+    "user": "U03EC",
+    "text": "FYI, the 'win it all back Monday' concept (H10) is rejected and I agree with the agent. Loss-chasing language is a hard no. Please don't re-submit variations like 'bounce back' or 'redemption bet'.",
+    "ts": "1791217860.000004",
+    "user_profile": {
+      "real_name": "Ethan Cho",
+      "display_name": "ethan.cho",
+      "title": "Senior Counsel, Legal & Compliance"
+    },
+    "reactions": [
+      {
+        "name": "+1",
+        "users": [
+          "U07KT",
+          "U04DO"
+        ],
+        "count": 2
+      }
+    ],
+    "thread_ts": "1791217860.000004",
+    "reply_count": 2,
+    "replies": [
+      {
+        "user": "U07KT",
+        "ts": "1791218640.000005"
+      },
+      {
+        "user": "U03EC",
+        "ts": "1791219120.000006"
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U07KT",
+    "text": "Understood. Is a neutral game preview for Monday night OK?",
+    "ts": "1791218640.000005",
+    "user_profile": {
+      "real_name": "Kevin Tran",
+      "display_name": "kevin.tran",
+      "title": "Growth Marketing Manager"
+    },
+    "thread_ts": "1791217860.000004",
+    "parent_user_id": "U03EC"
+  },
+  {
+    "type": "message",
+    "user": "U03EC",
+    "text": "Yes, a neutral game preview with odds and the full disclaimer is fine.",
+    "ts": "1791219120.000006",
+    "user_profile": {
+      "real_name": "Ethan Cho",
+      "display_name": "ethan.cho",
+      "title": "Senior Counsel, Legal & Compliance"
+    },
+    "thread_ts": "1791217860.000004",
+    "parent_user_id": "U03EC"
+  }
+]

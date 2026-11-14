@@ -1,0 +1,44 @@
+[
+  {
+    "type": "message",
+    "user": "U01RB",
+    "text": "Board asked about compliance. Ethan, can you confirm we've had zero regulatory findings this year?",
+    "ts": "1794492900.000045",
+    "user_profile": {
+      "real_name": "Rachel Bouchard",
+      "display_name": "rachel.bouchard",
+      "title": "CEO"
+    },
+    "thread_ts": "1794492900.000045",
+    "reply_count": 1,
+    "replies": [
+      {
+        "user": "U03EC",
+        "ts": "1794494400.000046"
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U03EC",
+    "text": "Zero findings. One AGCO inquiry (the 'free' language one, industry-wide) and we responded same day. The agent is catching the bulk of issues pre-launch.",
+    "ts": "1794494400.000046",
+    "user_profile": {
+      "real_name": "Ethan Cho",
+      "display_name": "ethan.cho",
+      "title": "Senior Counsel, Legal & Compliance"
+    },
+    "thread_ts": "1794492900.000045",
+    "parent_user_id": "U01RB",
+    "reactions": [
+      {
+        "name": "raised_hands",
+        "users": [
+          "U01RB",
+          "U02PN"
+        ],
+        "count": 2
+      }
+    ]
+  }
+]

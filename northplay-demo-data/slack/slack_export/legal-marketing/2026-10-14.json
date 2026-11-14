@@ -1,0 +1,22 @@
+[
+  {
+    "type": "message",
+    "user": "U03EC",
+    "text": "Week 6 opted-in email (H05) is approved. Terms are up front and the unsubscribe link is in place. This is the template for any offer going forward.",
+    "ts": "1791990900.000011",
+    "user_profile": {
+      "real_name": "Ethan Cho",
+      "display_name": "ethan.cho",
+      "title": "Senior Counsel, Legal & Compliance"
+    },
+    "reactions": [
+      {
+        "name": "+1",
+        "users": [
+          "U04DO"
+        ],
+        "count": 1
+      }
+    ]
+  }
+]

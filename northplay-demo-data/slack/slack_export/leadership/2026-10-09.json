@@ -1,0 +1,44 @@
+[
+  {
+    "type": "message",
+    "user": "U02PN",
+    "text": "Offsite takeaway: we cut bonus-led acquisition from 45% to ~10% of budget in 2027, and offers move to opted-in channels only. Deck v1.2 goes out next week.",
+    "ts": "1791588600.000007",
+    "user_profile": {
+      "real_name": "Priya Nair",
+      "display_name": "priya.nair",
+      "title": "Chief Marketing Officer"
+    },
+    "reactions": [
+      {
+        "name": "100",
+        "users": [
+          "U01RB",
+          "U08LF"
+        ],
+        "count": 2
+      }
+    ],
+    "thread_ts": "1791588600.000007",
+    "reply_count": 1,
+    "replies": [
+      {
+        "user": "U08LF",
+        "ts": "1791589260.000008"
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U08LF",
+    "text": "Supportive. Acquisition cost is up 38% YoY, so the bonus treadmill isn't working anyway.",
+    "ts": "1791589260.000008",
+    "user_profile": {
+      "real_name": "Liam Fraser",
+      "display_name": "liam.fraser",
+      "title": "CFO"
+    },
+    "thread_ts": "1791588600.000007",
+    "parent_user_id": "U02PN"
+  }
+]

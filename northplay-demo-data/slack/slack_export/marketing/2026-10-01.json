@@ -1,0 +1,43 @@
+[
+  {
+    "type": "message",
+    "user": "U04DO",
+    "text": "Morning all. Q4 hockey flight is live as of today. Saturday night odds creative (H01) cleared legal yesterday, nice work Amira.",
+    "ts": "1790863920.000001",
+    "user_profile": {
+      "real_name": "Daniel Okafor",
+      "display_name": "daniel.okafor",
+      "title": "Head of Performance Marketing"
+    },
+    "reactions": [
+      {
+        "name": "tada",
+        "users": [
+          "U06AH",
+          "U05SM"
+        ],
+        "count": 2
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U06AH",
+    "text": "Thanks! Marcus Doyle Play Smart story (H03) also cleared. Agent flagged that it only passes because there's zero betting CTA, so let's keep it that way.",
+    "ts": "1790864400.000002",
+    "user_profile": {
+      "real_name": "Amira Haddad",
+      "display_name": "amira.haddad",
+      "title": "Creative Lead"
+    },
+    "reactions": [
+      {
+        "name": "+1",
+        "users": [
+          "U05SM"
+        ],
+        "count": 1
+      }
+    ]
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "type": "message",
+    "user": "U06AH",
+    "text": "Starting Hockey Night Live Q1 concepts. Thinking 'Puck drops at 7' as the hero line with live odds cards. Same layout as H01.",
+    "ts": "1794236700.000038",
+    "user_profile": {
+      "real_name": "Amira Haddad",
+      "display_name": "amira.haddad",
+      "title": "Creative Lead"
+    },
+    "reactions": [
+      {
+        "name": "fire",
+        "users": [
+          "U05SM",
+          "U04DO"
+        ],
+        "count": 2
+      }
+    ],
+    "thread_ts": "1794236700.000038",
+    "reply_count": 1,
+    "replies": [
+      {
+        "user": "U05SM",
+        "ts": "1794237120.000039"
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U05SM",
+    "text": "Love it. Keep it city names only and the full disclaimer at 24px+.",
+    "ts": "1794237120.000039",
+    "user_profile": {
+      "real_name": "Sofia Marchetti",
+      "display_name": "sofia.marchetti",
+      "title": "Brand Manager"
+    },
+    "thread_ts": "1794236700.000038",
+    "parent_user_id": "U06AH"
+  }
+]
