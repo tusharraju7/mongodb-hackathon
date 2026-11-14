@@ -27,6 +27,7 @@ Database: **`greenlight`** on the hackathon sandbox `Cluster0`.
 | 9 | `runs` | One document per request | warn | 0 | |
 | 10 | `fs.files`, `fs.chunks` | Audio and image files (GridFS) | none | 4 files | produced by the seed script |
 | 11 | `checkpoints`, `checkpoint_writes` | Conversation state | none | 0 | created by LangGraph on first use |
+| 12 | `action_rules` | The rule for each action beyond its roles: whether the agent may take it, its conditions, and the per-run limits | warn | one per action, plus `_limits` | the defaults in `backend/app/core/gate.py` |
 
 "Strict" rejects a document that breaks the schema. "Warn" logs it and lets it through; `campaigns` and `runs` change shape fastest during the build, so they warn until the feature freeze and can be switched to strict then.
 
@@ -73,7 +74,7 @@ Dates must be stored as BSON dates, not strings. The TTL index and the effective
     "actions": { "bsonType": "array", "items": { "enum": [
       "compliance.check", "campaign.submit", "asset.regenerate", "campaign.approve", "campaign.release",
       "campaign.search", "campaign.ask", "fundamentals.read", "fundamentals.update", "fundamentals.review",
-      "memory.read", "memory.write", "memory.forget", "run.stop", "run.rollback", "audit.read" ] } },
+      "memory.read", "memory.write", "memory.forget", "run.stop", "run.rollback", "audit.read", "user.access" ] } },
     "updated_at": { "bsonType": "date" } } }
 ```
 
@@ -86,8 +87,25 @@ Dates must be stored as BSON dates, not strings. The TTL index and the effective
     "role": { "enum": ["manager", "marketer", "sales"] },
     "team": { "bsonType": "string" },
     "password_hash": { "bsonType": "string" },
+    "status": { "enum": ["active", "disabled"] },
+    "auth_version": { "bsonType": ["int", "long"], "minimum": 0 },
     "created_at": { "bsonType": "date" } } }
 ```
+
+`status` and `auth_version` are optional (absent means active, version 0). The gate re-reads the user at every step, so a user who is disabled, or whose version was raised, loses authority at the next step and every token issued before stops working.
+
+**`action_rules`** (warn)
+```json
+{ "bsonType": "object", "required": ["_id"],
+  "properties": {
+    "_id": { "bsonType": "string" },
+    "initiators": { "bsonType": "array", "items": { "enum": ["human", "agent"] } },
+    "preconditions": { "bsonType": "array", "items": { "enum": ["same_team", "pending_review", "passed_review", "approved", "approval_current"] } },
+    "per_run": { "bsonType": "object" },
+    "note": { "bsonType": "string" } } }
+```
+
+One document per action, and one with `_id: "_limits"` holding the per-run budget (`steps`, `model_calls`, `tokens`, `external_calls`). A document here replaces the default in `core/gate.py` for that action, so a rule can be read and tightened in Atlas without a deploy.
 
 **`offers`** (strict)
 ```json
@@ -156,11 +174,11 @@ Dates must be stored as BSON dates, not strings. The TTL index and the effective
     "region": { "bsonType": "string" },
     "channel": { "bsonType": "string" },
     "language": { "enum": ["en", "fr"] },
-    "modality": { "enum": ["text", "audio", "image"] },
+    "modality": { "enum": ["text", "audio", "image", "video"] },
     "version": { "bsonType": "int", "minimum": 1 },
     "text": { "bsonType": "string" },
     "assets": { "bsonType": "array", "items": { "bsonType": "object", "required": ["type", "file_id", "mime"],
-      "properties": { "type": { "enum": ["audio", "image"] } } } },
+      "properties": { "type": { "enum": ["audio", "image", "video"] } } } },
     "source": { "enum": ["seed", "submitted", "regenerated"] },
     "status": { "enum": ["pending_review", "approved", "released", "rejected", "rolled_back"] },
     "embedding": { "bsonType": "array" },
@@ -181,9 +199,12 @@ Dates must be stored as BSON dates, not strings. The TTL index and the effective
     "expires_at": { "bsonType": ["date", "null"] },
     "source": { "bsonType": "object", "required": ["type"],
       "properties": { "type": { "enum": ["agent", "manager_instruction", "review_feedback", "user_note", "slack", "strategy_deck", "ad_decision"] } } },
+    "strength": { "bsonType": ["double", "int"], "minimum": 0 },
     "embedding": { "bsonType": "array" },
     "created_at": { "bsonType": "date" } } }
 ```
+
+Optional fields added in round two: `strength` (1.0 when absent; see `docs/DESIGN_NOTES.md`), `last_reinforced_at`, `contested_by: {memory_id, run_id, at}`, `consolidated_from: [memory ids]`, `surprise`.
 
 **`ledger`** (strict)
 ```json
@@ -196,9 +217,13 @@ Dates must be stored as BSON dates, not strings. The TTL index and the effective
       "properties": { "user_id": { "bsonType": "string" },
                       "role": { "enum": ["manager", "marketer", "sales"] },
                       "team": { "bsonType": "string" } } },
-    "event": { "enum": ["decision", "outcome", "stop", "rollback"] },
+    "event": { "enum": ["decision", "outcome", "stop", "rollback", "checkpoint", "crash_detected", "resume",
+                        "model_call", "retrieval", "finding", "conflict", "attribution"] },
     "action": { "bsonType": "string" },
     "decision": { "enum": ["allow", "deny"] },
+    "seq": { "bsonType": ["int", "long"], "minimum": 0 },
+    "prev_hash": { "bsonType": "string" },
+    "hash": { "bsonType": "string" },
     "auth": { "bsonType": "object", "required": ["method"],
       "properties": { "method": { "enum": ["jwt", "jwt+password"] } } } } }
 ```
@@ -210,7 +235,7 @@ Dates must be stored as BSON dates, not strings. The TTL index and the effective
     "_id": { "bsonType": "string" },
     "intent": { "enum": ["review", "regenerate", "memory_update", "ask", "approve", "release"] },
     "status": { "enum": ["running", "completed", "blocked", "needs_input", "denied",
-                         "stop_requested", "stopped", "rolled_back", "error"] },
+                         "stop_requested", "stopped", "rolled_back", "error", "interrupted"] },
     "started_at": { "bsonType": "date" } } }
 ```
 
@@ -229,6 +254,8 @@ Dates must be stored as BSON dates, not strings. The TTL index and the effective
 | `ledger` | `{ run_id: 1, ts: 1 }` | | Reconstruct a run |
 | `ledger` | `{ "actor.user_id": 1, ts: -1 }` | | Audit by person |
 | `runs` | `{ "actor.user_id": 1, started_at: -1 }` | | A user's own runs |
+| `runs` | `{ status: 1, heartbeat_at: 1 }` | | Finding runs that stopped without finishing |
+| `ledger` | `{ run_id: 1, seq: 1 }` | unique, only where `seq` exists | The order of a run's events; makes it impossible for two writers to fork the hash chain |
 
 The TTL monitor runs about once a minute, so recall also filters on `expires_at` in the query.
 

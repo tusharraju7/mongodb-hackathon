@@ -50,7 +50,7 @@ def issue_token(identity: Identity) -> str:
 
 def identity_from_token(token: str) -> Identity:
     claims = jwt.decode(token, _secret(), algorithms=[ALGORITHM])
-    return Identity(**{k: claims[k] for k in ("user_id", "email", "name", "role", "team")})
+    return Identity(**{k: claims[k] for k in ("user_id", "email", "name", "role", "team")}, auth_version=int(claims.get("auth_version", 0)))
 
 
 def current_identity(authorization: Optional[str] = Header(None), token: Optional[str] = Query(None)) -> Identity:
@@ -69,9 +69,9 @@ def current_identity(authorization: Optional[str] = Header(None), token: Optiona
 def authenticate(email: str, password: str, db=None) -> Optional[Identity]:
     db = db if db is not None else get_db()
     user = db.users.find_one({"email": email.strip().lower()})
-    if not user or not password_matches(password, user.get("password_hash", "")):
+    if not user or user.get("status", "active") != "active" or not password_matches(password, user.get("password_hash", "")):
         return None
-    return Identity(user_id=str(user["_id"]), email=user["email"], name=user.get("name", ""), role=user["role"], team=user["team"])
+    return Identity(user_id=str(user["_id"]), email=user["email"], name=user.get("name", ""), role=user["role"], team=user["team"], auth_version=int(user.get("auth_version", 0)))
 
 
 def verify_password(identity: Identity, password: Optional[str], db=None) -> bool:

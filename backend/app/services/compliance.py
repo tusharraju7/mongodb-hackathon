@@ -60,6 +60,21 @@ class ReviewResult:
     code_clauses: list[dict] = field(default_factory=list)
 
 
+def dump_review(r: ReviewResult) -> dict:
+    """A review result in a form the run journal can store, so a resumed run does not pay for it twice."""
+    return {
+        "report": r.report.model_dump(), "extraction": r.extraction.model_dump() if r.extraction else None, "offer": r.offer,
+        "cache_key": r.cache_key, "code_clauses": [{k: v for k, v in c.items() if k != "embedding"} for c in r.code_clauses],
+    }
+
+
+def load_review(d: dict) -> ReviewResult:
+    return ReviewResult(
+        report=ComplianceReport(**d["report"]), extraction=Extraction(**d["extraction"]) if d.get("extraction") else None,
+        offer=d.get("offer"), cache_key=d.get("cache_key"), code_clauses=d.get("code_clauses") or [],
+    )
+
+
 def default_sources() -> Sources:
     from app.services.mongo_sources import MongoSources
 
@@ -145,7 +160,8 @@ def _judge_user(
     mem = []
     for m in memories:
         where = ", ".join(x for x in (m.get("source_label"), m.get("date")) if x)
-        mem.append(f"- id {m['id']} [{STANDING[authority_of(m)]}{'; ' + where if where else ''}]: {m['text']}")
+        contested = "; contested: an earlier review found a binding internal decision overrides this" if m.get("contested_by") else ""
+        mem.append(f"- id {m['id']} [{STANDING[authority_of(m)]}{'; ' + where if where else ''}{contested}]: {m['text']}")
     mem = mem or ["- none"]
     parts.append("<team_memories>\n" + "\n".join(mem) + "\n</team_memories>")
     return "\n\n".join(parts)
@@ -189,8 +205,14 @@ def review(
     usage: Optional[llm.TokenUsage] = None,
     extraction: Optional[Extraction] = None,
     cached_report: Optional[callable] = None,
+    memories: Optional[list[dict]] = None,
 ) -> ReviewResult:
-    """Review one ad. `ctx` is the AdContext as a dict, plus `team` taken from the identity."""
+    """Review one ad. `ctx` is the AdContext as a dict, plus `team` taken from the identity.
+
+    `memories`, when given, is the exact set put in front of the judge and nothing is recalled. The
+    lesion test uses it to repeat a review with one memory taken out and everything else unchanged.
+    """
+    fixed_memories = memories
     sources = sources or default_sources()
     ctx = {**ctx, "team": ctx.get("team") or identity.team}
 
@@ -251,10 +273,13 @@ def review(
     # 5. Memory: binding decisions, guidance, past verdicts and background, scoped by the source and
     #    searched once for the whole ad and once for each claim, so a single named person or phrase
     #    can find the decision about it.
-    memories = (
-        sources.recall(identity, vectors, ["procedural", "episodic", "semantic"], profile["memory"]["per_query"], profile["memory"]["budget"])
-        if use_memory else []
-    )
+    if fixed_memories is not None:
+        memories = fixed_memories
+    else:
+        memories = (
+            sources.recall(identity, vectors, ["procedural", "episodic", "semantic"], profile["memory"]["per_query"], profile["memory"]["budget"])
+            if use_memory else []
+        )
 
     # 6. A stored verdict for exactly this text, offer, clause versions and memories skips the judge.
     key = _cache_key(text, offer, consulted, memories, ctx)
@@ -317,6 +342,7 @@ def review(
             memory = by_memory[jf.ref]
             v = {
                 "source": "memory", "basis": "model", "certainty": jf.certainty, "memory_id": memory["id"],
+                "source_label": ", ".join(x for x in (memory.get("source_label"), memory.get("date")) if x) or None,
                 # A binding decision can carry its own weight; a plain team instruction asks for changes.
                 "materiality": memory.get("materiality") or "disclosure", "quote": jf.quote.strip(), "explanation": jf.explanation,
                 "reasoning": jf.reasoning, "evidence": {"memory_text": memory["text"][:600]}, "fix": jf.fix,
@@ -404,6 +430,13 @@ class RegeneratedCopy:
     copy: Optional[str]
     review: ReviewResult
     attempts: int
+
+    def dump(self) -> dict:
+        return {"status": self.status, "copy": self.copy, "review": dump_review(self.review), "attempts": self.attempts}
+
+    @classmethod
+    def load(cls, d: dict) -> "RegeneratedCopy":
+        return cls(d["status"], d.get("copy"), load_review(d["review"]), d["attempts"])
 
 
 def regenerate_copy(

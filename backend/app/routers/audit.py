@@ -14,7 +14,7 @@ from app.models import Identity
 router = APIRouter(tags=["audit"])
 
 STREAM_SECONDS = 300
-TERMINAL = {"completed", "blocked", "needs_input", "denied", "stopped", "rolled_back", "error"}
+TERMINAL = {"completed", "blocked", "needs_input", "denied", "stopped", "rolled_back", "error", "interrupted"}
 
 
 def _json(event: dict) -> dict:
@@ -36,10 +36,16 @@ def _require(identity: Identity) -> None:
 
 
 @router.get("/audit")
-def audit(run_id: Optional[str] = None, actor: Optional[str] = None, action: Optional[str] = None, limit: int = 200, identity: Identity = Depends(security.current_identity)) -> list[dict]:
-    """Ledger events, oldest first within a run, newest first otherwise."""
+def audit(run_id: Optional[str] = None, actor: Optional[str] = None, action: Optional[str] = None, limit: int = 200, detail: bool = False, identity: Identity = Depends(security.current_identity)) -> list[dict]:
+    """Ledger events, oldest first within a run, newest first otherwise.
+
+    By default: decisions, outcomes, stops, rollbacks and crash recovery. With `detail=true` also
+    every model call, retrieval, finding, conflict and attribution.
+    """
     _require(identity)
     query = _scope(identity)
+    if not detail:
+        query["event"] = {"$in": gate.CORE_EVENTS}
     if run_id:
         query["run_id"] = run_id
     if actor and identity.role == "manager":
@@ -48,6 +54,16 @@ def audit(run_id: Optional[str] = None, actor: Optional[str] = None, action: Opt
         query["action"] = action
     cursor = get_db().ledger.find(query).sort([("ts", 1 if run_id else -1), ("_id", 1 if run_id else -1)]).limit(min(max(limit, 1), 1000))
     return [_json(e) for e in cursor]
+
+
+@router.get("/audit/verify")
+def verify(run_id: str, identity: Identity = Depends(security.current_identity)) -> dict:
+    """Recompute the run's hash chain. Any event edited, removed or inserted after the fact breaks it."""
+    _require(identity)
+    db = get_db()
+    if not db.ledger.find_one({"run_id": run_id, **_scope(identity)}, {"_id": 1}):
+        return {"run_id": run_id, "events": 0, "chained": 0, "intact": None, "note": "No events of this run are in your scope."}
+    return gate.verify_chain(run_id, db)
 
 
 def _events(run_id: str, scope: dict) -> Iterator[str]:
@@ -87,7 +103,8 @@ def _events(run_id: str, scope: dict) -> Iterator[str]:
 
 
 @router.get("/audit/stream")
-def audit_stream(run_id: str, identity: Identity = Depends(security.current_identity)) -> StreamingResponse:
+def audit_stream(run_id: str, detail: bool = False, identity: Identity = Depends(security.current_identity)) -> StreamingResponse:
     """Server-sent events for one run. The token may be passed as `?token=` because EventSource cannot set headers."""
     _require(identity)
-    return StreamingResponse(_events(run_id, _scope(identity)), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+    scope = _scope(identity) if detail else {**_scope(identity), "event": {"$in": gate.CORE_EVENTS}}
+    return StreamingResponse(_events(run_id, scope), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})

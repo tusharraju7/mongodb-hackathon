@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from typing import Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Header
 from pydantic import BaseModel
 
 from app.agent import graph
@@ -22,12 +22,12 @@ class ChatBody(BaseModel):
     use_memory: bool = True
 
 
-@router.post("/chat")
-def chat(body: ChatBody, identity: Identity = Depends(security.current_identity)) -> dict:
-    run_id = body.run_id or str(uuid.uuid4())
-    gate.open_run(identity, run_id, thread_id=body.thread_id, input_summary=body.message, memory_enabled=body.use_memory)
+def execute(identity: Identity, run_id: str, request: dict) -> dict:
+    """Run one chat turn. Also what a resumed run calls, with the request it stored."""
     try:
-        result = graph.run_turn(identity, thread_id=body.thread_id, run_id=run_id, message=body.message, file_id=body.file_id, ad=body.ad, use_memory=body.use_memory)
+        result = graph.run_turn(identity, thread_id=request["thread_id"], run_id=run_id, message=request.get("message", ""), file_id=request.get("file_id"), ad=request.get("ad"), use_memory=request.get("use_memory", True))
+    except gate.SimulatedCrash:
+        raise  # left exactly as a crash leaves it: still marked running, nothing closed
     except Exception:
         gate.close_run(run_id, "error")
         raise
@@ -39,3 +39,11 @@ def chat(body: ChatBody, identity: Identity = Depends(security.current_identity)
         "run_id": run_id, "intent": result.get("intent"), "status": result.get("status", "completed"),
         "tokens": result.get("tokens", {"in": 0, "out": 0}), "grounding": result.get("grounding"),
     }
+
+
+@router.post("/chat")
+def chat(body: ChatBody, identity: Identity = Depends(security.current_identity), x_crash_after: Optional[str] = Header(None)) -> dict:
+    run_id = body.run_id or str(uuid.uuid4())
+    request = {"kind": "chat", **body.model_dump(exclude={"run_id"})}
+    gate.open_run(identity, run_id, thread_id=body.thread_id, input_summary=body.message, memory_enabled=body.use_memory, request=request, crash_after=x_crash_after)
+    return execute(identity, run_id, request)

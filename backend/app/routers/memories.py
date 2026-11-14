@@ -7,10 +7,10 @@ from fastapi import APIRouter, Body, Depends
 from fastapi.responses import Response
 from pydantic import BaseModel
 
-from app.core import gate, security
+from app.core import gate, llm, security
 from app.core.db import get_db, oid
 from app.models import Identity
-from app.services import memory
+from app.services import consolidation, memory
 
 router = APIRouter(tags=["memory"])
 
@@ -18,6 +18,7 @@ router = APIRouter(tags=["memory"])
 class CreateBody(BaseModel):
     kind: str = "procedural"
     text: str
+    consolidated_from: Optional[list[str]] = None  # ids of the past verdicts a standing lesson was drawn from
     scope: Optional[dict] = None  # {team, user_id}; defaults to the caller's team, or to the caller for a non-manager
     ttl_days: Optional[int] = None
     reason: Optional[str] = None
@@ -63,6 +64,52 @@ def list_memories(kind: Optional[str] = None, status: Optional[str] = None, iden
     return memory.list_scoped(identity, kind=kind, status=status)
 
 
+@router.get("/memories/fading")
+def fading_memories(identity: Identity = Depends(security.current_identity)) -> list[dict]:
+    """Team memories that have faded with disuse. A manager confirms the ones that still hold; the rest keep fading."""
+    if not gate.permitted(identity, "memory.read"):
+        gate.guarded(identity, "memory.read", {}, f"read-{uuid.uuid4()}", lambda: None)
+    return memory.fading(identity)
+
+
+@router.post("/memories/consolidate")
+def consolidate(identity: Identity = Depends(security.current_identity)) -> dict:
+    """Draft standing lessons from groups of past verdicts that turned on the same rule. Nothing is saved:
+    each draft is confirmed by the manager through `POST /memories`, with their password."""
+    run_id = _run(identity, None, "consolidate past verdicts")
+    usage = llm.TokenUsage()
+    try:
+        if identity.role != "manager":
+            gate.record_denial(identity, "memory.write", {"step": "consolidate"}, run_id, "only a manager can turn past verdicts into a team lesson")
+            raise gate.Denied("Only a manager can turn past verdicts into a team lesson.")
+        with gate.acting_as("agent"):
+            proposals = gate.guarded(
+                identity, "memory.write", {"step": "consolidate_draft"}, run_id, lambda: consolidation.draft(identity, usage=usage, run_id=run_id), tokens=usage.as_dict,
+                summarize=lambda p: {"status": "ok", "summary": f"Drafted {len(p)} lesson(s) from past verdicts; nothing saved until each is confirmed"},
+            )
+    except Exception:
+        gate.close_run(run_id, "denied")
+        raise
+    gate.close_run(run_id, "completed", tokens=usage.as_dict())
+    return {"proposals": proposals, "run_id": run_id, "tokens": usage.as_dict()}
+
+
+@router.post("/memories/{memory_id}/confirm")
+def confirm_memory(memory_id: str, identity: Identity = Depends(security.current_identity)) -> dict:
+    """A manager confirms a faded team memory still holds, restoring it to full strength."""
+    run_id = _run(identity, None, f"confirm {memory_id}")
+    try:
+        if identity.role != "manager":
+            gate.record_denial(identity, "memory.write", {"step": "confirm", "memory_id": memory_id}, run_id, "only a manager can confirm a team memory")
+            raise gate.Denied("Only a manager can confirm a team memory.")
+        saved = memory.confirm(identity, run_id, memory_id)
+    except Exception:
+        gate.close_run(run_id, "denied")
+        raise
+    gate.close_run(run_id, "completed")
+    return {**saved, "run_id": run_id}
+
+
 @router.post("/memories")
 def create_memory(body: CreateBody, identity: Identity = Depends(security.current_identity)) -> dict:
     scope = body.scope or {"team": identity.team, "user_id": None if identity.role == "manager" else identity.user_id}
@@ -71,7 +118,9 @@ def create_memory(body: CreateBody, identity: Identity = Depends(security.curren
     params = {"kind": body.kind, "text": body.text, "scope": scope, "reason": body.reason}
     try:
         method = _step_up(identity, scope, source, body.password, "memory.write", params, run_id)
-        saved = memory.remember(identity, run_id, kind=body.kind, text=body.text, scope=scope, ttl_days=body.ttl_days, source_type=source, auth_method=method)
+        # A lesson drawn from past verdicts is guidance found by relevance, not an order shown on every review.
+        extra = {"consolidated_from": body.consolidated_from, "authority": "guidance", "always": False} if body.consolidated_from else None
+        saved = memory.remember(identity, run_id, kind=body.kind, text=body.text, scope=scope, ttl_days=body.ttl_days, source_type=source, auth_method=method, extra=extra)
     except Exception:
         gate.close_run(run_id, "denied")
         raise

@@ -9,6 +9,7 @@ Notes for Claude 5.5 models, which shape this file:
 from __future__ import annotations
 
 import base64
+import time
 from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Any, Optional, Type, TypeVar
@@ -17,6 +18,7 @@ from langchain.chat_models import init_chat_model
 from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel
 
+from app.core import gate
 from app.core.config import get_settings
 
 T = TypeVar("T", bound=BaseModel)
@@ -69,6 +71,20 @@ def fast_model():
     return init_chat_model(s.llm_fast_model, max_tokens=MAX_TOKENS, output_config={"effort": s.llm_fast_effort})
 
 
+def _name(model) -> Optional[str]:
+    return getattr(model, "model", None) or getattr(model, "model_name", None)
+
+
+def _effort(model) -> Optional[str]:
+    return (getattr(model, "output_config", None) or getattr(model, "model_kwargs", {}).get("output_config") or {}).get("effort")
+
+
+def prompts_version() -> str:
+    from app.agent.prompts import PROMPT_VERSION
+
+    return PROMPT_VERSION
+
+
 def cached_system(stable: list[str]) -> list[dict]:
     """A system prompt made of parts that do not change from call to call, marked for prompt caching.
 
@@ -110,11 +126,28 @@ def call_structured(
         "tags": [t for t in ("greenlight", intent) if t],
         "metadata": {k: v for k, v in {"run_id": run_id, "intent": intent, "step": label}.items() if v},
     }
-    result = runnable.invoke([SystemMessage(content=system), HumanMessage(content=user)], config=config)
+    started = time.time()
+    try:
+        result = runnable.invoke([SystemMessage(content=system), HumanMessage(content=user)], config=config)
+    except Exception as exc:
+        gate.emit("model_call", f"model.{label}", params={"model": _name(model), "prompt_version": prompts_version()},
+                  result={"status": "error", "summary": type(exc).__name__}, duration_ms=int((time.time() - started) * 1000))
+        gate.count(model_calls=1)
+        raise
     raw = result.get("raw")
     if usage is not None and raw is not None:
         usage.add(label, getattr(raw, "usage_metadata", None))
     stop_reason = (getattr(raw, "response_metadata", None) or {}).get("stop_reason")
+    meta = getattr(raw, "usage_metadata", None) or {}
+    spent = {"in": int(meta.get("input_tokens", 0)), "out": int(meta.get("output_tokens", 0)), "cached": int((meta.get("input_token_details") or {}).get("cache_read", 0) or 0)}
+    # The ledger holds fingerprints of the prompt and the answer, not copies; the full text is in the trace.
+    gate.emit(
+        "model_call", f"model.{label}", duration_ms=int((time.time() - started) * 1000), tokens=spent,
+        params={"model": _name(model), "effort": _effort(model), "prompt_version": prompts_version(), "prompt_hash": gate.digest([system, user]),
+                "output_hash": gate.digest(getattr(raw, "content", None)), "schema": schema.__name__, "trace_id": getattr(raw, "id", None)},
+        result={"status": "refused" if stop_reason == "refusal" else "ok" if result.get("parsed") is not None else "error", "summary": f"{label}: {stop_reason or 'done'}"},
+    )
+    gate.count(model_calls=1, tokens=spent["in"] + spent["out"])
     if stop_reason == "refusal":
         raise ModelRefused(f"{label}: the model declined this request")
     parsed = result.get("parsed")

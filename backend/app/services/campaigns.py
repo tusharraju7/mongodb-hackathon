@@ -93,7 +93,10 @@ def search_by_vector(identity: Identity, vector: list[float], k: int = 1, db=Non
         {"$set": {"_score": {"$meta": "vectorSearchScore"}}},
         {"$project": NO_VECTOR},
     ]
-    return list(db.campaigns.aggregate(pipeline))
+    hits = list(db.campaigns.aggregate(pipeline))
+    gate.emit("retrieval", "campaign.search", params={"collection": "campaigns", "filter": {"team": identity.team, "status": visible_statuses(identity)}, "limit": k},
+              result={"status": "ok", "summary": f"{len(hits)} ad(s) in scope", "hits": [{"id": str(h["_id"]), "score": round(h.get("_score", 0), 4)} for h in hits]})
+    return hits
 
 
 def search(identity: Identity, query: str, *, k: int = 1, db=None) -> list[dict]:
@@ -104,16 +107,19 @@ def submit(
     identity: Identity, run_id: str, *, name: Optional[str], text: str, ctx: dict, facts: dict, summary: str, description: str,
     modality: str, file_id: Optional[str], mime: Optional[str], compliance: ComplianceReport, cache_key: Optional[str] = None,
     campaign_id: Optional[str] = None, source: str = "submitted", derived_from: Optional[int] = None,
-    vector: Optional[list[float]] = None, db=None,
+    vector: Optional[list[float]] = None, step_key: Optional[str] = None, db=None,
 ) -> dict:
-    """File an ad, or the next version of one. A new version always clears the approval."""
+    """File an ad, or the next version of one. A new version always clears the approval.
+
+    With a `step_key` the filing is checkpointed: a run that is resumed does not file twice.
+    """
     db = db if db is not None else get_db()
     existing = _load(identity, campaign_id, db) if campaign_id else None
     params = {"name": name or (existing or {}).get("name"), "modality": modality, "offer_id": ctx.get("offer_id"), "campaign_id": campaign_id, "source": source}
 
     def apply() -> dict:
         report = {**compliance.model_dump(), "checked_at": _now(), "cache_key": cache_key}
-        assets = [{"type": modality, "file_id": file_id, "mime": mime}] if file_id and modality in ("audio", "image") else []
+        assets = [{"type": modality, "file_id": file_id, "mime": mime}] if file_id and modality in ("audio", "image", "video") else []
         fields = {
             "text": text, "visual_notes": ctx.get("visual_notes"), "summary": summary, "description": description, "facts": facts,
             "assets": assets, "modality": modality, "language": ctx.get("language") or facts.get("language") or "en",
@@ -139,11 +145,16 @@ def submit(
         doc.pop("embedding", None)
         return doc
 
+    def adopt() -> Optional[dict]:
+        # Every version carries the run that filed it, so an interrupted run can find its own filing.
+        query = {"run_id": run_id, "team": identity.team, **({"_id": existing["_id"]} if existing else {})}
+        return db.campaigns.find_one(query, NO_VECTOR)
+
     return gate.guarded(
         identity, "campaign.submit", params, run_id, apply,
         undo=lambda c: {"type": "campaign.rollback", "ref": {"id": str(c["_id"]), "version": c.get("version", 1)}},
         summarize=lambda c: {"status": "ok", "summary": f"Filed version {c.get('version', 1)} of '{c.get('name')}' as pending review", "ref": {"collection": "campaigns", "id": str(c["_id"])}},
-        db=db,
+        facts={"target_team": (existing or {}).get("team", identity.team)}, step_key=step_key, adopt=adopt, db=db,
     )
 
 
@@ -173,6 +184,7 @@ def approve(identity: Identity, run_id: str, campaign_id: str, feedback: Optiona
 
     return gate.guarded(
         identity, "campaign.approve", params, run_id, apply,
+        facts={"target_team": c.get("team"), "ad_status": c.get("status"), "verdict": report.get("verdict")},
         policy_refs=report.get("checked_fundamentals", []),
         undo={"type": "campaign.status", "ref": {"id": campaign_id, "status": "pending_review", "clear_approval": True}},
         summarize=lambda d: {"status": "ok", "summary": f"Approved version {d.get('version', 1)} of '{d.get('name')}'", "ref": {"collection": "campaigns", "id": campaign_id}},
@@ -245,6 +257,7 @@ def release(identity: Identity, run_id: str, campaign_id: str, db=None) -> dict:
 
     return gate.guarded(
         identity, "campaign.release", params, run_id, apply,
+        facts={"target_team": c.get("team"), "ad_status": c.get("status"), "stale_changes": changes},
         policy_refs=c["approval"].get("policy_versions", []),
         undo={"type": "campaign.status", "ref": {"id": campaign_id, "status": "approved"}},
         summarize=lambda d: {"status": "ok", "summary": f"Released version {d.get('version', 1)} of '{d.get('name')}'", "ref": {"collection": "campaigns", "id": campaign_id}},
@@ -282,3 +295,16 @@ def rollback(ref: dict, db=None) -> str:
     restored["status"] = "pending_review"
     db.campaigns.update_one({"_id": c["_id"]}, {"$set": restored, "$pop": {"history": 1}, "$unset": {"approval": ""}})
     return f"version {c.get('version')} removed; version {previous.get('version')} is current again"
+
+
+def restore_report(ref: dict, db=None) -> str:
+    """Undo a re-review that updated an ad's report in place. Used by run rollback."""
+    db = db if db is not None else get_db()
+    c = db.campaigns.find_one({"_id": oid(ref["id"])}, NO_VECTOR)
+    if not c or c.get("version", 1) != ref.get("version"):
+        return "a later version exists; nothing undone"
+    update: dict = {"$set": {"compliance": ref.get("compliance"), "status": ref.get("status")}}
+    if ref.get("approval"):
+        update["$set"]["approval"] = ref["approval"]
+    db.campaigns.update_one({"_id": c["_id"]}, update)
+    return "earlier review restored"

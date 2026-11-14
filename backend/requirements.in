@@ -18,3 +18,5 @@ pillow
 pytest
 mongomock
 httpx
+opencv-python-headless
+imageio-ffmpeg

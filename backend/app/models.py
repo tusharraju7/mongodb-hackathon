@@ -11,7 +11,7 @@ Role = Literal["manager", "marketer", "sales"]
 Team = str      # the teams of the loaded data set; see profile.json
 Region = str    # "CA", "CA-ON", "CA-QC", ...
 Language = Literal["en", "fr"]
-Modality = Literal["text", "audio", "image"]
+Modality = Literal["text", "audio", "image", "video"]
 ClaimType = str  # one of the data set's claim types (profile.json), or "other"
 Materiality = Literal["material", "disclosure", "formatting"]
 Verdict = Literal["pass", "needs_changes", "blocked"]
@@ -31,6 +31,7 @@ class Identity(BaseModel):
     name: str = ""
     role: Role
     team: Team
+    auth_version: int = 0   # bumped when the user's role, team or status changes; older tokens then stop working
 
 
 class AdContext(BaseModel):
@@ -90,6 +91,7 @@ class Violation(BaseModel):
     fundamental_key: Optional[str] = None
     version: Optional[int] = None
     memory_id: Optional[str] = None
+    source_label: Optional[str] = None  # for a memory: where it came from, e.g. "Slack #legal-marketing, Ethan Cho, 2026-10-30"
     materiality: Materiality
     quote: str = ""
     explanation: str
@@ -114,6 +116,9 @@ class ComplianceReport(BaseModel):
     passed_checks: list[PassedCheck] = Field(default_factory=list)
     violations: list[Violation] = Field(default_factory=list)
     conflicts: list[dict] = Field(default_factory=list)  # [{between: [{type, ref, label}], winner: {...}, explanation}]
+    # Image ads: where each finding sits. `finding` indexes `violations`; `box` is [left, top, right, bottom] as fractions, or null.
+    highlights: list[dict] = Field(default_factory=list)
+    annotated_url: Optional[str] = None  # the image with numbered boxes and a legend drawn on it
     channel_class: Optional[str] = None  # public | owned | direct | unknown, decided in code
     prompt_version: Optional[str] = None
     corrected_copy: Optional[str] = None

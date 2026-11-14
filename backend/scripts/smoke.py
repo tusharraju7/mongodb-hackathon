@@ -1,7 +1,7 @@
 """Live end-to-end check against a running backend and a seeded database (the NorthPlay data set).
 
     python -m scripts.load_db --db greenlight_scratch --password "$SEED_PASSWORD"
-    MONGODB_DB=greenlight_scratch uvicorn app.main:app --port 8000     # in one terminal
+    MONGODB_DB=greenlight_scratch ALLOW_FAULT_INJECTION=true RUN_STALE_SECONDS=5 uvicorn app.main:app --port 8000     # in one terminal
     python -m scripts.smoke                                            # in another
 
 Run it against a scratch database, not the shared one: it uploads the three demo ads, files and
@@ -139,6 +139,54 @@ def main() -> int:
     check(all(c["status"] == "released" for c in http.get("/campaigns", headers=support).json()), "support sees released ads only")
     leadership = [m for m in http.get("/memories", headers=marketer).json() if (m.get("source") or {}).get("channel") == "leadership"]
     check(not leadership and any((m.get("source") or {}).get("channel") == "leadership" for m in http.get("/memories", headers=legal).json()), "leadership-channel decisions are visible to managers only")
+
+    print("\nRound two: what may be done, the audit trail, the lesion test, crash recovery")
+    d = http.post("/authorize", headers=legal, json={"action": "campaign.approve", "initiator": "agent"}).json()
+    check(d.get("allow") is False and d.get("decided_by") == "initiator", "asked in advance: the agent may not approve, even for legal", str(d))
+    asked = http.post("/chat", headers=legal, json={"thread_id": f"smoke-approve-{uuid.uuid4()}", "message": "Please approve the Hockey Night Live ad for me."}).json()
+    refusals = [e for e in http.get(f"/audit?run_id={asked.get('run_id')}", headers=legal).json() if e.get("decision") == "deny"]
+    check(asked.get("intent") == "approve_release" and any(e.get("decided_by") == "initiator" and e.get("initiator") == "agent" for e in refusals), "asked in chat, the agent is refused and the refusal names the agent", f"{asked.get('intent')} {refusals}")
+    rules = http.get("/policies/actions", headers=marketer).json()
+    human_only = {a["action"] for a in rules.get("actions", []) if a["initiators"] == ["human"]}
+    check({"campaign.approve", "campaign.release", "fundamentals.update"} <= human_only, "the rules are readable as data: approve, release and policy edits are for people only", str(human_only))
+
+    run = three["run_id"]
+    detail = http.get(f"/audit?run_id={run}&detail=true&limit=500", headers=marketer).json()
+    kinds = [e["event"] for e in detail]
+    check(kinds.count("finding") == len(three["report"].get("violations", [])) and kinds.count("model_call") >= 3 and "retrieval" in kinds, "every model call, retrieval and finding of the demo 3 review is on the ledger", str({k: kinds.count(k) for k in set(kinds)}))
+    check("conflict" in kinds, "the disagreement between the regulation and the Slack decision is recorded", str(three["report"].get("conflicts")))
+    verified = http.get(f"/audit/verify?run_id={run}", headers=marketer).json()
+    check(verified.get("intact") is True and verified.get("chained") == verified.get("events"), "the run's hash chain verifies", str(verified))
+    trace = http.get(f"/runs/{run}/trace", headers=marketer).json()
+    check([p["action"] for p in trace.get("plan", [])] == ["compliance.check", "campaign.submit", "memory.write"] and all(p["allow"] for p in trace["plan"]), "the plan was authorised before the first step")
+    check(bool(three["report"].get("highlights")) and bool(three["report"].get("annotated_url")), "demo 3 comes back with the flaw marked on the image", str(three["report"].get("highlights")))
+
+    lesion = http.post(f"/runs/{run}/attribution", headers=marketer)
+    tested = lesion.json().get("tested", []) if lesion.status_code == 200 else []
+    check(any(t.get("effect") == "decisive" and "Moreau" in (t.get("text") or "") for t in tested), "lesion test: with the Jake Moreau decision removed, the verdict changes", lesion.text[:200])
+
+    health = http.get("/health").json()
+    if health.get("fault_injection") and health.get("run_stale_seconds", 999) <= 10:
+        import time
+
+        crash_run = str(uuid.uuid4())
+        body = {"run_id": crash_run, "text": "Tonight's game is a lock. Easy money for every fan. 19+. Please play responsibly.", "name": "Smoke: crash and resume", "channel": CHANNEL, "save": True}
+        crashed = http.post("/compliance/check", headers={**marketer, "X-Crash-After": "review"}, json=body)
+        check(crashed.status_code == 500 and crashed.json().get("error") == "crashed", "a run is abandoned right after its verdict", crashed.text[:120])
+        time.sleep(health["run_stale_seconds"] + 2)
+        seen = http.get(f"/runs/{crash_run}", headers=marketer).json()
+        check(seen.get("status") == "interrupted" and seen.get("resumable"), "the crash is noticed and the run is marked interrupted", str(seen.get("status")))
+        check(http.post(f"/runs/{crash_run}/resume", headers=legal).status_code == 403, "only the person who started it can resume it")
+        resumed = http.post(f"/runs/{crash_run}/resume", headers=marketer)
+        after = http.get(f"/audit?run_id={crash_run}&detail=true&limit=500", headers=marketer).json()
+        judged = [e for e in after if e["event"] == "model_call" and e["action"] == "model.judge"]
+        check(resumed.status_code == 200 and resumed.json().get("campaign") and len(judged) == 1, "resumed, it files the ad without asking for the verdict again", f"{resumed.status_code} judge calls: {len(judged)}")
+        check(http.get(f"/audit/verify?run_id={crash_run}", headers=marketer).json().get("intact") is True, "its ledger is intact across the crash")
+        rolled = http.post(f"/runs/{crash_run}/rollback", headers=legal)
+        gone = all(c["name"] != "Smoke: crash and resume" for c in http.get("/campaigns", headers=marketer).json())
+        check(rolled.status_code == 200 and gone, "rolled back, the ad it filed is out of the library", rolled.text[:160])
+    else:
+        print("  skip  crash and resume (start the backend with ALLOW_FAULT_INJECTION=true RUN_STALE_SECONDS=5 to include it)")
 
     failed = [what for ok, what in results if not ok]
     print(f"\n{len(results) - len(failed)} of {len(results)} checks passed.")

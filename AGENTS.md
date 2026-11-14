@@ -28,6 +28,7 @@ This file is the single source of guidance for Claude Code, Codex, and any other
 | Collection schemas, indexes, RBAC, API, service signatures | [docs/CONTRACTS.md](docs/CONTRACTS.md) |
 | What to create in MongoDB, in what order, and the seed data | [docs/MONGODB_SETUP.md](docs/MONGODB_SETUP.md) |
 | The backend as built: how to run it, what is verified, what data and the web app must match | [docs/BACKEND.md](docs/BACKEND.md) |
+| Why the gate, the ledger, crash recovery and memory work the way they do | [docs/DESIGN_NOTES.md](docs/DESIGN_NOTES.md) |
 | Shared Atlas access, env vars, MCP setup | [docs/SETUP.md](docs/SETUP.md) |
 | Demo script and rules checklist | [docs/DEMO.md](docs/DEMO.md) |
 
@@ -52,11 +53,12 @@ backend/
   app/services/      compliance.py  compliance_rules.py  confidence.py   the review; the last two are pure
                      fundamentals.py  offers.py  memory.py  campaigns.py  media.py
                      mongo_sources.py  fixture_sources.py                where a review reads from
-  app/routers/       auth  chat  compliance  campaigns  assets  fundamentals  memories  audit  runs
+                     attribution.py (lesion test)  consolidation.py (lessons from past verdicts)
+  app/routers/       auth  chat  compliance  campaigns  assets  fundamentals  memories  audit  runs  governance
   scripts/           dry_run.py (review without the database)  smoke.py (live end to end)
                      build_seed.py (source data -> seed files)  load_db.py (seed files -> MongoDB)
   seed/              *.json, generated from northplay-demo-data/ by build_seed.py
-  tests/             offline: rules, confidence, gate, services, whole API flow (on fixtures/tamarack)
+  tests/             offline: rules, confidence, gate, services, whole API flow, round two (on fixtures/tamarack)
 northplay-demo-data/ the source data set: regulations, past ads, Slack export, strategy decks, 3 demo ads
 frontend/            web app owner; not started in this repo yet
 ```
@@ -76,7 +78,7 @@ Edit only the files your area owns.
 ## Rules
 
 1. **Stay in your lane.** If you need something from another stream, call its function as specified in `docs/CONTRACTS.md`. If the contract is not enough, stop and tell your human; do not edit another stream's files.
-2. **Every state-changing action goes through `guarded()`** in `backend/app/core/gate.py`. No tool or router writes to the database or calls ElevenLabs directly.
+2. **Every state-changing action goes through `guarded()`** in `backend/app/core/gate.py`. No tool or router writes to the database or calls ElevenLabs directly. A step inside a lane takes a fixed `step_key`, so a resumed run does not repeat it, and whatever it creates carries the `run_id`.
 3. **Identity comes from the JWT, never from model output.** Lanes receive `identity` and `run_id` as arguments from the router.
 4. **Access scope lives in the query.** Team, role and status filters go in the `$vectorSearch` pre-filter or the `find` filter, never in a prompt instruction.
 5. **Shared database.** Everyone works against the same Atlas cluster. Never drop collections or indexes. Never run an unfiltered delete or update. Schema, validator and index changes go only through `backend/scripts/setup_db.py`, which must stay idempotent. For destructive experiments set `MONGODB_DB=greenlight_<yourname>`.
@@ -119,7 +121,7 @@ Trunk-based. `main` must always start.
 ```bash
 # backend (Python 3.12 or later; the system python3 on macOS is too old)
 cd backend && python3.13 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
-pytest                           # 52 offline tests, no keys or database needed
+pytest                           # 77 offline tests, no keys or database needed
 python -m scripts.dry_run --suite   # live: every past ad against its recorded decision, no database needed
 python -m scripts.dry_run --image ../northplay-demo-data/demo_ads/demo_03_play_smart_breaks.png --channel "Instagram (paid social)"
 uvicorn app.main:app --reload --port 8000     # API on http://localhost:8000, docs at /docs

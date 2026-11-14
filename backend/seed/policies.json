@@ -17,7 +17,8 @@
       "memory.forget",
       "run.stop",
       "run.rollback",
-      "audit.read"
+      "audit.read",
+      "user.access"
     ]
   },
   {

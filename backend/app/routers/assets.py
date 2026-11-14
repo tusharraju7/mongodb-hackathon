@@ -14,18 +14,19 @@ from app.services import campaigns, media
 router = APIRouter(tags=["assets"])
 
 MAX_BYTES = 20 * 1024 * 1024
+MAX_VIDEO_BYTES = 50 * 1024 * 1024
 
 
 @router.post("/assets")
 async def upload(file: UploadFile, identity: Identity = Depends(security.current_identity)) -> dict:
-    """Upload an audio or image ad for review. Returns the id to send with the chat message or the check."""
+    """Upload an audio, image or video ad for review. Returns the id to send with the chat message or the check."""
     data = await file.read()
-    if len(data) > MAX_BYTES:
-        raise HTTPException(status_code=413, detail="File is larger than 20 MB")
     try:
         kind = media.kind_of(file.content_type or "")
     except media.UnsupportedMedia as exc:
         raise HTTPException(status_code=415, detail=str(exc))
+    if len(data) > (MAX_VIDEO_BYTES if kind == "video" else MAX_BYTES):
+        raise HTTPException(status_code=413, detail="File is larger than 50 MB" if kind == "video" else "File is larger than 20 MB")
     run_id = f"upload-{uuid.uuid4()}"
 
     def save() -> str:
@@ -47,7 +48,7 @@ def download(file_id: str, identity: Identity = Depends(security.current_identit
         raise HTTPException(status_code=404, detail="No such file")
     meta = info.get("metadata") or {}
     used_by_visible_ad = db.campaigns.count_documents(
-        {"team": identity.team, "status": {"$in": campaigns.visible_statuses(identity)}, "$or": [{"assets.file_id": file_id}, {"history.assets.file_id": file_id}]}, limit=1
+        {"team": identity.team, "status": {"$in": campaigns.visible_statuses(identity)}, "$or": [{"assets.file_id": file_id}, {"history.assets.file_id": file_id}, {"compliance.annotated_url": f"/assets/{file_id}"}]}, limit=1
     )
     if not used_by_visible_ad and meta.get("uploaded_by") != identity.user_id:
         raise HTTPException(status_code=404, detail="No such file")

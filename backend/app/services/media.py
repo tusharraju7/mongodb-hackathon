@@ -16,12 +16,15 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 from app.agent import prompts
-from app.core import llm
+from app.core import gate, llm
 from app.core.config import get_settings
 from app.core.db import bucket, oid
 
 AUDIO_TYPES = {"audio/mpeg", "audio/mp3", "audio/wav", "audio/x-wav", "audio/mp4", "audio/x-m4a", "audio/m4a", "audio/webm", "audio/ogg"}
 IMAGE_TYPES = {"image/png", "image/jpeg", "image/webp", "image/gif"}
+VIDEO_TYPES = {"video/mp4", "video/quicktime", "video/webm"}
+MAX_FRAMES = 6
+FRAME_WIDTH = 1024
 TTS_MODEL = "eleven_multilingual_v2"  # handles English and French with one voice
 STT_MODEL = "scribe_v1"
 
@@ -36,7 +39,9 @@ def kind_of(mime: str) -> str:
         return "audio"
     if mime in IMAGE_TYPES:
         return "image"
-    raise UnsupportedMedia(f"Unsupported file type: {mime or 'unknown'}. Upload audio (mp3, wav, m4a) or an image (png, jpg).")
+    if mime in VIDEO_TYPES:
+        return "video"
+    raise UnsupportedMedia(f"Unsupported file type: {mime or 'unknown'}. Upload audio (mp3, wav, m4a), an image (png, jpg) or a video (mp4, mov, webm).")
 
 
 # ---------------------------------------------------------------- storage (GridFS)
@@ -87,6 +92,7 @@ def voice_id() -> str:
 
 
 def transcribe_bytes(data: bytes, filename: str = "ad.mp3") -> str:
+    gate.count(external_calls=1)
     result = _eleven().speech_to_text.convert(model_id=STT_MODEL, file=(filename, io.BytesIO(data)), tag_audio_events=False)
     return (result.text or "").strip()
 
@@ -97,12 +103,13 @@ def transcribe(file_id: str, db=None) -> str:
 
 
 def synthesize_bytes(text: str, language: str = "en") -> bytes:
+    gate.count(external_calls=1)
     chunks = _eleven().text_to_speech.convert(voice_id(), text=text, model_id=TTS_MODEL, output_format="mp3_44100_128", language_code=None)
     return b"".join(chunks)
 
 
-def synthesize_speech(text: str, language: str = "en", db=None) -> str:
-    return store(synthesize_bytes(text, language), "audio/mpeg", "regenerated.mp3", db)
+def synthesize_speech(text: str, language: str = "en", db=None, metadata: Optional[dict] = None) -> str:
+    return store(synthesize_bytes(text, language), "audio/mpeg", "regenerated.mp3", db, metadata=metadata)
 
 
 # ---------------------------------------------------------------- image in
@@ -132,6 +139,217 @@ def read_image_bytes(data: bytes, mime: str, *, usage: Optional[llm.TokenUsage] 
 def read_image(file_id: str, db=None, **kw) -> dict:
     data, mime = open_file(file_id, db)
     return read_image_bytes(data, mime, **kw)
+
+
+# ---------------------------------------------------------------- video in
+#
+# A video is taken through the same review as any other ad: its speech is transcribed, a few frames
+# are read for what is on screen, and the review runs on that text. Nothing is marked on the video.
+
+
+class VideoReading(BaseModel):
+    on_screen_text: str = Field(description="Every piece of text shown in any frame, exactly as written, in the order it first appears. Empty if there is none.")
+    visual_notes: str = Field(description="Three or four sentences on what the video shows across the frames.")
+    fine_print_present: bool
+    fine_print_legible: bool = Field(description="Would the legal disclaimer be read at a glance? False only when clearly too small or too faint. True when readable, and true when there is none.")
+    people_present: bool
+
+
+def sample_frames(path: str, count: int = MAX_FRAMES) -> tuple[list[bytes], float]:
+    """Up to `count` evenly spaced frames as JPEGs, and the length of the video in seconds."""
+    import cv2
+
+    video = cv2.VideoCapture(path)
+    try:
+        total = int(video.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
+        fps = float(video.get(cv2.CAP_PROP_FPS) or 0) or 25.0
+        if total <= 0:
+            raise UnsupportedMedia("This video could not be read. Try an mp4 (H.264) file.")
+        # The middle of each of `count` equal stretches, so the opening and the end card are both covered.
+        wanted = sorted({min(total - 1, int((i + 0.5) * total / count)) for i in range(min(count, total))})
+        frames = []
+        for index in wanted:
+            video.set(cv2.CAP_PROP_POS_FRAMES, index)
+            ok, frame = video.read()
+            if not ok:
+                continue
+            height, width = frame.shape[:2]
+            if width > FRAME_WIDTH:
+                frame = cv2.resize(frame, (FRAME_WIDTH, int(height * FRAME_WIDTH / width)), interpolation=cv2.INTER_AREA)
+            ok, encoded = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
+            if ok:
+                frames.append(encoded.tobytes())
+        if not frames:
+            raise UnsupportedMedia("No frame of this video could be read. Try an mp4 (H.264) file.")
+        return frames, total / fps
+    finally:
+        video.release()
+
+
+def extract_audio(path: str) -> Optional[bytes]:
+    """The sound track as mp3, using the ffmpeg binary that ships with imageio-ffmpeg. None if there is no sound."""
+    import subprocess
+
+    import imageio_ffmpeg
+
+    done = subprocess.run(
+        [imageio_ffmpeg.get_ffmpeg_exe(), "-v", "error", "-i", path, "-vn", "-ac", "1", "-ar", "16000", "-f", "mp3", "pipe:1"],
+        capture_output=True, timeout=120,
+    )
+    return done.stdout if done.returncode == 0 and len(done.stdout) > 1000 else None
+
+
+def video_speech(path: str) -> str:
+    """What is said in the video. The sound track is pulled out first, so only audio is sent for transcription."""
+    audio = extract_audio(path)
+    if not audio:
+        return ""
+    return transcribe_bytes(audio, "video-audio.mp3")
+
+
+def read_video_bytes(data: bytes, mime: str, *, usage: Optional[llm.TokenUsage] = None, run_id: Optional[str] = None) -> dict:
+    import os
+    import tempfile
+
+    suffix = {"video/mp4": ".mp4", "video/quicktime": ".mov", "video/webm": ".webm"}.get((mime or "").split(";")[0], ".mp4")
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as handle:
+        handle.write(data)
+        path = handle.name
+    try:
+        frames, seconds = sample_frames(path)
+        spoken = video_speech(path)
+    finally:
+        os.unlink(path)
+    blocks = [llm.image_block(frame, "image/jpeg") for frame in frames]
+    blocks.append({"type": "text", "text": f"These are {len(frames)} frames from a {seconds:.0f}-second video advertisement, in order. Read them."})
+    reading: VideoReading = llm.call_structured(llm.fast_model(), VideoReading, system=prompts.READ_VIDEO_SYSTEM, user=blocks, label="read_video", usage=usage, run_id=run_id, intent="review")
+    on_screen = reading.on_screen_text.strip()
+    # The review runs on one text: what is said, then what is shown in writing.
+    parts = [p for p in ((f"Spoken: {spoken}" if spoken else ""), (f"On screen: {on_screen}" if on_screen else "")) if p]
+    return {
+        "text": "\n".join(parts), "spoken": spoken, "on_screen": on_screen, "visual_notes": reading.visual_notes,
+        "fine_print_present": reading.fine_print_present, "fine_print_legible": reading.fine_print_legible,
+        "people_present": reading.people_present, "seconds": round(seconds, 1), "frames": len(frames),
+    }
+
+
+# ---------------------------------------------------------------- highlighting findings on an image
+
+
+class Located(BaseModel):
+    number: int = Field(description="The number of the problem, as listed.")
+    found: bool = Field(description="False when the problem has no place on the image, or you cannot find it.")
+    left: float = Field(description="Left edge as a fraction of the image width, 0 to 1.")
+    top: float = Field(description="Top edge as a fraction of the image height, 0 to 1.")
+    right: float = Field(description="Right edge as a fraction of the image width, 0 to 1.")
+    bottom: float = Field(description="Bottom edge as a fraction of the image height, 0 to 1.")
+
+
+class Locations(BaseModel):
+    items: list[Located]
+
+
+def locate_findings(data: bytes, mime: str, findings: list[dict], *, usage: Optional[llm.TokenUsage] = None, run_id: Optional[str] = None) -> list[dict]:
+    """Where each finding sits on the image. One model call; boxes are fractions of width and height.
+
+    A finding about something missing has no place on the image and is returned without a box.
+    Boxes come from a general vision model and are approximate.
+    """
+    if not findings:
+        return []
+    listed = "\n".join(
+        f"{i}. " + (f'Quotes: "{f["quote"]}". ' if f.get("quote") else "Quotes nothing. ") + f["explanation"] for i, f in enumerate(findings, start=1)
+    )
+    result = llm.call_structured(
+        llm.main_model(), Locations, system=prompts.LOCATE_SYSTEM,
+        user=[llm.image_block(data, mime), {"type": "text", "text": f"<problems>\n{listed}\n</problems>"}],
+        label="locate_findings", usage=usage, run_id=run_id, intent="review",
+    )
+    by_number = {item.number: item for item in result.items}
+    out = []
+    for i, finding in enumerate(findings, start=1):
+        item = by_number.get(i)
+        box = None
+        if item and item.found:
+            l, t, r, b = (max(0.0, min(1.0, v)) for v in (item.left, item.top, item.right, item.bottom))
+            # A box that is inside out, a sliver, or the whole image says nothing useful.
+            if r - l > 0.01 and b - t > 0.01 and (r - l) * (b - t) < 0.85:
+                box = [round(l, 4), round(t, 4), round(r, 4), round(b, 4)]
+        out.append({"finding": i - 1, "box": box, "kind": "located" if box else "not_on_image"})
+    return out
+
+
+SEVERE, WARN, INK, PAPER = (214, 48, 49), (230, 150, 20), (28, 32, 38), (250, 250, 248)
+
+
+def finding_label(finding: dict) -> str:
+    return finding.get("fundamental_key") or finding.get("source_label") or "team instruction"
+
+
+def annotate_image_bytes(data: bytes, findings: list[dict], highlights: list[dict]) -> bytes:
+    """Draw a numbered box for each located finding, and a legend underneath listing every finding.
+
+    Red marks a finding that rejects the ad; amber one that asks for changes. Findings with no
+    place on the image appear in the legend only, marked as not on the image.
+    """
+    from PIL import Image, ImageDraw
+
+    base = Image.open(io.BytesIO(data)).convert("RGB")
+    w, h = base.size
+    unit = max(12, w // 60)                       # everything scales with the image
+    font, small = _font(int(unit * 1.15)), _font(unit)
+    pad = unit
+
+    probe = ImageDraw.Draw(base)
+    rows = []
+    for i, f in enumerate(findings):
+        located = any(x["finding"] == i and x["box"] for x in highlights)
+        head = f"{finding_label(f)}" + ("" if located else "  (not on the image)")
+        rows.append((i, head, _wrap(probe, f["explanation"], small, w - pad * 4 - unit * 2)))
+    legend_h = pad * 2 + sum(int(unit * 1.6) + len(body) * int(unit * 1.3) + pad // 2 for _, _, body in rows)
+
+    canvas = Image.new("RGB", (w, h + legend_h), PAPER)
+    canvas.paste(base, (0, 0))
+    draw = ImageDraw.Draw(canvas)
+
+    def colour(f: dict):
+        return SEVERE if f.get("materiality") == "material" else WARN
+
+    def badge(x: int, y: int, n: int, fill) -> None:
+        r = int(unit * 0.95)
+        draw.ellipse([x - r, y - r, x + r, y + r], fill=fill, outline=PAPER, width=max(1, unit // 8))
+        label = str(n)
+        tw = draw.textlength(label, font=small)
+        draw.text((x - tw / 2, y - unit * 0.62), label, font=small, fill=PAPER)
+
+    placed: list[tuple[int, int]] = []
+    for hl in highlights:
+        if not hl["box"]:
+            continue
+        f = findings[hl["finding"]]
+        l, t, r, b = hl["box"]
+        box = [int(l * w), int(t * h), int(r * w), int(b * h)]
+        draw.rectangle(box, outline=colour(f), width=max(3, unit // 4))
+        # Two findings can point at the same words. Step each further badge along so none is hidden.
+        x, y = max(int(unit), box[0]), max(int(unit), box[1])
+        while any(abs(x - px) < unit * 2 and abs(y - py) < unit * 2 for px, py in placed):
+            x += int(unit * 2.1)
+        placed.append((x, y))
+        badge(x, y, hl["finding"] + 1, colour(f))
+
+    y = h + pad
+    for i, head, body in rows:
+        f = findings[i]
+        badge(pad + unit, y + int(unit * 0.8), i + 1, colour(f))
+        draw.text((pad * 2 + unit * 2, y), head, font=font, fill=INK)
+        y += int(unit * 1.6)
+        for line in body:
+            draw.text((pad * 2 + unit * 2, y), line, font=small, fill=(70, 76, 86))
+            y += int(unit * 1.3)
+        y += pad // 2
+    out = io.BytesIO()
+    canvas.save(out, format="PNG")
+    return out.getvalue()
 
 
 # ---------------------------------------------------------------- image out (brand template)
@@ -261,6 +479,15 @@ def render_image_bytes(copy: str, *, language: str = "en", card_name: Optional[s
     return out.getvalue()
 
 
-def render_image(copy: str, *, language: str = "en", offer: Optional[dict] = None, db=None) -> str:
+def render_image(copy: str, *, language: str = "en", offer: Optional[dict] = None, db=None, metadata: Optional[dict] = None) -> str:
     name = (offer or {}).get("card_name_fr" if language == "fr" else "card_name")
-    return store(render_image_bytes(copy, language=language, card_name=name), "image/png", "regenerated.png", db)
+    return store(render_image_bytes(copy, language=language, card_name=name), "image/png", "regenerated.png", db, metadata=metadata)
+
+
+def run_files(run_id: str, kind: Optional[str] = None, db=None) -> list[dict]:
+    """Files a run made (a rendering, a recording, an annotated image), newest first."""
+    from app.core.db import get_db
+
+    db = db if db is not None else get_db()
+    query = {"metadata.run_id": run_id, **({"metadata.kind": kind} if kind else {})}
+    return list(db["fs.files"].find(query).sort("uploadDate", -1))

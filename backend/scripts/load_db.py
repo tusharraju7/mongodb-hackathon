@@ -21,7 +21,7 @@ from datetime import datetime, timedelta, timezone
 
 from pymongo.operations import SearchIndexModel
 
-from app.core import embeddings, security
+from app.core import embeddings, gate, security
 from app.core.config import REPO_ROOT, SEED_DIR, SOURCE_DATA_DIR
 from app.core.db import get_client
 from app.core.profile import get_profile
@@ -42,6 +42,10 @@ INDEXES = [
     ("ledger", [("run_id", 1), ("ts", 1)], {}),
     ("ledger", [("actor.user_id", 1), ("ts", -1)], {}),
     ("runs", [("actor.user_id", 1), ("started_at", -1)], {}),
+    ("runs", [("status", 1), ("heartbeat_at", 1)], {}),
+    # One event per position in a run: two writers can never fork the hash chain. Events from before
+    # chaining, and seeded ones, have no `seq` and are left out of the index.
+    ("ledger", [("run_id", 1), ("seq", 1)], {"unique": True, "partialFilterExpression": {"seq": {"$exists": True}}}),
     ("slack_messages", [("channel", 1), ("ts", 1)], {}),
 ]
 ROUTE_REASON = {"pass": "No findings", "needs_changes": "Changes required before it can run", "blocked": "Material finding"}
@@ -109,6 +113,11 @@ def load(db, password: str, with_media: bool) -> None:
 
     for doc in seed("policies"):
         db.policies.replace_one({"_id": doc["_id"]}, {**doc, "updated_at": at}, upsert=True)
+    # The rule for each action, as data. These are the defaults the gate would use anyway; storing
+    # them makes them readable in Atlas, and editing one there changes the rule without a deploy.
+    for action, rule in gate.DEFAULT_RULES.items():
+        db.action_rules.replace_one({"_id": action}, {"_id": action, **rule, "updated_at": at}, upsert=True)
+    db.action_rules.replace_one({"_id": "_limits"}, {"_id": "_limits", "per_run": gate.DEFAULT_LIMITS, "note": "The most one run may use before its next step is refused.", "updated_at": at}, upsert=True)
 
     password_hash = security.hash_password(password)
     for u in seed("users"):
@@ -212,7 +221,7 @@ def load(db, password: str, with_media: bool) -> None:
         for d in docs:
             db[name].replace_one(key(d), d, upsert=True)
 
-    names = ("policies", "users", "offers", "fundamentals", "fundamentals_versions", "campaigns", "memories", "ledger", "slack_messages", "strategy_docs", "regulations", "ad_decisions")
+    names = ("action_rules", "policies", "users", "offers", "fundamentals", "fundamentals_versions", "campaigns", "memories", "ledger", "slack_messages", "strategy_docs", "regulations", "ad_decisions")
     print("loaded:", {n: db[n].count_documents({}) for n in names}, "| files:", db["fs.files"].count_documents({}))
 
 

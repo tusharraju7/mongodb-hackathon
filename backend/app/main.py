@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import importlib
+import os
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,14 +24,45 @@ app.add_middleware(
     expose_headers=["X-Run-Id"],
 )
 
-for name in ("auth", "chat", "compliance", "campaigns", "assets", "fundamentals", "memories", "audit", "runs"):
+class RequestStartsAsHuman:
+    """An action is the agent's only inside a lane. Each request begins as its caller's own act."""
+
+    def __init__(self, inner):
+        self.inner = inner
+
+    async def __call__(self, scope, receive, send):
+        with gate.fresh_request():
+            await self.inner(scope, receive, send)
+
+
+app.add_middleware(RequestStartsAsHuman)
+
+for name in ("auth", "chat", "compliance", "campaigns", "assets", "fundamentals", "memories", "audit", "runs", "governance"):
     app.include_router(importlib.import_module(f"app.routers.{name}").router)
+
+
+@app.on_event("startup")
+def notice_crashed_runs() -> None:
+    """A run left `running` by a process that died is marked interrupted, so it can be resumed or rolled back."""
+    try:
+        gate.sweep_interrupted()
+    except Exception:
+        pass  # the database may be unreachable; /health reports that
+
+
+@app.exception_handler(gate.SimulatedCrash)
+async def simulated_crash(request: Request, exc: gate.SimulatedCrash) -> JSONResponse:
+    # Fault injection only. The run is left untouched, exactly as a dead process would leave it.
+    return JSONResponse(status_code=500, content={"error": "crashed", "message": str(exc)})
 
 
 @app.get("/health")
 def health() -> dict:
     s = get_settings()
     status = {"status": "ok", "database": s.mongodb_db, "model": s.llm_model, "fast_model": s.llm_fast_model}
+    # Shown so a test or a demo can tell whether a crash can be staged, and how soon it is noticed.
+    status["fault_injection"] = os.environ.get("ALLOW_FAULT_INJECTION", "").lower() == "true"
+    status["run_stale_seconds"] = gate.RUN_STALE_SECONDS
     try:
         from app.core.db import get_client
 

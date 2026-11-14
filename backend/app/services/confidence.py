@@ -33,6 +33,9 @@ def input_quality(modality: str, fine_print_legible: Optional[bool] = None) -> t
         if fine_print_legible is False:
             return 0.60, "Read from an image with hard-to-read fine print (input quality 0.60)"
         return 0.80, "Read from an image (input quality 0.80)"
+    if modality == "video":
+        # Speech is transcribed and only a few frames are read, so something on screen may be missed.
+        return 0.75, "Transcribed from a video and read from sampled frames (input quality 0.75)"
     return 1.00, "The ad was submitted as typed text"
 
 

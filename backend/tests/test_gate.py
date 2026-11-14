@@ -17,6 +17,8 @@ MANAGER = Identity(user_id="u-manager", email="manager.national@tamarack.test", 
 def db():
     database = mongomock.MongoClient().greenlight
     database.policies.insert_many(json.loads((SEED_DIR / "policies.json").read_text()))
+    # The gate re-reads the user at every step, so the people acting must exist.
+    database.users.insert_many([{"_id": i.user_id, "email": i.email, "name": i.name, "role": i.role, "team": i.team} for i in (MARKETER, SALES, MANAGER)])
     return database
 
 
@@ -110,7 +112,7 @@ def test_secrets_and_raw_files_never_reach_the_ledger(db):
 
 
 def test_step_up_and_tokens(db, monkeypatch):
-    db.users.insert_one({"_id": "u-manager", "email": MANAGER.email, "name": "G", "role": "manager", "team": "national", "password_hash": security.hash_password("correct horse")})
+    db.users.update_one({"_id": "u-manager"}, {"$set": {"password_hash": security.hash_password("correct horse")}})
     assert security.verify_password(MANAGER, "correct horse", db)
     assert not security.verify_password(MANAGER, "wrong", db)
     assert not security.verify_password(MANAGER, None, db)

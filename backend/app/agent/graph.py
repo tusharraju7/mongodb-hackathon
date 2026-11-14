@@ -68,11 +68,17 @@ def route(state: ChatState) -> dict:
     ad = state.get("ad") or {}
     if state.get("file_id") or ad.get("text"):
         return {"intent": "review"}
+    # A resumed run does not ask again: the intent it was given the first time stands.
+    remembered = gate.step_result(state["run_id"], "route")
+    if remembered:
+        return {"intent": remembered}
     usage = llm.TokenUsage()
     recent = "\n".join(f"{t['role']}: {t['text'][:200]}" for t in (state.get("history") or [])[-4:]) or "(none)"
     has_ad = "yes" if state.get("last_campaign_id") or ad.get("campaign_id") else "no"
     user = f"<recent_turns>\n{recent}\n</recent_turns>\n<an_ad_is_under_discussion>{has_ad}</an_ad_is_under_discussion>\n\n<message>\n{state['message']}\n</message>"
-    decided: Route = llm.call_structured(llm.fast_model(), Route, system=prompts.router_system(), user=user, label="route", usage=usage, run_id=state["run_id"], intent="route")
+    with gate.detail_context(_identity(state), state["run_id"], state.get("thread_id")):
+        decided: Route = llm.call_structured(llm.fast_model(), Route, system=prompts.router_system(), user=user, label="route", usage=usage, run_id=state["run_id"], intent="route")
+    gate.save_step(state["run_id"], "route", decided.intent)
     return {"intent": decided.intent, "tokens": usage.as_dict()}
 
 
@@ -116,9 +122,15 @@ def act(state: ChatState) -> dict:
         elif intent == "ask":
             result = lanes.ask_lane(identity, run_id, question=state["message"], thread_campaign_id=campaign_id, usage=usage, thread_id=state.get("thread_id"))
         elif intent == "approve_release":
-            # Not a chat action. The gate still records a refusal for a role that may not approve.
-            gate.guarded(identity, "campaign.approve", {"via": "chat", "message": state["message"]}, run_id, lambda: None, thread_id=state.get("thread_id"), summarize=lambda _: {"status": "ok", "summary": "Pointed to the library; nothing changed"})
-            result = {"reply": "Approving and releasing are done from the ad library, with the Approve and Release buttons, so each one is a deliberate click.", "cards": [], "memories_used": [], "status": "completed"}
+            # Never an agent action. A role that may not approve was refused above. For a role that
+            # may, the gate refuses the *agent* and records it: approval is a person's deliberate click.
+            try:
+                with gate.acting_as("agent"):
+                    gate.guarded(identity, "campaign.approve", {"via": "chat", "message": state["message"]}, run_id, lambda: None, thread_id=state.get("thread_id"))
+            except gate.Denied as refusal:
+                if refusal.check != "initiator":
+                    raise
+            result = {"reply": "Approving and releasing are done from the ad library, with the Approve and Release buttons, so each one is a deliberate click. The assistant cannot do either; the request was not carried out.", "cards": [], "memories_used": [], "status": "completed"}
         else:
             result = {"reply": HELP, "cards": [], "memories_used": [], "status": "completed"}
     except gate.Denied:

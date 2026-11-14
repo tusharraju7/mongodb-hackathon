@@ -42,17 +42,28 @@ def _episodic_text(identity: Identity, ctx: dict, report: ComplianceReport, name
 
 # ---------------------------------------------------------------- review
 
+# The steps a lane intends to take, checked together before the first one runs.
+REVIEW_PLAN = ["compliance.check", "campaign.submit", "memory.write"]
+REGENERATE_PLAN = ["asset.regenerate", "campaign.submit", "memory.write"]
+
 
 def review_lane(
     identity: Identity, run_id: str, *, text: Optional[str], file_id: Optional[str], ctx: dict, use_memory: bool = True,
     usage: Optional[llm.TokenUsage] = None, thread_id: Optional[str] = None, save: bool = True,
     sources: Optional[Sources] = None, db=None,
 ) -> dict:
+    """Review an ad and, with `save`, file it. Every step is checkpointed under a fixed key, so a run
+    that is interrupted and resumed picks up after its last completed step and repeats nothing."""
+    with gate.acting_as("agent"):
+        return _review(identity, run_id, text=text, file_id=file_id, ctx=ctx, use_memory=use_memory, usage=usage, thread_id=thread_id, save=save, sources=sources, db=db)
+
+
+def _review(identity, run_id, *, text, file_id, ctx, use_memory, usage, thread_id, save, sources, db) -> dict:
     db = db if db is not None else get_db()
     sources = sources or default_sources()
     usage = usage or llm.TokenUsage()
     ctx = {**ctx, "team": identity.team}
-    modality, mime = "text", None
+    modality, mime, data = "text", None, None
     existing = None
 
     # An ad already in the library: review its stored text; nothing is read again.
@@ -64,6 +75,9 @@ def review_lane(
             ctx[key] = existing.get(key) or ctx.get(key)
         ctx["name"] = ctx.get("name") or existing.get("name")
 
+    # Nothing starts unless every step this run intends to take is permitted.
+    gate.preflight(identity, run_id, REVIEW_PLAN if save else REVIEW_PLAN[:1], thread_id=thread_id, db=db)
+
     # A file is turned into text once. The file itself is never sent to a model again.
     if file_id:
         data, mime = media.open_file(file_id, db)
@@ -71,13 +85,22 @@ def review_lane(
         if modality == "audio":
             text = gate.guarded(
                 identity, "compliance.check", {"step": "transcribe", "file_id": file_id, "bytes": len(data)}, run_id,
-                lambda: media.transcribe_bytes(data), thread_id=thread_id, db=db,
+                lambda: media.transcribe_bytes(data), thread_id=thread_id, db=db, step_key="read",
                 summarize=lambda t: {"status": "ok", "summary": f"Transcribed {len(t.split())} words from audio"},
             )
+        elif modality == "video":
+            reading = gate.guarded(
+                identity, "compliance.check", {"step": "read_video", "file_id": file_id, "bytes": len(data)}, run_id,
+                lambda: media.read_video_bytes(data, mime, usage=usage, run_id=run_id), thread_id=thread_id, db=db, step_key="read", tokens=usage.as_dict,
+                summarize=lambda r: {"status": "ok", "summary": f"Read a {r['seconds']:.0f}-second video: {len(r['spoken'].split())} spoken words, {len(r['on_screen'].split())} words on screen, {r['frames']} frames"},
+            )
+            text = reading["text"]
+            ctx["visual_notes"] = reading["visual_notes"]
+            ctx["fine_print_legible"] = reading["fine_print_legible"]
         else:
             reading = gate.guarded(
                 identity, "compliance.check", {"step": "read_image", "file_id": file_id, "bytes": len(data)}, run_id,
-                lambda: media.read_image_bytes(data, mime, usage=usage, run_id=run_id), thread_id=thread_id, db=db,
+                lambda: media.read_image_bytes(data, mime, usage=usage, run_id=run_id), thread_id=thread_id, db=db, step_key="read", tokens=usage.as_dict,
                 summarize=lambda r: {"status": "ok", "summary": f"Read {len(r['text'].split())} words from the image"},
             )
             text = reading["text"]
@@ -86,17 +109,55 @@ def review_lane(
     ctx["modality"] = modality
 
     if not (text or "").strip():
-        return {"reply": "There is no ad text to review. Paste the copy, attach an audio or image file, or choose an ad from the library.", "cards": [], "memories_used": [], "status": "needs_input"}
+        return {"reply": "There is no ad text to review. Paste the copy, attach an audio, image or video file, or choose an ad from the library.", "cards": [], "memories_used": [], "status": "needs_input"}
 
+    fresh: list[int] = []  # set when the verdict is produced now, not restored from a checkpoint
+
+    def run_review() -> compliance.ReviewResult:
+        fresh.append(1)
+        return compliance.review(text, ctx, identity, run_id, use_memory=use_memory, sources=sources, usage=usage)
+
+    review_ctx = dict(ctx)
     result: compliance.ReviewResult = gate.guarded(
         identity, "compliance.check",
         {"step": "review", "modality": modality, "offer_id": ctx.get("offer_id"), "region": ctx.get("region"), "channel": ctx.get("channel"), "text": text},
-        run_id, lambda: compliance.review(text, ctx, identity, run_id, use_memory=use_memory, sources=sources, usage=usage),
-        thread_id=thread_id, db=db,
+        run_id, run_review, thread_id=thread_id, db=db,
         policy_refs=lambda r: r.report.checked_fundamentals, memories_used=lambda r: r.report.memories_used,
         summarize=_report_outcome, tokens=usage.as_dict,
+        # The stored result also keeps the exact text and context judged, which the lesion test replays.
+        step_key="review", dump=lambda r: {**compliance.dump_review(r), "text": text, "ctx": review_ctx}, load=compliance.load_review,
     )
     report = result.report
+    # One event per finding and per conflict. Journalled like a step, so a run that crashed right
+    # after the verdict still records them when it is resumed, and never records them twice.
+    if fresh or gate.step_result(run_id, "findings", db) is None:
+        _record_findings(identity, run_id, report, thread_id, db)
+        # A memory that lost to a binding decision is marked, so the next review sees it as contested.
+        lost = [(b["ref"], c["winner"]["ref"]) for c in report.conflicts if c["winner"]["type"] == "memory" for b in c["between"] if b["type"] == "memory" and b["ref"] != c["winner"]["ref"]]
+        if lost and use_memory:
+            memory.mark_contested(identity, run_id, lost, db)
+        gate.save_step(run_id, "findings", True, db)
+
+    # Image ads: mark each finding on the picture. Best effort: a failure here is recorded and the
+    # review stands without highlights.
+    asset_id = file_id or (_first_asset(existing) if modality == "image" else None)
+    if modality == "image" and asset_id and report.violations:
+        try:
+            if data is None:
+                data, mime = media.open_file(asset_id, db)
+            marked = gate.guarded(
+                identity, "compliance.check", {"step": "annotate", "file_id": asset_id, "findings": len(report.violations)}, run_id,
+                lambda: _annotate(data, mime, report, identity, run_id, usage, db), thread_id=thread_id, db=db, tokens=usage.as_dict,
+                step_key="annotate", adopt=lambda: _adopt_annotation(run_id, db),
+                summarize=lambda m: {"status": "ok", "summary": f"Marked {sum(1 for h in m['highlights'] if h['box'])} of {len(m['highlights'])} findings on the image", "ref": {"collection": "fs.files", "id": m["file_id"]}},
+            )
+            report.highlights = marked["highlights"]
+            report.annotated_url = f"/assets/{marked['file_id']}"
+        except (gate.Denied, gate.RunStopped, gate.SimulatedCrash):
+            raise
+        except Exception:
+            pass
+
     cards = [{"type": "compliance_report", "data": report.model_dump()}]
     chips = _memory_chips(report.memories_used, db)
 
@@ -109,25 +170,74 @@ def review_lane(
         ex = result.extraction
         ctx["language"] = ctx.get("language") or ex.language
         episodic = _episodic_text(identity, ctx, report, ctx.get("name"))
-        # One embedding request covers the ad's search text and the memory of this verdict.
-        ad_vector, memory_vector = embeddings.embed_documents([campaigns.search_document(ex.description, ex.summary), episodic])
-        campaign = campaigns.submit(
-            identity, run_id, name=ctx.get("name"), text=text, ctx=ctx, facts=ex.facts().model_dump(), summary=ex.summary,
-            description=ex.description, modality=modality, file_id=file_id or _first_asset(existing), mime=mime or _first_mime(existing),
-            compliance=report, cache_key=result.cache_key, campaign_id=ctx.get("campaign_id"), vector=ad_vector, db=db,
-        ) if not existing or existing.get("text") != text else _refresh_report(existing, report, result.cache_key, db)
-        if report.verdict != "pass" and use_memory:
+        remember = report.verdict != "pass" and use_memory
+        done = gate.steps_done(run_id, db)
+        ad_vector = memory_vector = None
+        if "file" not in done or (remember and "remember" not in done):
+            # One embedding request covers the ad's search text and the memory of this verdict.
+            ad_vector, memory_vector = embeddings.embed_documents([campaigns.search_document(ex.description, ex.summary), episodic])
+        if not existing or existing.get("text") != text:
+            campaign = campaigns.submit(
+                identity, run_id, name=ctx.get("name"), text=text, ctx=ctx, facts=ex.facts().model_dump(), summary=ex.summary,
+                description=ex.description, modality=modality, file_id=file_id or _first_asset(existing), mime=mime or _first_mime(existing),
+                compliance=report, cache_key=result.cache_key, campaign_id=ctx.get("campaign_id"), vector=ad_vector, step_key="file", db=db,
+            )
+        else:
+            before = {"compliance": existing.get("compliance"), "status": existing.get("status"), "approval": existing.get("approval")}
+            campaign = gate.guarded(
+                identity, "campaign.submit", {"step": "refresh_report", "campaign_id": str(existing["_id"]), "ad_version": existing.get("version", 1)}, run_id,
+                lambda: _refresh_report(existing, report, result.cache_key, db), thread_id=thread_id, db=db, step_key="file",
+                facts={"target_team": existing.get("team")},
+                undo={"type": "campaign.report", "ref": {"id": str(existing["_id"]), "version": existing.get("version", 1), **before}},
+                summarize=lambda c: {"status": "ok", "summary": f"Updated the review on version {c.get('version', 1)} of '{c.get('name')}'", "ref": {"collection": "campaigns", "id": str(c["_id"])}},
+            )
+        if remember:
             memory.remember(
                 identity, run_id, kind="episodic", text=episodic, scope={"team": identity.team, "user_id": None},
-                ttl_days=EPISODIC_TTL_DAYS, source_type="agent", vector=memory_vector, db=db,
+                ttl_days=EPISODIC_TTL_DAYS, source_type="agent", vector=memory_vector, step_key="remember", db=db,
             )
         cards.append({"type": "campaign", "data": campaigns.card(campaign)})
 
     if report.verdict == "pass":
         reply += " It is filed as pending review and needs a manager's approval before release." if save else ""
     else:
-        reply += f" Next step: {report.route.replace('_', ' ')}." + (" You can regenerate a compliant version." if report.corrected_copy else "")
+        reply += f" Next step: {report.route.replace('_', ' ')}." + (" You can regenerate a compliant version." if report.corrected_copy and modality != "video" else "")
     return {"reply": reply, "cards": cards, "memories_used": chips, "status": "completed", "campaign_id": str(campaign["_id"]) if campaign else None}
+
+
+def _record_findings(identity: Identity, run_id: str, report: ComplianceReport, thread_id: Optional[str], db) -> None:
+    """One ledger event per finding and per conflict: what it rests on and how its confidence was made up."""
+    try:
+        for n, v in enumerate(report.violations, 1):
+            ref = {"policy": v.fundamental_key, "version": v.version} if v.fundamental_key else {"memory": v.memory_id, "source": v.source_label}
+            gate.record(
+                identity, run_id, "finding", "compliance.finding", thread_id=thread_id, db=db, step="review",
+                params={"n": n, "rests_on": ref, "materiality": v.materiality, "decided_by": v.basis, "certainty": v.certainty, "quote": v.quote},
+                result={"status": "blocked", "summary": v.explanation, "confidence": v.confidence.score if v.confidence else None},
+                confidence=v.confidence.model_dump() if v.confidence else None,
+            )
+        for c in report.conflicts:
+            gate.record(
+                identity, run_id, "conflict", "compliance.conflict", thread_id=thread_id, db=db, step="review",
+                params={"between": [b["label"] for b in c["between"]], "winner": c["winner"]["label"], "sources": c["between"]},
+                result={"status": "ok", "summary": c["explanation"]},
+            )
+    except Exception:
+        pass  # detail only; the report already carries every finding
+
+
+def _annotate(data: bytes, mime: str, report: ComplianceReport, identity: Identity, run_id: str, usage: llm.TokenUsage, db) -> dict:
+    findings = [v.model_dump() for v in report.violations]
+    highlights = media.locate_findings(data, mime, findings, usage=usage, run_id=run_id)
+    png = media.annotate_image_bytes(data, findings, highlights)
+    # The file carries the run and the boxes, so an interrupted run can find it again.
+    file_id = media.store(png, "image/png", "annotated.png", db, metadata={"team": identity.team, "uploaded_by": identity.user_id, "kind": "annotated", "run_id": run_id, "highlights": highlights})
+    return {"highlights": highlights, "file_id": file_id}
+
+
+def _adopt_annotation(run_id: str, db) -> Optional[dict]:
+    made = media.run_files(run_id, "annotated", db)
+    return {"highlights": made[0]["metadata"].get("highlights", []), "file_id": str(made[0]["_id"])} if made else None
 
 
 def _first_asset(existing: Optional[dict]) -> Optional[str]:
@@ -166,30 +276,48 @@ def _memory_chips(ids: list[str], db) -> list[dict]:
 
 # ---------------------------------------------------------------- regenerate
 
+AD_SNAPSHOT = ("_id", "name", "text", "version", "modality", "language", "product", "offer_id", "region", "channel", "budget", "compliance", "team")
+
 
 def regenerate_lane(identity: Identity, run_id: str, *, campaign_id: str, usage: Optional[llm.TokenUsage] = None, thread_id: Optional[str] = None, sources: Optional[Sources] = None, db=None) -> dict:
     """Produce the next version of an ad that passes the same review, in the ad's own form. Fails closed."""
+    with gate.acting_as("agent"):
+        return _regenerate(identity, run_id, campaign_id=campaign_id, usage=usage, thread_id=thread_id, sources=sources, db=db)
+
+
+def _regenerate(identity, run_id, *, campaign_id, usage, thread_id, sources, db) -> dict:
     db = db if db is not None else get_db()
     sources = sources or default_sources()
     usage = usage or llm.TokenUsage()
-    ad = campaigns.get(identity, campaign_id, db)
+    # The ad as it stood when this run began. A resumed run works from that, not from whatever the
+    # run itself has since filed.
+    ad = gate.step_result(run_id, "load", db)
+    if ad is None:
+        ad = {k: v for k, v in campaigns.get(identity, campaign_id, db).items() if k in AD_SNAPSHOT}
+        gate.save_step(run_id, "load", ad, db)
     report = ComplianceReport(**{k: v for k, v in (ad.get("compliance") or {}).items() if k in ComplianceReport.model_fields})
     params = {"campaign_id": campaign_id, "from_version": ad.get("version", 1), "modality": ad.get("modality", "text")}
 
     if report.verdict == "pass":
         gate.guarded(identity, "asset.regenerate", params, run_id, lambda: None, thread_id=thread_id, db=db, summarize=lambda _: {"status": "ok", "summary": "Nothing to regenerate: the ad already passes"})
         return {"status": "failed", "campaign": campaigns.card(ad), "report": report.model_dump(), "attempts": 0, "reply": "This ad already passes review, so there is nothing to regenerate."}
+    if ad.get("modality") == "video":
+        gate.guarded(identity, "asset.regenerate", params, run_id, lambda: None, thread_id=thread_id, db=db, summarize=lambda _: {"status": "ok", "summary": "A video is not regenerated; the corrected script is on the report"})
+        return {"status": "failed", "campaign": campaigns.card(ad), "report": report.model_dump(), "attempts": 0, "reply": "A video cannot be regenerated here. The report carries a corrected script for whoever re-cuts it."}
 
+    gate.preflight(identity, run_id, REGENERATE_PLAN, thread_id=thread_id, db=db)
     ctx = {k: ad.get(k) for k in ("product", "offer_id", "region", "channel", "language", "budget")}
     ctx["team"] = identity.team
+    target = {"target_team": ad.get("team")}
 
     # 1. Copy first. Nothing is rendered until the copy has passed.
     outcome: compliance.RegeneratedCopy = gate.guarded(
         identity, "asset.regenerate", {**params, "step": "copy"}, run_id,
         lambda: compliance.regenerate_copy(ad["text"], report, ctx, identity, run_id, sources=sources, usage=usage),
-        thread_id=thread_id, db=db, tokens=usage.as_dict,
+        thread_id=thread_id, db=db, tokens=usage.as_dict, facts=target,
         policy_refs=lambda o: o.review.report.checked_fundamentals,
         summarize=lambda o: {"status": "ok" if o.status == "regenerated" else "blocked", "summary": f"Corrected copy {'passed' if o.status == 'regenerated' else 'did not pass'} review after {o.attempts} attempt(s)", "confidence": o.review.report.confidence.score},
+        step_key="copy", dump=lambda o: o.dump(), load=compliance.RegeneratedCopy.load,
     )
     if outcome.status != "regenerated":
         return {
@@ -203,30 +331,42 @@ def regenerate_lane(identity: Identity, run_id: str, *, campaign_id: str, usage:
     ctx["language"] = language
 
     # 2. Render in the ad's own form. A new recording or a new rendering, not an edit of the original.
+    #    The file carries the run that made it, so a resumed run finds it and does not pay for another.
     file_id = mime = None
+    tag = {"run_id": run_id, "kind": "regenerated", "team": identity.team, "uploaded_by": identity.user_id}
+
+    def adopt_render() -> Optional[tuple]:
+        made = media.run_files(run_id, "regenerated", db)
+        return (str(made[0]["_id"]), made[0]["metadata"].get("mime")) if made else None
+
     if modality == "audio":
         file_id, mime = gate.guarded(
             identity, "asset.regenerate", {**params, "step": "render_audio", "language": language}, run_id,
-            lambda: (media.synthesize_speech(outcome.copy, language, db), "audio/mpeg"), thread_id=thread_id, db=db,
+            lambda: (media.synthesize_speech(outcome.copy, language, db, metadata=tag), "audio/mpeg"), thread_id=thread_id, db=db,
+            step_key="render", dump=list, load=tuple, adopt=adopt_render,
             summarize=lambda r: {"status": "ok", "summary": "Recorded the corrected script with a stock voice", "ref": {"collection": "fs.files", "id": r[0]}},
         )
     elif modality == "image":
         file_id, mime = gate.guarded(
             identity, "asset.regenerate", {**params, "step": "render_image", "language": language}, run_id,
-            lambda: (media.render_image(outcome.copy, language=language, offer=outcome.review.offer, db=db), "image/png"), thread_id=thread_id, db=db,
+            lambda: (media.render_image(outcome.copy, language=language, offer=outcome.review.offer, db=db, metadata=tag), "image/png"), thread_id=thread_id, db=db,
+            step_key="render", dump=list, load=tuple, adopt=adopt_render,
             summarize=lambda r: {"status": "ok", "summary": "Rendered the corrected copy on the brand template", "ref": {"collection": "fs.files", "id": r[0]}},
         )
 
     # 3. File it as the next version, with the passing report. It still needs approval.
     ex = outcome.review.extraction
     episodic = f"The corrected version of the {identity.team} {ad.get('channel')} ad '{ad.get('name')}' for {ad.get('offer_id')} passed review."
-    ad_vector, memory_vector = embeddings.embed_documents([campaigns.search_document(ex.description, ex.summary), episodic])
+    done = gate.steps_done(run_id, db)
+    ad_vector = memory_vector = None
+    if not {"file", "remember"} <= done:
+        ad_vector, memory_vector = embeddings.embed_documents([campaigns.search_document(ex.description, ex.summary), episodic])
     new = campaigns.submit(
         identity, run_id, name=ad.get("name"), text=outcome.copy, ctx=ctx, facts=ex.facts().model_dump(), summary=ex.summary,
         description=ex.description, modality=modality, file_id=file_id, mime=mime, compliance=passing, cache_key=outcome.review.cache_key,
-        campaign_id=campaign_id, source="regenerated", derived_from=ad.get("version", 1), vector=ad_vector, db=db,
+        campaign_id=campaign_id, source="regenerated", derived_from=ad.get("version", 1), vector=ad_vector, step_key="file", db=db,
     )
-    memory.remember(identity, run_id, kind="episodic", text=episodic, scope={"team": identity.team, "user_id": None}, ttl_days=EPISODIC_TTL_DAYS, source_type="agent", vector=memory_vector, db=db)
+    memory.remember(identity, run_id, kind="episodic", text=episodic, scope={"team": identity.team, "user_id": None}, ttl_days=EPISODIC_TTL_DAYS, source_type="agent", vector=memory_vector, step_key="remember", db=db)
     return {
         "status": "regenerated", "campaign": campaigns.card(new), "report": passing.model_dump(), "attempts": outcome.attempts,
         "reply": f"Version {new.get('version')} passes the same review as any other ad. It is pending review and still needs a manager's approval.",
@@ -257,6 +397,11 @@ def _ad_block(label: str, ad: dict, offer: Optional[dict], with_text: bool) -> s
 
 
 def ask_lane(identity: Identity, run_id: str, *, question: str, thread_campaign_id: Optional[str] = None, usage: Optional[llm.TokenUsage] = None, thread_id: Optional[str] = None, db=None) -> dict:
+    with gate.acting_as("agent"):
+        return _ask(identity, run_id, question=question, thread_campaign_id=thread_campaign_id, usage=usage, thread_id=thread_id, db=db)
+
+
+def _ask(identity, run_id, *, question, thread_campaign_id, usage, thread_id, db) -> dict:
     db = db if db is not None else get_db()
     usage = usage or llm.TokenUsage()
 
@@ -301,6 +446,7 @@ def ask_lane(identity: Identity, run_id: str, *, question: str, thread_campaign_
 
     out = gate.guarded(
         identity, "campaign.ask", {"question": question}, run_id, answer, thread_id=thread_id, db=db, tokens=usage.as_dict,
+        step_key="answer", dump=lambda o: {**o, "grounding": o["grounding"].model_dump()}, load=lambda o: {**o, "grounding": Grounding(**o["grounding"])},
         summarize=lambda o: {"status": "ok", "summary": f"Answered about '{o['ad'].get('name')}'" if o["ad"] else "No matching ad in scope", "ref": {"collection": "campaigns", "id": str(o["ad"]["_id"])} if o["ad"] else None},
     )
     cards = [{"type": "campaign", "data": campaigns.card(out["ad"])}] if out["ad"] else []
@@ -325,6 +471,11 @@ def memory_update_lane(identity: Identity, run_id: str, *, message: str, usage: 
     The web app shows the proposal, collects the password and reason, and calls the write endpoint.
     The password never passes through this function or the model.
     """
+    with gate.acting_as("agent"):
+        return _draft_change(identity, run_id, message=message, usage=usage, thread_id=thread_id, db=db)
+
+
+def _draft_change(identity, run_id, *, message, usage, thread_id, db) -> dict:
     db = db if db is not None else get_db()
     usage = usage or llm.TokenUsage()
     manager = identity.role == "manager"
@@ -344,7 +495,7 @@ def memory_update_lane(identity: Identity, run_id: str, *, message: str, usage: 
         return _proposal(d, identity, mine, db)
 
     proposal = gate.guarded(
-        identity, "memory.write", {"step": "draft", "message": message}, run_id, draft, thread_id=thread_id, db=db, tokens=usage.as_dict,
+        identity, "memory.write", {"step": "draft", "message": message}, run_id, draft, thread_id=thread_id, db=db, tokens=usage.as_dict, step_key="draft",
         summarize=lambda p: {"status": "ok", "summary": "Drafted a proposed change; nothing saved until it is confirmed" if p["card"] else "Asked for clarification"},
     )
     return {"reply": proposal["reply"], "cards": [proposal["card"]] if proposal["card"] else [], "memories_used": [], "status": "completed"}
