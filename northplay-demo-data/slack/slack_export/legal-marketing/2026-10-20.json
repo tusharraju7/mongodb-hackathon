@@ -1,0 +1,62 @@
+[
+  {
+    "type": "message",
+    "user": "U03EC",
+    "text": "Heads up on the Big Game in February. We do NOT hold NFL marks. Never say 'Super Bowl' in any creative, copy, hashtag or audio. Use 'the Big Game'. Same for team names and logos across NFL and NHL: city names only (e.g. 'Toronto vs. Montreal'). No logos, no jerseys.",
+    "ts": "1792507200.000015",
+    "user_profile": {
+      "real_name": "Ethan Cho",
+      "display_name": "ethan.cho",
+      "title": "Senior Counsel, Legal & Compliance"
+    },
+    "reactions": [
+      {
+        "name": "pushpin",
+        "users": [
+          "U04DO",
+          "U05SM",
+          "U06AH"
+        ],
+        "count": 3
+      }
+    ],
+    "thread_ts": "1792507200.000015",
+    "reply_count": 2,
+    "replies": [
+      {
+        "user": "U06AH",
+        "ts": "1792507620.000016"
+      },
+      {
+        "user": "U03EC",
+        "ts": "1792508100.000017"
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U06AH",
+    "text": "Does that include the team colours on the odds cards?",
+    "ts": "1792507620.000016",
+    "user_profile": {
+      "real_name": "Amira Haddad",
+      "display_name": "amira.haddad",
+      "title": "Creative Lead"
+    },
+    "thread_ts": "1792507200.000015",
+    "parent_user_id": "U03EC"
+  },
+  {
+    "type": "message",
+    "user": "U03EC",
+    "text": "Generic colours are fine. Avoid anything that looks like a team logo or uniform.",
+    "ts": "1792508100.000017",
+    "user_profile": {
+      "real_name": "Ethan Cho",
+      "display_name": "ethan.cho",
+      "title": "Senior Counsel, Legal & Compliance"
+    },
+    "thread_ts": "1792507200.000015",
+    "parent_user_id": "U03EC"
+  }
+]

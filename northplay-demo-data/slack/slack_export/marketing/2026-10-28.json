@@ -1,0 +1,44 @@
+[
+  {
+    "type": "message",
+    "user": "U02PN",
+    "text": "Q1 plan v1.0 is posted. Channel mix is Meta, YouTube/CTV, programmatic, TikTok/Snap (25+ only), radio/podcast and opted-in email/SMS.",
+    "ts": "1793223900.000020",
+    "user_profile": {
+      "real_name": "Priya Nair",
+      "display_name": "priya.nair",
+      "title": "Chief Marketing Officer"
+    },
+    "reactions": [
+      {
+        "name": "+1",
+        "users": [
+          "U04DO",
+          "U07KT"
+        ],
+        "count": 2
+      }
+    ],
+    "thread_ts": "1793223900.000020",
+    "reply_count": 1,
+    "replies": [
+      {
+        "user": "U07KT",
+        "ts": "1793224920.000021"
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U07KT",
+    "text": "'Turned 19?' Snapchat (H14) came back approved with changes. Rewriting to 'New to NorthPlay? Learn how betting works.'",
+    "ts": "1793224920.000021",
+    "user_profile": {
+      "real_name": "Kevin Tran",
+      "display_name": "kevin.tran",
+      "title": "Growth Marketing Manager"
+    },
+    "thread_ts": "1793223900.000020",
+    "parent_user_id": "U02PN"
+  }
+]

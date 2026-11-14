@@ -1,0 +1,23 @@
+[
+  {
+    "type": "message",
+    "user": "U01RB",
+    "text": "Reminder: 2027 strategy offsite is Oct 9. Priya, please bring a view on how we shift away from bonus-led acquisition.",
+    "ts": "1790975100.000003",
+    "user_profile": {
+      "real_name": "Rachel Bouchard",
+      "display_name": "rachel.bouchard",
+      "title": "CEO"
+    },
+    "reactions": [
+      {
+        "name": "eyes",
+        "users": [
+          "U02PN",
+          "U08LF"
+        ],
+        "count": 2
+      }
+    ]
+  }
+]

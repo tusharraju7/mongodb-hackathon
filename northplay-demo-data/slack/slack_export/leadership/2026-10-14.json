@@ -1,0 +1,24 @@
+[
+  {
+    "type": "message",
+    "user": "U01RB",
+    "text": "2027 Business Strategy v1.2 is final and posted in the drive. Trust-first, product-led, hockey-first.",
+    "ts": "1792015200.000012",
+    "user_profile": {
+      "real_name": "Rachel Bouchard",
+      "display_name": "rachel.bouchard",
+      "title": "CEO"
+    },
+    "reactions": [
+      {
+        "name": "tada",
+        "users": [
+          "U02PN",
+          "U03EC",
+          "U08LF"
+        ],
+        "count": 3
+      }
+    ]
+  }
+]

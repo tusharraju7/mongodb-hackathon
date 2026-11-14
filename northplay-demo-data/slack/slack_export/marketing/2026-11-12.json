@@ -1,0 +1,23 @@
+[
+  {
+    "type": "message",
+    "user": "U05SM",
+    "text": "NorthPlay Limits launch: Marcus Doyle hero line will be quote (3) 'Set your limit before the puck drops.' Amira is on the creative.",
+    "ts": "1794508200.000047",
+    "user_profile": {
+      "real_name": "Sofia Marchetti",
+      "display_name": "sofia.marchetti",
+      "title": "Brand Manager"
+    },
+    "reactions": [
+      {
+        "name": "+1",
+        "users": [
+          "U06AH",
+          "U02PN"
+        ],
+        "count": 2
+      }
+    ]
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "id": "U01RB",
+    "name": "rachel.bouchard",
+    "real_name": "Rachel Bouchard",
+    "profile": {
+      "real_name": "Rachel Bouchard",
+      "title": "CEO",
+      "display_name": "rachel.bouchard"
+    },
+    "is_bot": false,
+    "deleted": false
+  },
+  {
+    "id": "U02PN",
+    "name": "priya.nair",
+    "real_name": "Priya Nair",
+    "profile": {
+      "real_name": "Priya Nair",
+      "title": "Chief Marketing Officer",
+      "display_name": "priya.nair"
+    },
+    "is_bot": false,
+    "deleted": false
+  },
+  {
+    "id": "U03EC",
+    "name": "ethan.cho",
+    "real_name": "Ethan Cho",
+    "profile": {
+      "real_name": "Ethan Cho",
+      "title": "Senior Counsel, Legal & Compliance",
+      "display_name": "ethan.cho"
+    },
+    "is_bot": false,
+    "deleted": false
+  },
+  {
+    "id": "U04DO",
+    "name": "daniel.okafor",
+    "real_name": "Daniel Okafor",
+    "profile": {
+      "real_name": "Daniel Okafor",
+      "title": "Head of Performance Marketing",
+      "display_name": "daniel.okafor"
+    },
+    "is_bot": false,
+    "deleted": false
+  },
+  {
+    "id": "U05SM",
+    "name": "sofia.marchetti",
+    "real_name": "Sofia Marchetti",
+    "profile": {
+      "real_name": "Sofia Marchetti",
+      "title": "Brand Manager",
+      "display_name": "sofia.marchetti"
+    },
+    "is_bot": false,
+    "deleted": false
+  },
+  {
+    "id": "U06AH",
+    "name": "amira.haddad",
+    "real_name": "Amira Haddad",
+    "profile": {
+      "real_name": "Amira Haddad",
+      "title": "Creative Lead",
+      "display_name": "amira.haddad"
+    },
+    "is_bot": false,
+    "deleted": false
+  },
+  {
+    "id": "U07KT",
+    "name": "kevin.tran",
+    "real_name": "Kevin Tran",
+    "profile": {
+      "real_name": "Kevin Tran",
+      "title": "Growth Marketing Manager",
+      "display_name": "kevin.tran"
+    },
+    "is_bot": false,
+    "deleted": false
+  },
+  {
+    "id": "U08LF",
+    "name": "liam.fraser",
+    "real_name": "Liam Fraser",
+    "profile": {
+      "real_name": "Liam Fraser",
+      "title": "CFO",
+      "display_name": "liam.fraser"
+    },
+    "is_bot": false,
+    "deleted": false
+  }
+]

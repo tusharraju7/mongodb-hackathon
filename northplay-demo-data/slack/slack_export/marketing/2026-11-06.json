@@ -1,0 +1,46 @@
+[
+  {
+    "type": "message",
+    "user": "U02PN",
+    "text": "Team: TikTok and Snapchat are paused for all paid creative, effective today. Do not submit or traffic anything for those placements. The Q1 deck will be updated later; this overrides it.",
+    "ts": "1793982900.000035",
+    "user_profile": {
+      "real_name": "Priya Nair",
+      "display_name": "priya.nair",
+      "title": "Chief Marketing Officer"
+    },
+    "reactions": [
+      {
+        "name": "white_check_mark",
+        "users": [
+          "U04DO",
+          "U05SM",
+          "U06AH",
+          "U07KT"
+        ],
+        "count": 4
+      }
+    ],
+    "thread_ts": "1793982900.000035",
+    "reply_count": 1,
+    "replies": [
+      {
+        "user": "U07KT",
+        "ts": "1793983260.000036"
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U07KT",
+    "text": "Pulling the two TikTok cuts we had in the queue.",
+    "ts": "1793983260.000036",
+    "user_profile": {
+      "real_name": "Kevin Tran",
+      "display_name": "kevin.tran",
+      "title": "Growth Marketing Manager"
+    },
+    "thread_ts": "1793982900.000035",
+    "parent_user_id": "U02PN"
+  }
+]

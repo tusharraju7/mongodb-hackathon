@@ -1,0 +1,22 @@
+[
+  {
+    "type": "message",
+    "user": "U04DO",
+    "text": "Tip-off story (H15) came back: the disclaimer was there but basically invisible. Remember 24px minimum on stories.",
+    "ts": "1793733300.000037",
+    "user_profile": {
+      "real_name": "Daniel Okafor",
+      "display_name": "daniel.okafor",
+      "title": "Head of Performance Marketing"
+    },
+    "reactions": [
+      {
+        "name": "sweat_smile",
+        "users": [
+          "U06AH"
+        ],
+        "count": 1
+      }
+    ]
+  }
+]

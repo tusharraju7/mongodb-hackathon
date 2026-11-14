@@ -1,0 +1,44 @@
+[
+  {
+    "type": "message",
+    "user": "U06AH",
+    "text": "Sharing three Q1 drafts for agent review next week: Hockey Night Live hero, a Big Game parlay builder spot, and the Limits launch with Marcus.",
+    "ts": "1794583200.000048",
+    "user_profile": {
+      "real_name": "Amira Haddad",
+      "display_name": "amira.haddad",
+      "title": "Creative Lead"
+    },
+    "reactions": [
+      {
+        "name": "eyes",
+        "users": [
+          "U04DO",
+          "U05SM"
+        ],
+        "count": 2
+      }
+    ],
+    "thread_ts": "1794583200.000048",
+    "reply_count": 1,
+    "replies": [
+      {
+        "user": "U04DO",
+        "ts": "1794583860.000049"
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U04DO",
+    "text": "Reminder that nothing traffics without an approval ID from the agent.",
+    "ts": "1794583860.000049",
+    "user_profile": {
+      "real_name": "Daniel Okafor",
+      "display_name": "daniel.okafor",
+      "title": "Head of Performance Marketing"
+    },
+    "thread_ts": "1794583200.000048",
+    "parent_user_id": "U06AH"
+  }
+]

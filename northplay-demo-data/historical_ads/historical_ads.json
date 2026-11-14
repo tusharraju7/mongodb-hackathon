@@ -1,0 +1,568 @@
+[
+  {
+    "ad_id": "NP-H01",
+    "file": "NP-H01_approved_saturday_night_odds.png",
+    "campaign": "Hockey Night Live Odds",
+    "channel": "Instagram (paid social)",
+    "format": "square",
+    "submitted_date": "2026-09-12",
+    "decision_date": "2026-09-13",
+    "headline": "Saturday night. Every play, live.",
+    "body_copy": "Toronto vs. Montreal. Live odds update with every shift.",
+    "odds": [
+      [
+        "TORONTO",
+        "+120"
+      ],
+      [
+        "MONTREAL",
+        "-140"
+      ]
+    ],
+    "cta": "See live odds",
+    "disclaimer_text": "19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "status": "approved",
+    "confidence": 0.95,
+    "rules_cited": [
+      {
+        "rule_id": "REG-14",
+        "finding": "Full house disclaimer present and legible."
+      },
+      {
+        "rule_id": "REG-09",
+        "finding": "Odds shown factually; no promise of winning."
+      },
+      {
+        "rule_id": "REG-12",
+        "finding": "No bonus, credit or inducement in public creative."
+      }
+    ],
+    "rationale": "Product-focused ad showing live odds as plain information. No offers, no outcome promises, no people, and the full responsible gambling disclaimer is legible. Meets all applicable rules.",
+    "reviewer": "NorthPlay Legal Approver Agent v1",
+    "required_changes": [],
+    "revised_copy": null,
+    "extracted_text": "Saturday night. Every play, live. Toronto vs. Montreal. Live odds update with every shift. TORONTO +120 | MONTREAL -140 See live odds 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "brand": "NorthPlay (fictional)",
+    "jurisdiction": "Ontario, Canada",
+    "product": "Sportsbook",
+    "dimensions": "1080x1080"
+  },
+  {
+    "ad_id": "NP-H02",
+    "file": "NP-H02_approved_set_your_limits.png",
+    "campaign": "Play Smart Brand",
+    "channel": "Programmatic display",
+    "format": "landscape",
+    "submitted_date": "2026-09-03",
+    "decision_date": "2026-09-03",
+    "headline": "Set your limits. Then enjoy the game.",
+    "body_copy": "Deposit limits, time reminders and cool-off periods are built into every NorthPlay account.",
+    "cta": "Learn about our tools",
+    "disclaimer_text": "19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "status": "approved",
+    "confidence": 0.97,
+    "rules_cited": [
+      {
+        "rule_id": "REG-14",
+        "finding": "Disclaimer present."
+      },
+      {
+        "rule_id": "REG-06",
+        "finding": "Promotes responsible gambling tools; no enticement of high-risk players."
+      }
+    ],
+    "rationale": "Responsible gambling brand ad. Describes player-protection tools factually with no betting call-to-action or offer. Low risk; approved.",
+    "reviewer": "NorthPlay Legal Approver Agent v1",
+    "required_changes": [],
+    "revised_copy": null,
+    "extracted_text": "Set your limits. Then enjoy the game. Deposit limits, time reminders and cool-off periods are built into every NorthPlay account. Learn about our tools 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "brand": "NorthPlay (fictional)",
+    "jurisdiction": "Ontario, Canada",
+    "product": "Sportsbook",
+    "dimensions": "1200x628"
+  },
+  {
+    "ad_id": "NP-H03",
+    "file": "NP-H03_approved_athlete_rg_exception.png",
+    "campaign": "Play Smart Ambassadors",
+    "channel": "Instagram Stories (paid social)",
+    "format": "story",
+    "submitted_date": "2026-10-01",
+    "decision_date": "2026-10-02",
+    "headline": "Know your limit before kickoff.",
+    "body_copy": "\"Set a budget before kickoff. Take breaks. Know when to walk away.\" - Marcus Doyle, retired CFL lineman",
+    "cta": "Set a deposit limit",
+    "disclaimer_text": "19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "status": "approved",
+    "confidence": 0.86,
+    "rules_cited": [
+      {
+        "rule_id": "REG-03",
+        "finding": "Retired athlete used exclusively to advocate responsible gambling. No odds, offers or betting call-to-action in the creative, so the exception applies."
+      },
+      {
+        "rule_id": "REG-14",
+        "finding": "Disclaimer present."
+      }
+    ],
+    "rationale": "Uses a retired athlete, which is normally prohibited. The only exception is creative made exclusively to advocate responsible gambling. This ad contains only responsible gambling messaging and its CTA leads to deposit-limit settings, not betting. Exception applies; approved. Any future version that adds odds, offers or a 'bet now' CTA must be rejected.",
+    "reviewer": "NorthPlay Legal Approver Agent v1",
+    "required_changes": [],
+    "revised_copy": null,
+    "extracted_text": "Know your limit before kickoff. \"Set a budget before kickoff. Take breaks. Know when to walk away.\" - Marcus Doyle, retired CFL lineman Set a deposit limit 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "brand": "NorthPlay (fictional)",
+    "jurisdiction": "Ontario, Canada",
+    "product": "Sportsbook",
+    "dimensions": "1080x1920"
+  },
+  {
+    "ad_id": "NP-H04",
+    "file": "NP-H04_approved_parlay_builder.png",
+    "campaign": "Product Feature: Parlay Builder",
+    "channel": "Instagram (paid social)",
+    "format": "square",
+    "submitted_date": "2026-10-08",
+    "decision_date": "2026-10-08",
+    "headline": "Build your parlay in seconds.",
+    "body_copy": "Pick your games, add your legs, see your odds update instantly.",
+    "cta": "Try the parlay builder",
+    "disclaimer_text": "19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "status": "approved",
+    "confidence": 0.92,
+    "rules_cited": [
+      {
+        "rule_id": "REG-09",
+        "finding": "Describes a feature; no claim that parlays are likely to win."
+      },
+      {
+        "rule_id": "REG-14",
+        "finding": "Disclaimer present."
+      }
+    ],
+    "rationale": "Feature ad explaining how the parlay builder works. No winning claims, offers or social pressure. Approved.",
+    "reviewer": "NorthPlay Legal Approver Agent v1",
+    "required_changes": [],
+    "revised_copy": null,
+    "extracted_text": "Build your parlay in seconds. Pick your games, add your legs, see your odds update instantly. Try the parlay builder 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "brand": "NorthPlay (fictional)",
+    "jurisdiction": "Ontario, Canada",
+    "product": "Sportsbook",
+    "dimensions": "1080x1080"
+  },
+  {
+    "ad_id": "NP-H05",
+    "file": "NP-H05_approved_consented_email_offer.png",
+    "campaign": "Opted-in Player Offers: Week 6",
+    "channel": "Email (direct marketing, opted-in players only)",
+    "format": "landscape",
+    "submitted_date": "2026-10-14",
+    "decision_date": "2026-10-15",
+    "headline": "Bet $50, get $50 in bonus bets",
+    "body_copy": "Place a $50 bet on any NFL game this week and receive $50 in bonus bets.",
+    "terms": "Opted-in players only. Min. odds -200. Bonus bets expire 7 days after issue. 1x playthrough. Bonus bet stake not included in winnings. Full terms at northplay.example/terms.",
+    "cta": null,
+    "disclaimer_text": "19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "status": "approved",
+    "confidence": 0.88,
+    "rules_cited": [
+      {
+        "rule_id": "REG-12",
+        "finding": "Inducement delivered by direct marketing to opted-in players, which is a permitted channel."
+      },
+      {
+        "rule_id": "REG-13",
+        "finding": "Offer not described as free or risk-free; material terms shown at first presentation."
+      },
+      {
+        "rule_id": "REG-15",
+        "finding": "Opt-in confirmed and unsubscribe link present. Audience scrubbed against self-exclusion list per campaign brief."
+      },
+      {
+        "rule_id": "REG-14",
+        "finding": "Disclaimer present."
+      }
+    ],
+    "rationale": "Bonus offer, but sent only by email to players who opted in, which is the permitted channel for inducements. Terms are shown up front, the offer is not called free or risk-free, and an unsubscribe option is included. Approved.",
+    "reviewer": "NorthPlay Legal Approver Agent v1",
+    "required_changes": [],
+    "revised_copy": null,
+    "extracted_text": "Bet $50, get $50 in bonus bets Place a $50 bet on any NFL game this week and receive $50 in bonus bets. Opted-in players only. Min. odds -200. Bonus bets expire 7 days after issue. 1x playthrough. Bonus bet stake not included in winnings. Full terms at northplay.example/terms. 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "brand": "NorthPlay (fictional)",
+    "jurisdiction": "Ontario, Canada",
+    "product": "Sportsbook",
+    "dimensions": "1200x628"
+  },
+  {
+    "ad_id": "NP-H06",
+    "file": "NP-H06_rejected_public_bonus_offer.png",
+    "campaign": "Fall Acquisition Push",
+    "channel": "Instagram (paid social)",
+    "format": "square",
+    "submitted_date": "2026-09-18",
+    "decision_date": "2026-09-18",
+    "headline": "Get $500 in bonus bets when you sign up!",
+    "body_copy": "New players only. Join NorthPlay today.",
+    "cta": "Claim your bonus",
+    "disclaimer_text": "19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "status": "rejected",
+    "confidence": 0.99,
+    "rules_cited": [
+      {
+        "rule_id": "REG-12",
+        "finding": "Public paid-social ad communicates a sign-up bonus. Inducements may only be advertised on-site or to consented players."
+      }
+    ],
+    "rationale": "Advertises a $500 sign-up bonus on public paid social. Ontario prohibits public advertising of bonuses, credits and inducements; they may only appear on NorthPlay's own site or in direct marketing to opted-in players. Rejected.",
+    "required_changes": [
+      "Remove the bonus offer from all public creative.",
+      "Move the offer to the on-site promotions page or consented email/SMS."
+    ],
+    "reviewer": "NorthPlay Legal Approver Agent v1",
+    "revised_copy": null,
+    "extracted_text": "Get $500 in bonus bets when you sign up! New players only. Join NorthPlay today. Claim your bonus 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "brand": "NorthPlay (fictional)",
+    "jurisdiction": "Ontario, Canada",
+    "product": "Sportsbook",
+    "dimensions": "1080x1080"
+  },
+  {
+    "ad_id": "NP-H07",
+    "file": "NP-H07_rejected_risk_free_first_bet.png",
+    "campaign": "Fall Acquisition Push",
+    "channel": "Instagram Stories (paid social)",
+    "format": "story",
+    "submitted_date": "2026-09-18",
+    "decision_date": "2026-09-19",
+    "headline": "Your first bet is RISK-FREE.",
+    "body_copy": "Up to $250 back if your first bet loses. Deposit required.",
+    "cta": "Bet risk-free",
+    "disclaimer_text": "19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "status": "rejected",
+    "confidence": 0.99,
+    "rules_cited": [
+      {
+        "rule_id": "REG-12",
+        "finding": "Public ad communicates an inducement (refund on first bet)."
+      },
+      {
+        "rule_id": "REG-13",
+        "finding": "Described as 'risk-free' although the player must deposit and risk their own money."
+      }
+    ],
+    "rationale": "Two blocking issues. It advertises an inducement on a public channel, and it calls the bet 'risk-free' when the player has to deposit and stake their own money. A bet is only risk-free if the player cannot lose their own money. Rejected.",
+    "required_changes": [
+      "Remove the offer from public creative.",
+      "Never use 'risk-free' for offers that require the player's own money."
+    ],
+    "reviewer": "NorthPlay Legal Approver Agent v1",
+    "revised_copy": null,
+    "extracted_text": "Your first bet is RISK-FREE. Up to $250 back if your first bet loses. Deposit required. Bet risk-free 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "brand": "NorthPlay (fictional)",
+    "jurisdiction": "Ontario, Canada",
+    "product": "Sportsbook",
+    "dimensions": "1080x1920"
+  },
+  {
+    "ad_id": "NP-H08",
+    "file": "NP-H08_rejected_athlete_endorsement.png",
+    "campaign": "NorthPlay Ambassadors",
+    "channel": "Programmatic display",
+    "format": "landscape",
+    "submitted_date": "2026-09-25",
+    "decision_date": "2026-09-25",
+    "headline": "Get in the game with Jake Moreau.",
+    "body_copy": "\"I've played the game. Now I bet on it. Join me on NorthPlay.\" - Jake Moreau, NorthPlay ambassador and former NHL star",
+    "cta": "Bet with Jake",
+    "disclaimer_text": "19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "status": "rejected",
+    "confidence": 0.98,
+    "rules_cited": [
+      {
+        "rule_id": "REG-03",
+        "finding": "Retired professional athlete with a paid ambassador arrangement promotes betting. Not a responsible gambling message, so the exception does not apply."
+      },
+      {
+        "rule_id": "REG-11",
+        "finding": "Implies betting is linked to the athlete's success and status."
+      }
+    ],
+    "rationale": "A retired NHL player under a paid NorthPlay arrangement directly promotes betting ('Bet with Jake'). Ontario bans athletes in gambling ads except for messages made exclusively to promote responsible gambling. Compare NP-H03, which was approved because it contained only responsible gambling content. Rejected.",
+    "required_changes": [
+      "Remove the athlete, or rebuild as a responsible-gambling-only message with no betting call-to-action."
+    ],
+    "reviewer": "NorthPlay Legal Approver Agent v1",
+    "revised_copy": null,
+    "extracted_text": "Get in the game with Jake Moreau. \"I've played the game. Now I bet on it. Join me on NorthPlay.\" - Jake Moreau, NorthPlay ambassador and former NHL star Bet with Jake 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "brand": "NorthPlay (fictional)",
+    "jurisdiction": "Ontario, Canada",
+    "product": "Sportsbook",
+    "dimensions": "1200x628"
+  },
+  {
+    "ad_id": "NP-H09",
+    "file": "NP-H09_rejected_rent_parlay.png",
+    "campaign": "Payday Weekend",
+    "channel": "Facebook (paid social)",
+    "format": "landscape",
+    "submitted_date": "2026-09-27",
+    "decision_date": "2026-09-27",
+    "headline": "Rent due? Your next parlay could cover it.",
+    "body_copy": "Turn Sunday into payday.",
+    "cta": "Build a parlay",
+    "disclaimer_text": "19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "status": "rejected",
+    "confidence": 0.99,
+    "rules_cited": [
+      {
+        "rule_id": "REG-07",
+        "finding": "Presents betting as a way to pay rent and as a source of income ('payday')."
+      },
+      {
+        "rule_id": "REG-09",
+        "finding": "Implies winning is a realistic outcome."
+      },
+      {
+        "rule_id": "REG-06",
+        "finding": "Exploits financial pressure, which targets potentially high-risk persons."
+      }
+    ],
+    "rationale": "Frames betting as a way to cover rent and earn income. Gambling may not be promoted as a solution to financial problems or an alternative to employment. Targeting people under financial pressure also exploits potentially high-risk persons. Rejected.",
+    "required_changes": [
+      "Remove all financial-outcome framing (rent, payday, income)."
+    ],
+    "reviewer": "NorthPlay Legal Approver Agent v1",
+    "revised_copy": null,
+    "extracted_text": "Rent due? Your next parlay could cover it. Turn Sunday into payday. Build a parlay 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "brand": "NorthPlay (fictional)",
+    "jurisdiction": "Ontario, Canada",
+    "product": "Sportsbook",
+    "dimensions": "1200x628"
+  },
+  {
+    "ad_id": "NP-H10",
+    "file": "NP-H10_rejected_win_it_back.png",
+    "campaign": "Monday Night Retention",
+    "channel": "Instagram (paid social)",
+    "format": "square",
+    "submitted_date": "2026-10-05",
+    "decision_date": "2026-10-05",
+    "headline": "Rough Sunday? Win it all back Monday night.",
+    "body_copy": "Kansas City vs. Buffalo. One game to turn your weekend around.",
+    "cta": "Bet Monday night",
+    "disclaimer_text": "19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "status": "rejected",
+    "confidence": 0.98,
+    "rules_cited": [
+      {
+        "rule_id": "REG-08",
+        "finding": "Encourages betting to recover previous losses ('win it all back')."
+      },
+      {
+        "rule_id": "REG-06",
+        "finding": "Targets players who have just lost, a potentially high-risk group."
+      }
+    ],
+    "rationale": "Tells players who lost on Sunday to 'win it all back' on Monday. Encouraging play to recover losses is prohibited because loss-chasing is a core warning sign of problem gambling. Rejected.",
+    "required_changes": [
+      "Remove any reference to previous losses or recovering money. A neutral game-preview version would be acceptable."
+    ],
+    "reviewer": "NorthPlay Legal Approver Agent v1",
+    "revised_copy": null,
+    "extracted_text": "Rough Sunday? Win it all back Monday night. Kansas City vs. Buffalo. One game to turn your weekend around. Bet Monday night 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "brand": "NorthPlay (fictional)",
+    "jurisdiction": "Ontario, Canada",
+    "product": "Sportsbook",
+    "dimensions": "1080x1080"
+  },
+  {
+    "ad_id": "NP-H11",
+    "file": "NP-H11_rejected_lock_easy_money.png",
+    "campaign": "Tonight's Picks",
+    "channel": "TikTok (paid social)",
+    "format": "story",
+    "submitted_date": "2026-10-10",
+    "decision_date": "2026-10-10",
+    "headline": "Tonight's LOCK: Toronto ML. Easy money.",
+    "body_copy": "The more you bet, the more you win.",
+    "cta": "Lock it in",
+    "disclaimer_text": "19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "status": "rejected",
+    "confidence": 0.99,
+    "rules_cited": [
+      {
+        "rule_id": "REG-09",
+        "finding": "'Lock' and 'easy money' present winning as certain; 'the more you bet, the more you win' implies spending more improves the chance of winning."
+      }
+    ],
+    "rationale": "Presents a bet as a sure thing ('lock', 'easy money') and claims that betting more means winning more. Ads may not present winning as the probable outcome or suggest that spending more improves the odds. Rejected.",
+    "required_changes": [
+      "Remove certainty language and any claim linking stake size to winning."
+    ],
+    "reviewer": "NorthPlay Legal Approver Agent v1",
+    "revised_copy": null,
+    "extracted_text": "Tonight's LOCK: Toronto ML. Easy money. The more you bet, the more you win. Lock it in 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "brand": "NorthPlay (fictional)",
+    "jurisdiction": "Ontario, Canada",
+    "product": "Sportsbook",
+    "dimensions": "1080x1920"
+  },
+  {
+    "ad_id": "NP-H12",
+    "file": "NP-H12_rejected_cartoon_mascot_youth.png",
+    "campaign": "Pucky Launch",
+    "channel": "YouTube Shorts (paid social)",
+    "format": "square",
+    "submitted_date": "2026-10-17",
+    "decision_date": "2026-10-17",
+    "headline": "No cap, this parlay is bussin.",
+    "body_copy": "Pucky says: bet with your squad!",
+    "cta": "Bet with Pucky",
+    "disclaimer_text": "19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "status": "rejected",
+    "confidence": 0.97,
+    "rules_cited": [
+      {
+        "rule_id": "REG-02",
+        "finding": "Cartoon mascot ('Pucky') is the focal point and is likely to appeal to minors."
+      },
+      {
+        "rule_id": "REG-01",
+        "finding": "Youth slang ('no cap', 'bussin', 'squad') appeals primarily to minors."
+      },
+      {
+        "rule_id": "REG-11",
+        "finding": "'Bet with your squad' implies peer pressure."
+      }
+    ],
+    "rationale": "A cartoon mascot combined with teen slang makes the ad likely to appeal to minors, and 'bet with your squad' adds peer pressure. Ontario bans cartoon figures and youth-oriented themes or language in gambling ads. Rejected.",
+    "required_changes": [
+      "Remove the mascot.",
+      "Rewrite the copy in neutral adult language.",
+      "Remove peer-pressure framing."
+    ],
+    "reviewer": "NorthPlay Legal Approver Agent v1",
+    "revised_copy": null,
+    "extracted_text": "No cap, this parlay is bussin. Pucky says: bet with your squad! Bet with Pucky 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "brand": "NorthPlay (fictional)",
+    "jurisdiction": "Ontario, Canada",
+    "product": "Sportsbook",
+    "dimensions": "1080x1080"
+  },
+  {
+    "ad_id": "NP-H13",
+    "file": "NP-H13_changes_missing_disclaimer.png",
+    "campaign": "Hockey Night Live Odds",
+    "channel": "Instagram (paid social)",
+    "format": "square",
+    "submitted_date": "2026-10-22",
+    "decision_date": "2026-10-22",
+    "headline": "Ottawa vs. Edmonton. Odds are live.",
+    "body_copy": "Every goal moves the line.",
+    "cta": "See live odds",
+    "disclaimer_text": null,
+    "status": "approved_with_changes",
+    "confidence": 0.93,
+    "rules_cited": [
+      {
+        "rule_id": "REG-14",
+        "finding": "No responsible gambling message, age statement or Ontario-only statement."
+      }
+    ],
+    "rationale": "The creative itself is compliant: factual live odds with no offers or claims. However, it has no responsible gambling message, which every gambling ad must include. Approved on condition that the full house disclaimer is added.",
+    "required_changes": [
+      "Add the full house disclaimer as a legible footer."
+    ],
+    "revised_copy": {
+      "disclaimer_text": "19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600."
+    },
+    "reviewer": "NorthPlay Legal Approver Agent v1",
+    "extracted_text": "Ottawa vs. Edmonton. Odds are live. Every goal moves the line. See live odds",
+    "brand": "NorthPlay (fictional)",
+    "jurisdiction": "Ontario, Canada",
+    "product": "Sportsbook",
+    "dimensions": "1080x1080"
+  },
+  {
+    "ad_id": "NP-H14",
+    "file": "NP-H14_changes_rite_of_passage.png",
+    "campaign": "New Player Welcome",
+    "channel": "Snapchat (paid social)",
+    "format": "landscape",
+    "submitted_date": "2026-10-27",
+    "decision_date": "2026-10-28",
+    "headline": "Turned 19? Welcome to the big leagues.",
+    "body_copy": "Your first bet is a milestone. Make it count.",
+    "cta": "Place your first bet",
+    "disclaimer_text": "19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "status": "approved_with_changes",
+    "confidence": 0.84,
+    "rules_cited": [
+      {
+        "rule_id": "REG-11",
+        "finding": "Frames gambling as a rite of passage tied to turning 19."
+      },
+      {
+        "rule_id": "REG-05",
+        "finding": "Snapchat audience skews young; placement must be restricted to verified 19+ adult-majority audiences."
+      }
+    ],
+    "rationale": "Frames turning 19 and placing a first bet as a coming-of-age milestone, which is prohibited rite-of-passage messaging. The placement also skews toward young audiences. The ad's goal (onboarding new adult players) is fine, so it is approved with a rewrite and a placement restriction.",
+    "required_changes": [
+      "Replace rite-of-passage copy with a neutral explainer.",
+      "Restrict placement to verified 19+ audiences, 25+ preferred."
+    ],
+    "revised_copy": {
+      "headline": "New to NorthPlay? Learn how betting works.",
+      "body_copy": "Odds, bet types and limit tools explained in 2 minutes.",
+      "cta": "Read the guide"
+    },
+    "reviewer": "NorthPlay Legal Approver Agent v1",
+    "extracted_text": "Turned 19? Welcome to the big leagues. Your first bet is a milestone. Make it count. Place your first bet 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "brand": "NorthPlay (fictional)",
+    "jurisdiction": "Ontario, Canada",
+    "product": "Sportsbook",
+    "dimensions": "1200x628"
+  },
+  {
+    "ad_id": "NP-H15",
+    "file": "NP-H15_changes_illegible_disclaimer.png",
+    "campaign": "Basketball Tip-Off",
+    "channel": "Instagram Stories (paid social)",
+    "format": "story",
+    "submitted_date": "2026-11-03",
+    "decision_date": "2026-11-03",
+    "headline": "Tip-off is tonight.",
+    "body_copy": "Toronto vs. Boston. Bet player props, live.",
+    "odds": [
+      [
+        "TORONTO",
+        "+210"
+      ],
+      [
+        "BOSTON",
+        "-250"
+      ]
+    ],
+    "cta": "Explore props",
+    "disclaimer_text": "19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "status": "approved_with_changes",
+    "confidence": 0.9,
+    "rules_cited": [
+      {
+        "rule_id": "REG-14",
+        "finding": "Disclaimer is present but rendered at a tiny size with very low contrast, so it is effectively unreadable."
+      }
+    ],
+    "rationale": "Content is compliant, but the required disclaimer is so small and faint that a viewer could not read it. A disclaimer only counts if it is legible. Approved once the disclaimer is enlarged and given proper contrast.",
+    "required_changes": [
+      "Increase disclaimer size to at least 24px at 1080x1920 with high contrast."
+    ],
+    "reviewer": "NorthPlay Legal Approver Agent v1",
+    "revised_copy": null,
+    "extracted_text": "Tip-off is tonight. Toronto vs. Boston. Bet player props, live. TORONTO +210 | BOSTON -250 Explore props 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "brand": "NorthPlay (fictional)",
+    "jurisdiction": "Ontario, Canada",
+    "product": "Sportsbook",
+    "dimensions": "1080x1920"
+  }
+]

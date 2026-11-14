@@ -1,0 +1,45 @@
+[
+  {
+    "type": "message",
+    "user": "U01RB",
+    "text": "Confidential: we have terminated our agreement with Jake Moreau effective today, following the issues raised last week. Please make sure no Jake Moreau content of any kind runs again.",
+    "ts": "1793380500.000022",
+    "user_profile": {
+      "real_name": "Rachel Bouchard",
+      "display_name": "rachel.bouchard",
+      "title": "CEO"
+    },
+    "reactions": [
+      {
+        "name": "eyes",
+        "users": [
+          "U02PN",
+          "U03EC",
+          "U08LF"
+        ],
+        "count": 3
+      }
+    ],
+    "thread_ts": "1793380500.000022",
+    "reply_count": 1,
+    "replies": [
+      {
+        "user": "U03EC",
+        "ts": "1793380920.000023"
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U03EC",
+    "text": "Confirmed. That covers every format, including responsible gambling messaging. We no longer have the rights to his name, image or voice. I'll post the guidance in #legal-marketing.",
+    "ts": "1793380920.000023",
+    "user_profile": {
+      "real_name": "Ethan Cho",
+      "display_name": "ethan.cho",
+      "title": "Senior Counsel, Legal & Compliance"
+    },
+    "thread_ts": "1793380500.000022",
+    "parent_user_id": "U01RB"
+  }
+]

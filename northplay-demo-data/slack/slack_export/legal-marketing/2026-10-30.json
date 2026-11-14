@@ -1,0 +1,64 @@
+[
+  {
+    "type": "message",
+    "user": "U03EC",
+    "text": "IMPORTANT: The Jake Moreau partnership is terminated as of today. Do not use his name, image, likeness, voice or quotes in ANY creative, including Play Smart / responsible gambling messaging. Pull anything in flight. Any submission featuring him must be rejected.",
+    "ts": "1793383500.000024",
+    "user_profile": {
+      "real_name": "Ethan Cho",
+      "display_name": "ethan.cho",
+      "title": "Senior Counsel, Legal & Compliance"
+    },
+    "reactions": [
+      {
+        "name": "white_check_mark",
+        "users": [
+          "U02PN",
+          "U04DO",
+          "U05SM",
+          "U06AH",
+          "U07KT"
+        ],
+        "count": 5
+      }
+    ],
+    "thread_ts": "1793383500.000024",
+    "reply_count": 2,
+    "replies": [
+      {
+        "user": "U06AH",
+        "ts": "1793383920.000025"
+      },
+      {
+        "user": "U03EC",
+        "ts": "1793384100.000026"
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U06AH",
+    "text": "We had a Play Smart cut with Jake drafted for December ('take a break between periods'). Killing it.",
+    "ts": "1793383920.000025",
+    "user_profile": {
+      "real_name": "Amira Haddad",
+      "display_name": "amira.haddad",
+      "title": "Creative Lead"
+    },
+    "thread_ts": "1793383500.000024",
+    "parent_user_id": "U03EC"
+  },
+  {
+    "type": "message",
+    "user": "U03EC",
+    "text": "Correct. Even though an RG-only athlete message would normally pass AGCO rules, we don't have the rights. Reject.",
+    "ts": "1793384100.000026",
+    "user_profile": {
+      "real_name": "Ethan Cho",
+      "display_name": "ethan.cho",
+      "title": "Senior Counsel, Legal & Compliance"
+    },
+    "thread_ts": "1793383500.000024",
+    "parent_user_id": "U03EC"
+  }
+]

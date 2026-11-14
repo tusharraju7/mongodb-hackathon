@@ -1,0 +1,44 @@
+[
+  {
+    "type": "message",
+    "user": "U05SM",
+    "text": "Marcus Doyle question: can we write new quotes for him for the Limits launch?",
+    "ts": "1793632800.000027",
+    "user_profile": {
+      "real_name": "Sofia Marchetti",
+      "display_name": "sofia.marchetti",
+      "title": "Brand Manager"
+    },
+    "thread_ts": "1793632800.000027",
+    "reply_count": 1,
+    "replies": [
+      {
+        "user": "U03EC",
+        "ts": "1793634060.000028"
+      }
+    ]
+  },
+  {
+    "type": "message",
+    "user": "U03EC",
+    "text": "Not without his written sign-off. His renewed contract (through Dec 2027) limits us to the approved quote bank. Approved quotes: (1) 'Set a budget before kickoff. Take breaks. Know when to walk away.' (2) 'The best fans know their limits.' (3) 'Set your limit before the puck drops.' Anything else needs his agent's written approval before it goes to the agent for review.",
+    "ts": "1793634060.000028",
+    "user_profile": {
+      "real_name": "Ethan Cho",
+      "display_name": "ethan.cho",
+      "title": "Senior Counsel, Legal & Compliance"
+    },
+    "thread_ts": "1793632800.000027",
+    "parent_user_id": "U05SM",
+    "reactions": [
+      {
+        "name": "pushpin",
+        "users": [
+          "U05SM",
+          "U06AH"
+        ],
+        "count": 2
+      }
+    ]
+  }
+]
