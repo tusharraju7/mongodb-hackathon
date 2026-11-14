@@ -21,15 +21,13 @@ This file is the single source of guidance for Claude Code, Codex, and any other
 
 | You need | Read |
 |---|---|
-| Your tasks, time boxes, checks | [docs/PLAN.md](docs/PLAN.md) |
+| **Start here.** The backend as built: how to run it, what is verified, what data and the web app must match | [docs/BACKEND.md](docs/BACKEND.md) |
 | Tech stack, infrastructure diagram, core mechanisms | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
-| The three use-case flows, auth, memory, token rules | [docs/FLOWS.md](docs/FLOWS.md) |
-| One credit card ad followed end to end, with sample JSON | [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md) |
 | Collection schemas, indexes, RBAC, API, service signatures | [docs/CONTRACTS.md](docs/CONTRACTS.md) |
-| What to create in MongoDB, in what order, and the seed data | [docs/MONGODB_SETUP.md](docs/MONGODB_SETUP.md) |
-| The backend as built: how to run it, what is verified, what data and the web app must match | [docs/BACKEND.md](docs/BACKEND.md) |
-| Shared Atlas access, env vars, MCP setup | [docs/SETUP.md](docs/SETUP.md) |
+| Collections, validators and indexes; how to load the database | [docs/MONGODB_SETUP.md](docs/MONGODB_SETUP.md) |
+| Shared Atlas access, env vars, users, MCP setup | [docs/SETUP.md](docs/SETUP.md) |
 | Demo script and rules checklist | [docs/DEMO.md](docs/DEMO.md) |
+| Archived (bank example): event-day tasks and checks; use-case flows and token rules; one ad end to end | [docs/PLAN.md](docs/PLAN.md), [docs/FLOWS.md](docs/FLOWS.md), [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md) |
 
 ## How to pick up work
 
@@ -75,17 +73,17 @@ Edit only the files your area owns.
 
 ## Rules
 
-1. **Stay in your lane.** If you need something from another stream, call its function as specified in `docs/CONTRACTS.md`. If the contract is not enough, stop and tell your human; do not edit another stream's files.
+1. **Stay in your lane.** If you need something from another area, call its function as specified in `docs/CONTRACTS.md`. If the contract is not enough, stop and tell your human; do not edit another area's files.
 2. **Every state-changing action goes through `guarded()`** in `backend/app/core/gate.py`. No tool or router writes to the database or calls ElevenLabs directly.
 3. **Identity comes from the JWT, never from model output.** Lanes receive `identity` and `run_id` as arguments from the router.
 4. **Access scope lives in the query.** Team, role and status filters go in the `$vectorSearch` pre-filter or the `find` filter, never in a prompt instruction.
-5. **Shared database.** Everyone works against the same Atlas cluster. Never drop collections or indexes. Never run an unfiltered delete or update. Schema, validator and index changes go only through `backend/scripts/setup_db.py`, which must stay idempotent. For destructive experiments set `MONGODB_DB=greenlight_<yourname>`.
+5. **Shared database.** Everyone works against the same Atlas cluster. Never drop collections or indexes. Never run an unfiltered delete or update. Schema, validator and index changes go only through `backend/scripts/load_db.py` (definitions live in `docs/MONGODB_SETUP.md`), which must stay idempotent. For destructive experiments set `MONGODB_DB=greenlight_<yourname>`.
 6. **The repo is public. Never commit secrets.** No keys, passwords or connection strings in code, docs, tests, PR text or commit messages. `.env` is gitignored.
 7. **Do not change the embedding model or its dimensions** (`voyage-3.5`, 1024). The vector indexes depend on it.
 8. **Follow the token rules** in `docs/FLOWS.md`: deny before spending, one intent → one lane with no tool schemas sent to the model, filter before retrieving, summaries not documents, code before model, fast model for everything except the compliance verdict.
 9. **No Streamlit, no new frameworks, no extra services.** The stack in `docs/ARCHITECTURE.md` is fixed.
-10. **Original work only.** Do not paste code from other projects. Use only the fictional bank and card (Tamarack Bank, Tamarack Cashback Card) and stock ElevenLabs voices; no real institutions, card networks, people, voices or likenesses in seed data or demos.
-11. **P0 before anything else.** Do not start a P1 or P2 task while a P0 task in your stream is open. Nothing new after the feature freeze at T+3:15.
+10. **Original work only.** Do not paste code from other projects. Use only fictional brands (NorthPlay for the data and demo; Tamarack Bank in the offline test fixtures) and stock ElevenLabs voices; no real institutions, card networks, people, voices or likenesses in seed data or demos.
+11. **P0 before anything else.** Do not start a P1 or P2 task while a P0 task in your area is open. Nothing new after the feature freeze at T+3:15.
 12. **The model never sees a password.** UC4 changes are drafted by the agent and written by the web app calling the write endpoint with the password.
 13. **Never invent offer terms.** Rates, fees, bonus amounts and conditions come only from the ad or the `offers` record. No offer record → stop and ask.
 14. **Policy outranks memory.** Memory can add a team instruction or show a past verdict; it cannot waive a policy clause. Findings cite a policy key and version, the offer, or a memory id.
@@ -99,11 +97,11 @@ Edit only the files your area owns.
 
 Trunk-based. `main` must always start.
 
-- One branch per task: `<stream>/<task-id>-<slug>`, for example `agent/b1-compliance-engine`, `web/d2-chat`, `audit/a3-fundamentals-stepup`, `memory/c3-memory-service`.
+- One branch per task: `<area>/<slug>`, for example `data/demo-ads`, `web/lawyer-screen`, `backend/audio-review`.
 - Keep branches under about 45 minutes of work. Small PRs.
 - Before pushing: `git pull --rebase origin main`.
-- PR title: `[B1] Compliance engine`. Squash-merge it yourself once the task's check passes locally. There is no review gate in this event.
-- Never force-push `main`. Never commit directly to `main` after Stream 0.
+- PR title: a short description, for example `Lawyer approval screen`. Squash-merge it yourself once the task's check passes locally. There is no review gate in this event.
+- Never force-push `main`. Never commit directly to `main`.
 - Commit style: `feat(agent): …`, `fix(web): …`, `docs: …`.
 - Merge conflict in a file you do not own: stop and tell your human.
 
