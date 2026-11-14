@@ -113,6 +113,9 @@ class ComplianceReport(BaseModel):
     confidence: Confidence
     passed_checks: list[PassedCheck] = Field(default_factory=list)
     violations: list[Violation] = Field(default_factory=list)
+    conflicts: list[dict] = Field(default_factory=list)  # [{between: [{type, ref, label}], winner: {...}, explanation}]
+    channel_class: Optional[str] = None  # public | owned | direct | unknown, decided in code
+    prompt_version: Optional[str] = None
     corrected_copy: Optional[str] = None
     corrected_language: Optional[Language] = None  # differs from the ad's when the fix is to change language
     missing_inputs: list[str] = Field(default_factory=list)
@@ -168,8 +171,15 @@ class JudgeFinding(BaseModel):
     agrees_with_memory: Optional[str] = Field(None, description="Id of a listed past-verdict memory that settled a similar case the same way, if any.")
 
 
+class JudgeConflict(BaseModel):
+    between: list[str] = Field(description="The clause keys and memory ids that disagree about this ad, exactly as listed. At least two.")
+    winner: str = Field(description="The clause key or memory id that prevails under the ranking of sources.")
+    explanation: str = Field(description="One sentence: what each side says and why the winner prevails.")
+
+
 class JudgeOutput(BaseModel):
     findings: list[JudgeFinding]
+    conflicts: list[JudgeConflict] = Field(default_factory=list, description="Places where the sources disagree about this ad. Empty when none do.")
     summary: str = Field(description="At most three plain sentences for the marketer: the outcome and the main reasons.")
     corrected_copy: str = Field(description="The complete ad rewritten so that it has no findings. The ad unchanged if nothing needs fixing.")
     corrected_copy_language: Language = Field(description="The language the corrected copy is written in.")
