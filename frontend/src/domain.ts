@@ -50,3 +50,11 @@ export function suggestedPrompts(review: Review): string[] {
   for(let i=0;i<promptGroups.length;i++)if(promptGroups[i].some(p=>used.has(p)))group=i+1;
   return promptGroups.slice(group).flat().filter(p=>!used.has(p)).slice(0,3);
 }
+
+export function projectCounts(items: {id:string;status:string}[]) {
+  const projects=[...new Map(items.map(p=>[p.id,p])).values()];
+  const pending=projects.filter(p=>p.status==='pending_review').length;
+  const approved=projects.filter(p=>p.status==='approved'||p.status==='released').length;
+  const rejected=projects.filter(p=>p.status==='rejected').length;
+  return {submitted:pending+approved+rejected,pending,approved,rejected};
+}

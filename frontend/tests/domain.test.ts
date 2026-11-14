@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {suggestedPrompts,demoReply,canApprove,canSubmit,needsAcknowledgement,normalizeReport,roleFor,validAnnotation,validateFile} from '../src/domain';
+import {projectCounts,suggestedPrompts,demoReply,canApprove,canSubmit,needsAcknowledgement,normalizeReport,roleFor,validAnnotation,validateFile} from '../src/domain';
 import type {Review,Report,Annotation} from '../src/types';
 const report: Report={verdict:'pass',summary:'Pass',route:'none',route_reason:'',confidence:{score:97,band:'high',reasons:[]},violations:[],passed_checks:[],missing_inputs:[],checked_fundamentals:[],corrected_copy:null,memories_used:[],cached:false};
 const base: Review={key:'test',name:'Test',version:1,status:'draft',report,readiness:92,messages:[],trail:[]};
@@ -27,4 +27,9 @@ test('suggestions advance the whole row without repeating earlier prompts',()=>{
   r={...r,messages:[...r.messages,{id:'p3',role:'user',text:last[0]}]};
   assert.deepEqual(suggestedPrompts(r),[]);
   assert.deepEqual(suggestedPrompts(base),initial);
+});
+
+
+test('project counts exclude uploads, count released as approved, and deduplicate refreshed projects',()=>{
+ assert.deepEqual(projectCounts([{id:'draft',status:'draft'},{id:'a',status:'pending_review'},{id:'b',status:'released'},{id:'c',status:'rejected'},{id:'a',status:'approved'}]),{submitted:3,pending:0,approved:2,rejected:1});
 });

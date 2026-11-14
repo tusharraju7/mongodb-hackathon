@@ -11,12 +11,12 @@ export type Session = { token: string; user: Identity };
 export type Offer = { _id: string; card_name: string; version: number };
 export type AdContext = { name: string; product: string; offer_id?: string; region: string; channel: string; language: string; campaign_id?: string };
 export type Campaign = { id: string; name: string; version: number; status: Status; text: string; summary: string; modality: string; asset?: {type: string; url: string} | null; compliance_verdict?: Verdict; offer_id?: string; product?: string; region?: string; channel?: string; language?: string };
-export type FullCampaign = Campaign & {compliance: Partial<Report>; assets?: {file_id: string; type: string}[]; history?: {version: number; text?: string; status?: string; compliance?: Partial<Report>}[]; review_feedback?: string};
+export type FullCampaign = Campaign & {source?:string; compliance: Partial<Report>; assets?: {file_id: string; type: string}[]; history?: {version: number; text?: string; status?: string; compliance?: Partial<Report>}[]; review_feedback?: string};
 export type CheckResult = Partial<Report> & {assessment_key?: string; run_id: string; campaign: Campaign | null};
 export type ChatResult = {reply: string; run_id: string; status: string; cards: ({type: 'compliance_report'; data: Report} | {type: 'campaign'; data: Campaign} | {type: string; data: unknown})[]; memories_used?: {id: string; kind: string; text: string}[]};
 export type Message = {id: string; role: 'user' | 'assistant' | 'lawyer'; text: string; createdAt?: string};
 export type TrailEntry = {at: string; text: string};
-export type Review = {assessmentKey?: string; savedResult?: {model: string; generatedAt: string; claudeDecision: string; seconds: number}; key: string; name: string; image?: string; text?: string; fileName?: string; report?: Report; readiness?: number; status: Status; campaignId?: string; version: number; demoId?: 'hockey' | 'bonus' | 'breaks'; trail: TrailEntry[]; chats?: Partial<Record<ViewRole,Message[]>>; messages: Message[]};
+export type Review = {assessmentSource?:'team'|'live'; assessmentKey?: string; savedResult?: {model: string; generatedAt: string; claudeDecision: string; seconds: number}; key: string; name: string; image?: string; text?: string; fileName?: string; report?: Report; readiness?: number; status: Status; campaignId?: string; version: number; demoId?: 'hockey' | 'bonus' | 'breaks'; trail: TrailEntry[]; chats?: Partial<Record<ViewRole,Message[]>>; messages: Message[]};
 export type Region = {left: number; top: number; width: number; height: number};
 
 export type MemoryChange = {target:'memory'|'fundamental'; id?:string|null; key?:string; kind?:string; action?:'create'|'correct'|'forget'; scope?:{team:string;user_id:string|null}; before?:string|null; after?:string|null; requires_password:boolean; status:'proposed'};
