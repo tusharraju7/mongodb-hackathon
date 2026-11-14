@@ -1,0 +1,1 @@
+Three fictional NorthPlay demo ads. These are local image copies for preview and upload testing. New uploads do not run AI analysis in offline demo mode. Select the matching sample conversation for the scripted assessment.

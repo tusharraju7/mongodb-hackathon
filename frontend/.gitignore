@@ -1,0 +1,10 @@
+node_modules/
+dist/
+share/
+.env
+.env.*
+!.env.example
+*.log
+.next/
+out/
+tsconfig.tsbuildinfo

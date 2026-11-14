@@ -1,0 +1,14 @@
+{
+  "name": "greenlight-react",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build && node scripts/build.mjs",
+    "test": "tsx --test tests/*.test.ts",
+    "preview": "node scripts/serve.mjs"
+  },
+  "dependencies": { "react": "19.3.1", "react-dom": "19.3.1", "lucide-react": "1.73.0", "next": "16.4.6" },
+  "devDependencies": { "@types/node": "26.6.6", "@types/react": "19.3.0", "@types/react-dom": "19.3.0", "esbuild": "0.28.2", "tsx": "4.23.15", "typescript": "7.0.2" }
+}
