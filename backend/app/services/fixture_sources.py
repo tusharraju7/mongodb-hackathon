@@ -16,6 +16,7 @@ from typing import Optional
 from app.core import embeddings
 from app.core.config import BACKEND_ROOT, SEED_DIR, get_settings
 from app.models import Identity
+from app.services.fundamentals import clause_document
 
 CACHE_FILE = BACKEND_ROOT / ".cache" / "seed_embeddings.json"
 
@@ -37,11 +38,6 @@ def clause_applies(clause: dict, regions: list[str], product: str, at: datetime)
         and (start is None or start <= at)
         and (end is None or end >= at)
     )
-
-
-def clause_document(clause: dict) -> str:
-    """What is embedded for a clause. The data teammate's seed script must embed the same text."""
-    return f"{clause['title']}. {clause['text']}"
 
 
 def _digest(text: str) -> str:

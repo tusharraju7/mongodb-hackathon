@@ -7,7 +7,10 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.core import gate, llm, security
 from app.core.config import get_settings
+from app.core.embeddings import EmbeddingRateLimited
+from app.services import campaigns, fundamentals, media, memory
 
 app = FastAPI(title="Greenlight", version="0.1.0")
 
@@ -17,16 +20,11 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Run-Id"],
 )
 
-# Routers are added as they are built. A router that does not exist yet is skipped, so the app
-# always starts.
 for name in ("auth", "chat", "compliance", "campaigns", "assets", "fundamentals", "memories", "audit", "runs"):
-    try:
-        app.include_router(importlib.import_module(f"app.routers.{name}").router)
-    except ModuleNotFoundError as exc:
-        if exc.name != f"app.routers.{name}":
-            raise
+    app.include_router(importlib.import_module(f"app.routers.{name}").router)
 
 
 @app.get("/health")
@@ -43,26 +41,32 @@ def health() -> dict:
     return status
 
 
-def _error(status: int, code: str, message: str, **extra) -> JSONResponse:
-    return JSONResponse(status_code=status, content={"error": code, "message": message, **extra})
+# Domain errors and the statuses they map to (docs/CONTRACTS.md section 7).
+ERRORS: dict[type, tuple[int, str]] = {
+    gate.Denied: (403, "denied"),
+    gate.RunStopped: (409, "stopped"),
+    security.StepUpFailed: (401, "step_up_failed"),
+    campaigns.StaleApproval: (409, "stale_approval"),
+    campaigns.NotApprovable: (409, "not_approvable"),
+    campaigns.NotFound: (404, "not_found"),
+    fundamentals.NotFound: (404, "not_found"),
+    memory.NotFound: (404, "not_found"),
+    media.UnsupportedMedia: (415, "unsupported_media"),
+    EmbeddingRateLimited: (429, "embedding_rate_limited"),
+    llm.ModelRefused: (502, "model_refused"),
+    llm.ModelFailed: (502, "model_failed"),
+}
 
 
-@app.exception_handler(Exception)
-async def unhandled(request: Request, exc: Exception) -> JSONResponse:
-    """Map domain errors to the statuses in docs/CONTRACTS.md. Anything else is a 500 with no detail leaked."""
-    name = type(exc).__name__
-    if name == "Denied":
-        return _error(403, "denied", str(exc))
-    if name == "RunStopped":
-        return _error(409, "stopped", str(exc))
-    if name == "StaleApproval":
-        return _error(409, "stale_approval", str(exc), changes=getattr(exc, "changes", []))
-    if name == "NotFound":
-        return _error(404, "not_found", str(exc))
-    if name == "StepUpFailed":
-        return _error(401, "step_up_failed", str(exc))
-    if name == "EmbeddingRateLimited":
-        return _error(429, "embedding_rate_limited", str(exc))
-    if name in ("ModelRefused", "ModelFailed"):
-        return _error(502, "model_error", str(exc))
-    return _error(500, "internal_error", "Something went wrong. Nothing was changed.")
+def _handler(status: int, code: str):
+    async def handle(request: Request, exc: Exception) -> JSONResponse:
+        body = {"error": code, "message": str(exc)}
+        if isinstance(exc, campaigns.StaleApproval):
+            body["changes"] = exc.changes
+        return JSONResponse(status_code=status, content=body)
+
+    return handle
+
+
+for _exc, (_status, _code) in ERRORS.items():
+    app.add_exception_handler(_exc, _handler(_status, _code))
