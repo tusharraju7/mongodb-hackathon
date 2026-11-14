@@ -45,5 +45,6 @@ The strategy decks are **slightly out of date**. Slack holds newer decisions tha
 | `demo_01_hockey_night_live.png` | Clean ad. Should be approved. |
 | `demo_02_big_game_bonus.png` | Obvious violation. Should be rejected on regulations and Slack. |
 | `demo_03_play_smart_breaks.png` | Passes the regulations and matches an approved precedent. Should be rejected **only** because of Slack context. |
+| `demo_04_hockey_night_video.mp4` | 15-second video ad (1280x720, with audio) for demoing video creative. |
 
 Expected outcomes and reasoning are kept outside the repo (ask Alton).
