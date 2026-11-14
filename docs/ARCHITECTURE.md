@@ -7,7 +7,7 @@
 | Web app | Next.js (App Router, client components), Tailwind | Pages: login, chat, library, fundamentals, memory, audit |
 | Backend | Python 3.11+, FastAPI | One service, port 8000 |
 | Agent | LangGraph prebuilt tool-calling agent | Tools are built per request from the caller's role and the routed intent |
-| LLM | LangChain `init_chat_model` | `LLM_MODEL` (compliance verdict), `LLM_FAST_MODEL` (router, Q&A, extraction, drafting). Defaults: `anthropic:claude-opus-5-5` and `anthropic:claude-haiku-5-5`. Teammates with OpenAI keys set `openai:<model>` |
+| LLM | LangChain `init_chat_model` | `LLM_MODEL` (compliance verdict), `LLM_FAST_MODEL` (router, Q&A, extraction, drafting). Anthropic only: `anthropic:claude-opus-5-5` and `anthropic:claude-haiku-5-5`. Structured output uses the native JSON-schema method, since these models reject forced tool choice and sampling parameters |
 | Embeddings | Voyage AI `voyage-3.5`, 1024 dimensions | `input_type="document"` on write, `"query"` on search. Frozen for the whole team |
 | Database | MongoDB Atlas Sandbox, `Cluster0` (M10, MongoDB 9.0), database `greenlight` | Identity, policy, audit, memory and content all live here |
 | Vector search | Atlas `$vectorSearch` with pre-filters | Three indexes: fundamentals, campaigns, memories |
@@ -60,7 +60,7 @@ flowchart TB
     CON[("Content<br/>campaigns: vector<br/>offers: approved terms<br/>GridFS audio and images")]
   end
 
-  LLM["LLM via LangChain<br/>Claude or OpenAI"]
+  LLM["Claude via LangChain<br/>Opus 5.5 and Haiku 5.5"]
   VOY["Voyage AI<br/>voyage-3.5 embeddings"]
   EL["ElevenLabs<br/>Scribe speech-to-text,<br/>text-to-speech"]
 
