@@ -144,7 +144,7 @@ def call_structured(
     gate.emit(
         "model_call", f"model.{label}", duration_ms=int((time.time() - started) * 1000), tokens=spent,
         params={"model": _name(model), "effort": _effort(model), "prompt_version": prompts_version(), "prompt_hash": gate.digest([system, user]),
-                "output_hash": gate.digest(getattr(raw, "content", None)), "schema": schema.__name__, "trace_id": getattr(raw, "id", None)},
+                "output_hash": gate.digest(getattr(raw, "content", None)), "schema": schema.__name__, "message_id": getattr(raw, "id", None)},
         result={"status": "refused" if stop_reason == "refusal" else "ok" if result.get("parsed") is not None else "error", "summary": f"{label}: {stop_reason or 'done'}"},
     )
     gate.count(model_calls=1, tokens=spent["in"] + spent["out"])

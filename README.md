@@ -53,7 +53,7 @@ Next.js · FastAPI · LangGraph / LangChain · Claude (verdict and fast models) 
 
 The backend is built and the `greenlight` database on Atlas is loaded with the NorthPlay data. The web app is in progress.
 
-Checked so far: 52 offline tests pass; 14 of the 15 past ads come back with their recorded decision when reviewed without the memory of that decision; the three demo ads come out as intended; and 38 of 39 live end-to-end checks passed on Atlas, with the one failure fixed and re-checked. Details, limits and how to run it are in [docs/BACKEND.md](docs/BACKEND.md).
+Checked so far: 77 offline tests pass; 14 of the 15 past ads come back with their recorded decision when reviewed without the memory of that decision; the three demo ads come out as intended; and 54 of 54 live end-to-end checks passed on Atlas, including a staged crash that was resumed and then rolled back. Details, limits and how to run it are in [docs/BACKEND.md](docs/BACKEND.md); why the gate, the ledger and the memory work the way they do is in [docs/DESIGN_NOTES.md](docs/DESIGN_NOTES.md).
 
 ## Documents
 

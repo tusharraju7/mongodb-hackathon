@@ -131,6 +131,7 @@ python -m scripts.smoke          # live end to end; run it against a scratch dat
 python -m scripts.build_seed
 python -m scripts.load_db --db greenlight --shared --password "$SEED_PASSWORD"
 python -m scripts.load_db --db greenlight_scratch --password "$SEED_PASSWORD"   # a scratch copy for smoke
+python -m scripts.load_db --db greenlight --shared --setup-only                  # validators, indexes and action rules only; data untouched
 ```
 
 ## Looking at the shared database from your agent

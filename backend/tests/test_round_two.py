@@ -10,8 +10,8 @@ from PIL import Image
 
 from app.core import gate, llm
 from app.models import Identity
-from app.services import campaigns, compliance, media, memory
-from tests.conftest import PASSWORD, who
+from app.services import compliance, media, memory
+from tests.conftest import PASSWORD
 from tests.test_api_flow import AD, FIXED, FRENCH, QC_AD, RUNNING, api, canned, card, chat  # noqa: F401  (api is a fixture)
 
 MANAGER = "manager.national@tamarack.test"

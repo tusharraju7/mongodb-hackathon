@@ -3,6 +3,7 @@
     python -m scripts.build_seed                                              # northplay-demo-data/ -> backend/seed/
     python -m scripts.load_db --db greenlight --shared --password <password>  # the shared database
     python -m scripts.load_db --db greenlight_scratch --password <password>   # a scratch copy
+    python -m scripts.load_db --db greenlight --shared --setup-only           # validators, indexes and rules only
 
 It follows docs/MONGODB_SETUP.md: the validators and vector index definitions are read straight out
 of that file, so the database it builds is the one the docs describe. Everything is upserted on a
@@ -107,10 +108,9 @@ def wait_for_vectors(db, timeout: int = 300) -> bool:
     return False
 
 
-def load(db, password: str, with_media: bool) -> None:
+def load_rules(db) -> None:
+    """Who may do what: the role lists, and the rule for each action. Touches no other data."""
     at = now()
-    labels = get_profile()["decision_labels"]
-
     for doc in seed("policies"):
         db.policies.replace_one({"_id": doc["_id"]}, {**doc, "updated_at": at}, upsert=True)
     # The rule for each action, as data. These are the defaults the gate would use anyway; storing
@@ -118,6 +118,13 @@ def load(db, password: str, with_media: bool) -> None:
     for action, rule in gate.DEFAULT_RULES.items():
         db.action_rules.replace_one({"_id": action}, {"_id": action, **rule, "updated_at": at}, upsert=True)
     db.action_rules.replace_one({"_id": "_limits"}, {"_id": "_limits", "per_run": gate.DEFAULT_LIMITS, "note": "The most one run may use before its next step is refused.", "updated_at": at}, upsert=True)
+    print("rules:", {"policies": db.policies.count_documents({}), "action_rules": db.action_rules.count_documents({})})
+
+
+def load(db, password: str, with_media: bool) -> None:
+    at = now()
+    labels = get_profile()["decision_labels"]
+    load_rules(db)
 
     password_hash = security.hash_password(password)
     for u in seed("users"):
@@ -228,16 +235,23 @@ def load(db, password: str, with_media: bool) -> None:
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--db", required=True)
-    p.add_argument("--password", required=True, help="password given to every seeded user")
+    p.add_argument("--password", default="", help="password given to every seeded user (not needed with --setup-only)")
     p.add_argument("--no-media", action="store_true", help="do not upload the past ads' images")
     p.add_argument("--shared", action="store_true", help="allow writing to the shared `greenlight` database")
+    p.add_argument("--setup-only", action="store_true", help="apply validators, indexes and the action rules only; leave users, ads, memories and files as they are")
     args = p.parse_args()
     if args.db == "greenlight" and not args.shared:
         print("Refusing to write to the shared `greenlight` database without --shared. Use a scratch name such as greenlight_scratch.")
         return 2
+    if not args.setup_only and not args.password:
+        print("--password is required unless --setup-only is given.")
+        return 2
     db = get_client()[args.db]
     print(f"target database: {args.db}  |  data set: {get_profile()['brand']}")
     setup(db)
+    if args.setup_only:
+        load_rules(db)
+        return 0
     load(db, args.password, with_media=not args.no_media)
     return 0 if wait_for_vectors(db) else 1
 

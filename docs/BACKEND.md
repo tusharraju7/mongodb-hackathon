@@ -97,12 +97,20 @@ A lane declares its steps up front; all are checked before the first runs, and t
 | Offline tests (`pytest`) | 77 pass: the original 52, and 25 for round two (`tests/test_round_two.py`). They run on the earlier fictional-bank fixtures in `tests/fixtures/`, which exercise every code path including offer records |
 | The 15 past ads (`scripts/dry_run.py --suite`), each reviewed without the memory of its own decision | 14 match the recorded decision. `NP-H05` comes back stricter (below) |
 | The 3 demo ads, uploaded as images through the API | Demo 1 approved. Demo 2 rejected on `REG-12`, `REG-13` and a Slack decision. Demo 3 rejected on the Jake Moreau decision alone, with no regulation cited; replayed without memory it is not rejected |
-| Live end to end on Atlas (`scripts/smoke.py`, on a scratch copy) | 38 of 39. The one failure, a new team instruction not taking effect on the very next review, was fixed and re-checked live |
+| Live end to end on Atlas (`scripts/smoke.py`, on a scratch copy) | The 39 checks from before round two: 39 of 39 with round two in place, script unchanged. With the 15 round-two checks added: 54 of 54 |
+| Crash after the verdict, then resume (demo 3, live) | The run was marked interrupted, resumed by its owner, and finished. The resumed attempt made one model call (locating the finding on the image, 2,086 input tokens); reading the image, the claims and the verdict were reused from their checkpoints. Ledger chain intact across the crash |
+| Crash after filing, then rollback (live) | The ad the dead run had filed was removed from the library; the chain verified |
+| Lesion test (demo 3, live) | The control repeat reproduced the original verdict. With the Jake Moreau Slack decision removed, the result changed from rejected to approved: recorded as decisive. Two verdict calls, 16 s |
+| Conflict (demo 3, live) | Recorded: `REG-03` (whose exception would allow a retired athlete in a responsible-gambling message) against the Slack decision; the Slack decision won |
+| Flaw highlights, by eye | Demo 2, demo 3 and `NP-H12`: each box sat on the words or element the finding is about. Three ads is a small sample |
+| Video (a 7-second test clip made for this, with speech and on-screen text) | Speech transcribed (21 words), 6 frames read, rejected on `REG-12` twice, `REG-13` and the Slack ban on "risk-free"; filed as a video; a follow-up question answered from it; regenerate declined as designed. 35 s |
+| The agent asked to approve (a manager, in chat, live) | Refused, with `decided_by: initiator` on the ledger |
+| Consolidation (live) | Four drafts from the seeded past verdicts (`REG-14` from 7, `REG-12` from 5, `REG-09` from 4, `REG-06` from 3). Each read as a fair summary; none was saved |
 | Regenerate | Demo 3 is regenerated as a new banner without the athlete and passes the same review |
 
 **`NP-H05`** (the opted-in bonus email, recorded as approved) is rejected today on two points: the creative shows no unsubscribe option (`REG-15`), and it says "any NFL game" after Legal's 20 October message that NorthPlay holds no NFL marks. Whether that is right is a call for Alton, who holds the answer keys.
 
-**Not verified:** the three demo ads against Alton's answer keys beyond what the README states; how traces look in LangSmith; that two users' same-named conversations stay separate (it follows from how thread ids are built, but nothing tests it).
+**Not verified:** the three demo ads against Alton's answer keys beyond what the README states; how traces look in LangSmith; that two users' same-named conversations stay separate (it follows from how thread ids are built, but nothing tests it). From round two: disabling a user mid-run, a run over its budget, an in-doubt step being adopted, and the strength arithmetic are covered by offline tests only, not live; a real process kill (as opposed to the staged crash) was not tried; video was tried on one short clip made for the purpose, and not on mov or webm; the web app's use of any new field.
 
 **Not built:** reuse of a stored verdict for an unchanged ad, and the "review our policies for gaps" request.
 
