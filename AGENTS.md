@@ -12,7 +12,8 @@ This file is the single source of guidance for Claude Code, Codex, and any other
   - **UC5** Answer questions about an ad, returning the ad itself.
 - Ads are text, audio or image, in and out. Audio in: ElevenLabs Scribe. Image in: the fast model with image input. Audio out: ElevenLabs text-to-speech. Image out: a brand template rendered in code.
 - Out of scope: creating creative from a blank prompt (was UC2) and comparing campaigns (was UC3). Do not build them.
-- Setting: Tamarack Bank, a fictional Canadian bank advertising the Tamarack Cashback Card, with a `national` team and a `quebec` team; ad regions `CA` and `CA-QC`; amounts in CAD. One ad is followed end to end in [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md).
+- Data set: **NorthPlay**, a fictional Ontario sportsbook (`northplay-demo-data/`): 15 advertising regulations, 15 past ad decisions, Slack decisions that are binding and stricter than the regulations, and strategy decks that are partly out of date. The backend and the `greenlight` database run on it; see [docs/BACKEND.md](docs/BACKEND.md).
+- The older docs (`FLOWS.md`, `WORKED_EXAMPLE.md`, parts of `CONTRACTS.md`, `DEMO.md`) explain the same mechanisms with an earlier fictional-bank example. The offline tests still use that example as fixtures.
 - Every action is tied to an identity, checked against policy **before** it runs, and recorded in a ledger. Runs can be stopped and rolled back. (Problem statement 1: *Agents You Can Audit*.)
 - Memory is stored in MongoDB Atlas with Vector Search, scoped per team and role, expires, can be corrected or forgotten, and provably changes the next run. (Problem statement 2: *Memory You Can Govern*.)
 
@@ -53,9 +54,10 @@ backend/
                      mongo_sources.py  fixture_sources.py                where a review reads from
   app/routers/       auth  chat  compliance  campaigns  assets  fundamentals  memories  audit  runs
   scripts/           dry_run.py (review without the database)  smoke.py (live end to end)
-                     setup_db.py  seed.py                                data owner; not written yet
-  seed/              *.json
-  tests/             offline: rules, confidence, gate, services, whole API flow
+                     build_seed.py (source data -> seed files)  load_db.py (seed files -> MongoDB)
+  seed/              *.json, generated from northplay-demo-data/ by build_seed.py
+  tests/             offline: rules, confidence, gate, services, whole API flow (on fixtures/tamarack)
+northplay-demo-data/ the source data set: regulations, past ads, Slack export, strategy decks, 3 demo ads
 frontend/            web app owner; not started in this repo yet
 ```
 
@@ -65,7 +67,7 @@ Edit only the files your area owns.
 
 | Area | Owns |
 |---|---|
-| Data | `backend/scripts/setup_db.py`, `backend/scripts/seed.py`, `backend/seed/*`, the contents of the Atlas database, `docs/MONGODB_SETUP.md` |
+| Data | `northplay-demo-data/**`, and the mapping choices in `backend/scripts/build_seed.py` |
 | Web app | `frontend/**`, `docs/DEMO.md` |
 | Backend | everything else under `backend/` |
 
@@ -118,15 +120,15 @@ Trunk-based. `main` must always start.
 # backend (Python 3.12 or later; the system python3 on macOS is too old)
 cd backend && python3.13 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
 pytest                           # 52 offline tests, no keys or database needed
-python -m scripts.dry_run        # live review of the running example, no database needed
-python -m scripts.dry_run --suite   # every seeded ad against its expected verdict
+python -m scripts.dry_run --suite   # live: every past ad against its recorded decision, no database needed
+python -m scripts.dry_run --image ../northplay-demo-data/demo_ads/demo_03_play_smart_breaks.png --channel "Instagram (paid social)"
 uvicorn app.main:app --reload --port 8000     # API on http://localhost:8000, docs at /docs
-python -m scripts.smoke          # live end to end; needs a seeded database and SEED_PASSWORD
-python -m scripts.smoke_extras   # live: image in and out, ledger stream, stop, conversation memory
+python -m scripts.smoke          # live end to end; run it against a scratch database, it writes test ads
 
-# build and seed a database from docs/MONGODB_SETUP.md and backend/seed (refuses `greenlight` without --shared)
-python -m scripts.fake_data --db greenlight_test --password <test password>
-MONGODB_DB=greenlight_test SEED_PASSWORD=<test password> uvicorn app.main:app --port 8000
+# data: northplay-demo-data/ -> backend/seed/ -> MongoDB (refuses the shared `greenlight` without --shared)
+python -m scripts.build_seed
+python -m scripts.load_db --db greenlight --shared --password "$SEED_PASSWORD"
+python -m scripts.load_db --db greenlight_scratch --password "$SEED_PASSWORD"   # a scratch copy for smoke
 ```
 
 ## Looking at the shared database from your agent

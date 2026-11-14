@@ -131,8 +131,8 @@ def submit(
             )
             return db.campaigns.find_one({"_id": existing["_id"]}, NO_VECTOR)
         doc = {
-            **fields, "team": identity.team, "name": name or "Untitled ad", "product": ctx.get("product", "credit_card"),
-            "offer_id": ctx.get("offer_id"), "region": ctx.get("region", "CA"), "channel": ctx.get("channel", "email"),
+            **fields, "team": identity.team, "name": name or "Untitled ad", "product": ctx.get("product"),
+            "offer_id": ctx.get("offer_id"), "region": ctx.get("region"), "channel": ctx.get("channel", "unspecified"),
             "budget": ctx.get("budget"), "version": 1, "history": [], "created_by": identity.user_id, "created_at": _now(),
         }
         doc["_id"] = db.campaigns.insert_one(doc).inserted_id
@@ -210,6 +210,8 @@ def stale_changes(campaign: dict, current_versions: dict[str, Optional[int]], of
             changes.append(f"{ref['key']} is no longer in effect")
         elif now != ref["version"]:
             changes.append(f"{ref['key']} changed from version {ref['version']} to {now}")
+    if not campaign.get("offer_id"):
+        return changes  # this ad has no offer record to compare
     if offer is None:
         changes.append(f"offer {campaign.get('offer_id')} no longer exists")
     else:

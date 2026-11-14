@@ -125,6 +125,48 @@ def check_required_line(clause: dict, text: str, ctx: dict) -> tuple[list[dict],
     ], []
 
 
+def missing_elements(clause: dict, text: str) -> list[dict]:
+    """Elements of a required disclaimer that the ad does not carry. Each element lists acceptable wordings."""
+    haystack = norm(text)
+    return [e for e in (clause.get("rule") or {}).get("elements", []) if not any(norm(option) in haystack for option in e.get("any", []))]
+
+
+def check_required_elements(clause: dict, text: str, ctx: dict) -> tuple[list[dict], list[dict]]:
+    """A disclaimer made of parts (for example an age statement and a responsible-use message), and its legibility."""
+    language = ctx.get("language") or "en"
+    wording = approved_fix_for(clause, language)
+    findings, passed = [], []
+    missing = missing_elements(clause, text)
+    if missing:
+        names = ", ".join(e["name"] for e in missing)
+        findings.append(
+            _finding(
+                clause,
+                source="fundamental",
+                quote="",
+                explanation=f"The required disclaimer is incomplete or missing: {names}.",
+                reasoning=f"Every ad must carry the required disclaimer. This one does not include: {names}.",
+                fix=f"Add the full disclaimer: {wording}" if wording else f"Add: {names}.",
+                evidence={"policy_excerpt": clause.get("text", "")[:400]},
+            )
+        )
+    else:
+        passed.append({"check": f"required_disclaimer.{clause['key']}", "detail": "All required parts are present"})
+        if ctx.get("fine_print_legible") is False:
+            findings.append(
+                _finding(
+                    clause,
+                    source="fundamental",
+                    quote="",
+                    explanation="The disclaimer is present but too small or too faint to read easily.",
+                    reasoning="The disclaimer must be legible and proportionate to the creative. The image reading found it hard to read.",
+                    fix="Enlarge the disclaimer and raise its contrast so it reads at a glance.",
+                    evidence={"policy_excerpt": clause.get("text", "")[:400]},
+                )
+            )
+    return findings, passed
+
+
 def check_offer_match(clause: dict, claims: list[dict], offer: dict) -> tuple[list[dict], list[dict]]:
     """Compare every number the ad states with the approved offer record."""
     findings: list[dict] = []
@@ -191,7 +233,7 @@ def check_offer_match(clause: dict, claims: list[dict], offer: dict) -> tuple[li
     return findings, passed
 
 
-def run_hard_rules(text: str, ctx: dict, claims: list[dict], offer: dict, clauses: list[dict]) -> tuple[list[dict], list[dict]]:
+def run_hard_rules(text: str, ctx: dict, claims: list[dict], offer: Optional[dict], clauses: list[dict]) -> tuple[list[dict], list[dict]]:
     """Run every clause that carries a `rule`. Returns (findings, passed_checks)."""
     findings: list[dict] = []
     passed: list[dict] = []
@@ -204,7 +246,11 @@ def run_hard_rules(text: str, ctx: dict, claims: list[dict], offer: dict, clause
             f, p = check_banned_terms(clause, text)
         elif kind == "required_line":
             f, p = check_required_line(clause, text, ctx)
+        elif kind == "required_elements":
+            f, p = check_required_elements(clause, text, ctx)
         elif kind == "offer_match":
+            if offer is None:
+                continue  # this data set has no offer records
             f, p = check_offer_match(clause, claims, offer)
         else:
             continue
@@ -219,6 +265,11 @@ def ensure_required_lines(copy: str, ctx: dict, clauses: list[dict]) -> str:
     out = (copy or "").strip()
     for clause in clauses:
         rule = clause.get("rule") or {}
+        if rule.get("type") == "required_elements":
+            wording = approved_fix_for(clause, language)
+            if wording and missing_elements(clause, out):
+                out = f"{out} {wording}".strip()
+            continue
         if rule.get("type") != "required_line":
             continue
         if rule.get("channel") and rule["channel"] != ctx.get("channel"):
@@ -230,7 +281,7 @@ def ensure_required_lines(copy: str, ctx: dict, clauses: list[dict]) -> str:
 
 
 # Clauses fully decided in code. The judge is not shown these, so it cannot duplicate or contradict them.
-CODE_ONLY_RULES = {"budget_cap", "required_line", "offer_match"}
+CODE_ONLY_RULES = {"budget_cap", "required_line", "required_elements", "offer_match"}
 
 
 def decided_in_code(clause: dict) -> bool:

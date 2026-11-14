@@ -1,0 +1,83 @@
+[
+  {
+    "ref": "nat-proc-unsubscribe-last",
+    "kind": "procedural",
+    "text": "National email ads put the unsubscribe line last, after 'Conditions apply.'",
+    "team": "national", "user_email": null,
+    "visibility_roles": ["manager", "marketer"],
+    "source_type": "manager_instruction", "created_by": "manager.national@tamarack.test",
+    "ttl_days": null
+  },
+  {
+    "ref": "nat-sem-english-only",
+    "kind": "semantic",
+    "text": "The national team produces English creative only. French creative is handled by the Quebec team.",
+    "team": "national", "user_email": null,
+    "visibility_roles": ["manager", "marketer"],
+    "source_type": "manager_instruction", "created_by": "manager.national@tamarack.test",
+    "ttl_days": null
+  },
+  {
+    "ref": "nat-epi-instant-approval",
+    "kind": "episodic",
+    "text": "A national email ad for TCB-FALL-2026 was blocked for saying 'instant approval'. The version saying 'Subject to credit approval' was approved.",
+    "team": "national", "user_email": null,
+    "visibility_roles": ["manager", "marketer"],
+    "source_type": "agent", "created_by": "marketer.national@tamarack.test",
+    "ttl_days": 30
+  },
+  {
+    "ref": "nat-epi-rewards-hold",
+    "kind": "episodic",
+    "text": "Temporary: hold all Tamarack Rewards Card social posts until the annual fee change is confirmed.",
+    "team": "national", "user_email": null,
+    "visibility_roles": ["manager", "marketer"],
+    "source_type": "manager_instruction", "created_by": "manager.national@tamarack.test",
+    "ttl_minutes": 5
+  },
+  {
+    "ref": "nat-note-short-copy",
+    "kind": "semantic",
+    "text": "I prefer corrected copy to stay under 60 words.",
+    "team": "national", "user_email": "marketer.national@tamarack.test",
+    "visibility_roles": ["marketer"],
+    "source_type": "user_note", "created_by": "marketer.national@tamarack.test",
+    "ttl_days": null
+  },
+  {
+    "ref": "qc-proc-remise-en-argent",
+    "kind": "procedural",
+    "text": "Quebec ads say 'remise en argent'. They never use the English word 'cashback'.",
+    "team": "quebec", "user_email": null,
+    "visibility_roles": ["manager", "marketer"],
+    "source_type": "manager_instruction", "created_by": "manager.quebec@tamarack.test",
+    "ttl_days": null
+  },
+  {
+    "ref": "qc-proc-banner-sizes",
+    "kind": "procedural",
+    "text": "Quebec display banners are produced in two sizes: 300 by 250 and 728 by 90.",
+    "team": "quebec", "user_email": null,
+    "visibility_roles": ["manager", "marketer"],
+    "source_type": "manager_instruction", "created_by": "manager.quebec@tamarack.test",
+    "ttl_days": null
+  },
+  {
+    "ref": "qc-sem-french-first",
+    "kind": "semantic",
+    "text": "The Quebec team writes and reviews the French copy first. Any English version is adapted from the approved French.",
+    "team": "quebec", "user_email": null,
+    "visibility_roles": ["manager", "marketer"],
+    "source_type": "manager_instruction", "created_by": "manager.quebec@tamarack.test",
+    "ttl_days": null
+  },
+  {
+    "ref": "qc-epi-fine-print",
+    "kind": "episodic",
+    "text": "A Quebec banner was sent back because the fine print was too small to read. The corrected version used the standard footer size and was approved.",
+    "team": "quebec", "user_email": null,
+    "visibility_roles": ["manager", "marketer"],
+    "source_type": "agent", "created_by": "marketer.quebec@tamarack.test",
+    "ttl_days": 30
+  }
+]

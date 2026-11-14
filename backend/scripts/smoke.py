@@ -1,15 +1,14 @@
-"""Live end-to-end check against a running backend and the seeded shared database.
+"""Live end-to-end check against a running backend and a seeded database (the NorthPlay data set).
 
-    uvicorn app.main:app --port 8000          # in one terminal
-    python -m scripts.smoke                   # in another
+    python -m scripts.load_db --db greenlight_scratch --password "$SEED_PASSWORD"
+    MONGODB_DB=greenlight_scratch uvicorn app.main:app --port 8000     # in one terminal
+    python -m scripts.smoke                                            # in another
 
-Needs: the database created and seeded per docs/MONGODB_SETUP.md, and SEED_PASSWORD in .env set to
-the password the seeded users were given. It uses real model, embedding and (with --audio) speech
-calls, and it writes test ads, one team instruction and ledger events to the database, cleaning up
-the instruction at the end.
+Run it against a scratch database, not the shared one: it uploads the three demo ads, files and
+releases ads, edits and rolls back a policy clause, and saves and forgets a team instruction.
 
-On a Voyage account limited to three requests a minute this takes several minutes, because each
-review makes two embedding requests and the backend waits when it is rate limited.
+It uses real model and embedding calls. On a Voyage account limited to three requests a minute it
+takes several minutes, because the backend waits when it is rate limited.
 """
 from __future__ import annotations
 
@@ -19,117 +18,127 @@ import uuid
 
 import httpx
 
-from app.core.config import get_settings
+from app.core.config import SOURCE_DATA_DIR, get_settings
 
-RUNNING = "Guaranteed approval! Enjoy 0% interest for 12 months and earn $300 cash back. Apply today."
-AD = {"product": "credit_card", "offer_id": "TCB-FALL-2026", "region": "CA", "channel": "email", "budget": {"amount": 20000, "currency": "CAD"}}
-INSTRUCTION = "Quebec card ads must include the line 'Sous réserve de l'approbation du crédit.'"
-EXPECTED = {"credit.approval_claims", "policy.offer_accuracy", "credit.intro_rate_disclosure", "credit.bonus_conditions", "regional.ca.email_consent", "brand.required_footer"}
+DEMO = SOURCE_DATA_DIR / "demo_ads"
+CHANNEL = "Instagram (paid social)"
+INSTRUCTION = "every NorthPlay ad must include the line 'Set a limit. Stick to it.'"
 
 results: list[tuple[bool, str]] = []
 
 
 def check(ok: bool, what: str, detail: str = "") -> bool:
     results.append((bool(ok), what))
-    print(f"  {'ok  ' if ok else 'FAIL'}  {what}" + (f"   [{detail}]" if detail and not ok else ""))
+    print(f"  {'ok  ' if ok else 'FAIL'}  {what}" + (f"   [{detail}]" if detail and not ok else ""), flush=True)
     return bool(ok)
 
 
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--base", default="http://localhost:8000")
-    p.add_argument("--audio", action="store_true", help="also upload, review and regenerate an audio ad (uses ElevenLabs)")
     args = p.parse_args()
     password = get_settings().seed_password
     if not password:
         print("SEED_PASSWORD is not set in .env; cannot log in as the seeded users.")
         return 2
-    http = httpx.Client(base_url=args.base, timeout=300)
+    http = httpx.Client(base_url=args.base, timeout=600)
 
-    def login(name: str) -> dict:
-        r = http.post("/auth/login", json={"email": f"{name}@tamarack.test", "password": password})
-        check(r.status_code == 200, f"login {name}", r.text[:120])
-        return {"Authorization": f"Bearer {r.json().get('token', '')}"}
+    def login(email: str) -> tuple[dict, str]:
+        r = http.post("/auth/login", json={"email": email, "password": password})
+        check(r.status_code == 200, f"login {email.split('@')[0]}", r.text[:120])
+        token = r.json().get("token", "")
+        return {"Authorization": f"Bearer {token}"}, token
+
+    def review_image(headers: dict, name: str, title: str, **extra) -> dict:
+        up = http.post("/assets", headers=headers, files={"file": (name, (DEMO / name).read_bytes(), "image/png")}).json()
+        run_id = str(uuid.uuid4())
+        body = {"thread_id": f"smoke-{run_id}", "run_id": run_id, "file_id": up["file_id"], "ad": {"name": title, "channel": CHANNEL}, **extra}
+        r = http.post("/chat", headers=headers, json=body).json()
+        r["report"] = next((c["data"] for c in r.get("cards", []) if c["type"] == "compliance_report"), {})
+        r["ad"] = next((c["data"] for c in r.get("cards", []) if c["type"] == "campaign"), {})
+        return r
+
+    def refs(report: dict) -> tuple[set, list]:
+        return {v["fundamental_key"] for v in report.get("violations", []) if v.get("fundamental_key")}, [v for v in report.get("violations", []) if v.get("memory_id")]
 
     print("health:", http.get("/health").json())
-    mgr, mkt, sales = login("manager.national"), login("marketer.national"), login("sales.national")
-    qc_mgr, qc_mkt = login("manager.quebec"), login("marketer.quebec")
+    (legal, _), (marketer, marketer_token), (support, support_token), (alberta, _) = (
+        login("ethan.cho@northplay.test"), login("amira.haddad@northplay.test"), login("jordan.blake@northplay.test"), login("manager.alberta@northplay.test"),
+    )
 
-    print("\nUC1 review")
-    r = http.post("/compliance/check", headers=sales, json={**AD, "text": RUNNING})
-    check(r.status_code == 403, "sales cannot review", str(r.status_code))
-    run_id = str(uuid.uuid4())
-    r = http.post("/chat", headers=mkt, json={"thread_id": f"smoke-{run_id}", "run_id": run_id, "ad": {**AD, "text": RUNNING, "name": "Smoke test ad"}}).json()
-    report = next(c["data"] for c in r["cards"] if c["type"] == "compliance_report")
-    ad = next(c["data"] for c in r["cards"] if c["type"] == "campaign")
-    cited = {v["fundamental_key"] for v in report["violations"] if v.get("fundamental_key")}
-    check(report["verdict"] == "blocked" and report["route"] == "human_review", "running example is blocked and goes to human review", f"{report['verdict']}/{report['route']}")
-    check(EXPECTED <= cited, "the six expected clauses are cited", f"missing {sorted(EXPECTED - cited)}")
-    check(report["confidence"]["band"] == "high" and all("confidence" in v and v["reasoning"] for v in report["violations"]), "confidence and reasoning on every finding")
-    log = http.get(f"/audit?run_id={run_id}", headers=mkt).json()
-    check([e["event"] for e in log[:2]] == ["decision", "outcome"] and log[0]["decision"] == "allow", "decision is on the ledger before the outcome")
-    r = http.post("/compliance/check", headers=mkt, json={**AD, "offer_id": "NO-SUCH-OFFER", "text": RUNNING}).json()
-    check(r.get("missing_inputs") == ["offer_id"], "unknown offer stops the review")
-    r = http.post("/compliance/check", headers=qc_mkt, json={**AD, "region": "CA-QC", "text": "Get $300 cash back after $1,500 in purchases in your first 3 months. Conditions apply. Unsubscribe"}).json()
-    check("regional.qc.french_language" in {v.get("fundamental_key") for v in r["violations"]}, "English-only Quebec ad cites the French-language clause")
+    print("\nThe three demo ads")
+    r = http.post("/compliance/check", headers=support, json={"text": "Bet now", "channel": CHANNEL})
+    check(r.status_code == 403, "support cannot review an ad", str(r.status_code))
 
-    print("\nUC1 regenerate, approve, release")
-    check(http.post(f"/campaigns/{ad['id']}/approve", headers=mgr, json={}).status_code == 409, "a blocked ad cannot be approved")
-    regen = http.post(f"/campaigns/{ad['id']}/regenerate", headers=mkt, json={}).json()
-    check(regen.get("status") == "regenerated" and regen["report"]["verdict"] == "pass", "regenerated version passes the same review", str(regen.get("status")))
-    check(regen.get("campaign", {}).get("version") == 2 and regen["campaign"]["source"] == "regenerated", "filed as version 2, marked regenerated")
-    check(all(c["id"] != ad["id"] for c in http.get("/campaigns", headers=sales).json()), "sales cannot see it before release")
-    check(http.post(f"/campaigns/{ad['id']}/approve", headers=mkt, json={}).status_code == 403, "a marketer cannot approve")
-    check(http.post(f"/campaigns/{ad['id']}/approve", headers=mgr, json={}).status_code == 200, "manager approves")
+    one = review_image(marketer, "demo_01_hockey_night_live.png", "Smoke: Hockey Night Live")
+    check(one["report"].get("decision") == "approved", "demo 1 (clean ad) is approved", f"{one['report'].get('decision')} {refs(one['report'])[0]}")
+    check(one["ad"].get("modality") == "image" and one["ad"].get("status") == "pending_review", "it is filed with its image, pending review")
+    log = http.get(f"/audit?run_id={one['run_id']}", headers=marketer).json()
+    check([e["event"] for e in log[:2]] == ["decision", "outcome"] and log[0]["decision"] == "allow", "the allow decision is on the ledger before the outcome")
 
-    print("\nUC4 policy edit, stale release, rollback")
-    clause = next(c for c in http.get("/fundamentals", headers=mgr).json() if c["key"] == "credit.intro_rate_disclosure")
+    two = review_image(marketer, "demo_02_big_game_bonus.png", "Smoke: Big Game bonus")
+    clauses, mems = refs(two["report"])
+    check(two["report"].get("decision") == "rejected" and {"REG-12", "REG-13"} <= clauses, "demo 2 (public bonus offer) is rejected on REG-12 and REG-13", f"{two['report'].get('decision')} {clauses}")
+    check(len(mems) >= 1, "and on an internal Slack decision as well", str([m["memory_id"] for m in mems]))
+
+    three = review_image(marketer, "demo_03_play_smart_breaks.png", "Smoke: Play Smart breaks")
+    clauses, mems = refs(three["report"])
+    check(three["report"].get("decision") == "rejected" and len(mems) >= 1, "demo 3 is rejected because of an internal decision", f"{three['report'].get('decision')}")
+    check(not clauses, "no regulation is cited against demo 3: the rejection rests on Slack context alone", str(clauses))
+    check(any("Moreau" in (v.get("evidence", {}).get("memory_text") or "") for v in mems), "the decision it cites is the one about Jake Moreau")
+    replay = http.post("/compliance/check", headers=marketer, json={"campaign_id": three["ad"]["id"], "use_memory": False}).json()
+    check(replay.get("decision") != "rejected" and replay.get("memories_used") == [], "replayed without memory, the same ad is not rejected", str(replay.get("decision")))
+
+    print("\nRegenerate, approve, release")
+    check(http.post(f"/campaigns/{three['ad']['id']}/approve", headers=legal, json={}).status_code == 409, "a rejected ad cannot be approved")
+    regen = http.post(f"/campaigns/{three['ad']['id']}/regenerate", headers=marketer, json={}).json()
+    ok = regen.get("status") == "regenerated" and regen["report"]["verdict"] == "pass" and (regen["campaign"].get("asset") or {}).get("type") == "image"
+    if check(ok, "demo 3 is regenerated as a new banner that passes the same review", str(regen.get("status"))):
+        check("Moreau" not in regen["campaign"]["text"], "the regenerated copy no longer names him")
+        img = http.get(regen["campaign"]["asset"]["url"] + f"?token={marketer_token}")
+        check(img.status_code == 200 and img.content[:4] == b"\x89PNG", "the new banner is served")
+        check(http.get(regen["campaign"]["asset"]["url"] + f"?token={support_token}").status_code == 404, "support cannot fetch an unreleased ad's file")
+    check(http.post(f"/campaigns/{one['ad']['id']}/approve", headers=marketer, json={}).status_code == 403, "a marketer cannot approve")
+    check(http.post(f"/campaigns/{one['ad']['id']}/approve", headers=legal, json={}).status_code == 200, "legal approves demo 1")
+
+    print("\nPolicy edit, stale release, rollback")
+    clause = next(c for c in http.get("/fundamentals", headers=legal).json() if c["key"] == "REG-09")
     edit = {"text": clause["text"] + " (smoke test edit)", "reason": "smoke test"}
-    check(http.put(f"/fundamentals/{clause['id']}", headers=mgr, json=edit).status_code == 401, "policy edit without the password is refused")
-    edited = http.put(f"/fundamentals/{clause['id']}", headers=mgr, json={**edit, "password": password})
-    check(edited.status_code == 200 and edited.json()["version"] == clause["version"] + 1, "policy edit with the password bumps the version")
-    stale = http.post(f"/campaigns/{ad['id']}/release", headers=mkt, json={})
-    check(stale.status_code == 409 and "credit.intro_rate_disclosure" in " ".join(stale.json().get("changes", [])), "release is refused: approval is stale", stale.text[:160])
-    rolled = http.post(f"/runs/{edited.json()['run_id']}/rollback", headers=mgr)
-    check(rolled.status_code == 200 and rolled.json()["status"] == "rolled_back", "rollback restores the policy version", rolled.text[:160])
-    check(http.post(f"/campaigns/{ad['id']}/approve", headers=mgr, json={}).status_code == 200, "manager approves again")
-    check(http.post(f"/campaigns/{ad['id']}/release", headers=mkt, json={}).json().get("status") == "released", "release succeeds")
+    check(http.put(f"/fundamentals/{clause['id']}", headers=legal, json=edit).status_code == 401, "a policy edit without the password is refused")
+    edited = http.put(f"/fundamentals/{clause['id']}", headers=legal, json={**edit, "password": password})
+    check(edited.status_code == 200 and edited.json()["version"] == clause["version"] + 1, "with the password it becomes the next version")
+    stale = http.post(f"/campaigns/{one['ad']['id']}/release", headers=marketer, json={})
+    check(stale.status_code == 409 and "REG-09" in " ".join(stale.json().get("changes", [])), "release is refused: the approval is stale", stale.text[:160])
+    rolled = http.post(f"/runs/{edited.json()['run_id']}/rollback", headers=legal)
+    check(rolled.status_code == 200 and rolled.json()["status"] == "rolled_back", "rollback restores the earlier version", rolled.text[:160])
+    check(http.post(f"/campaigns/{one['ad']['id']}/approve", headers=legal, json={}).status_code == 200, "legal approves again")
+    check(http.post(f"/campaigns/{one['ad']['id']}/release", headers=marketer, json={}).json().get("status") == "released", "release succeeds")
 
-    print("\nUC5 questions")
-    r = http.post("/chat", headers=sales, json={"thread_id": f"smoke-sales-{run_id}", "message": "A customer got an email about $300 cash back on the card. What are the conditions?"}).json()
-    check(r["intent"] == "ask" and any(c["type"] == "campaign" for c in r["cards"]) and r.get("grounding"), "sales gets the released ad and a grounded answer", r["reply"][:120])
-    r = http.post("/chat", headers=sales, json={"thread_id": f"smoke-sales-{run_id}", "message": "From now on all ads must mention our mobile app."}).json()
-    check(r["status"] == "denied", "sales cannot change team memory, and it is recorded", r["status"])
+    print("\nA new instruction changes the next verdict")
+    draft = http.post("/chat", headers=legal, json={"thread_id": f"smoke-legal-{uuid.uuid4()}", "message": "From now on, " + INSTRUCTION}).json()
+    proposal = next((c["data"] for c in draft.get("cards", []) if c["type"] == "memory_change"), None)
+    if check(proposal is not None and proposal["status"] == "proposed" and proposal["requires_password"], "the agent drafts the instruction and saves nothing", draft.get("reply", "")[:120]):
+        body = {"kind": proposal["kind"], "text": proposal["after"], "scope": proposal["scope"], "reason": "smoke test"}
+        check(http.post("/memories", headers=legal, json=body).status_code == 401, "saving it without the password is refused")
+        check(http.post("/memories", headers=marketer, json={**body, "password": password}).status_code == 403, "a marketer cannot save a team instruction")
+        saved = http.post("/memories", headers=legal, json={**body, "password": password}).json()
+        flagged = http.post("/compliance/check", headers=marketer, json={"campaign_id": one["ad"]["id"]}).json()
+        check(any(v.get("memory_id") == saved["id"] for v in flagged["violations"]), "the ad that was approved is now flagged, citing the new instruction", str(flagged.get("decision")))
+        check(all(m["id"] != saved["id"] for m in http.get("/memories", headers=alberta).json()), "the Alberta team cannot see it")
+        gone = http.request("DELETE", f"/memories/{saved['id']}", headers=legal, json={"reason": "smoke test cleanup", "password": password})
+        check(gone.status_code == 204, "forgetting it needs the password and succeeds")
 
-    print("\nUC4 memory changes the next verdict")
-    qc_ad = next((c for c in http.get("/campaigns", headers=qc_mkt).json() if c["name"] == "Courriel remises d'automne"), None)
-    if check(qc_ad is not None, "seeded Quebec email is in the library"):
-        draft = http.post("/chat", headers=qc_mgr, json={"thread_id": f"smoke-qc-{run_id}", "message": "From now on, " + INSTRUCTION}).json()
-        proposal = next((c["data"] for c in draft["cards"] if c["type"] == "memory_change"), None)
-        if check(proposal is not None and proposal["status"] == "proposed", "the agent drafts the instruction and saves nothing", draft["reply"][:120]):
-            body = {"kind": proposal["kind"], "text": proposal["after"], "scope": proposal["scope"], "reason": "smoke test"}
-            check(http.post("/memories", headers=qc_mgr, json=body).status_code == 401, "saving it without the password is refused")
-            saved = http.post("/memories", headers=qc_mgr, json={**body, "password": password}).json()
-            flagged = http.post("/compliance/check", headers=qc_mkt, json={"campaign_id": qc_ad["id"]}).json()
-            check(any(v.get("memory_id") == saved["id"] for v in flagged["violations"]), "the same ad is now flagged, citing the instruction", flagged["verdict"])
-            replay = http.post("/compliance/check", headers=qc_mkt, json={"campaign_id": qc_ad["id"], "use_memory": False}).json()
-            check(not any(v.get("memory_id") for v in replay["violations"]) and replay["memories_used"] == [], "replay without memory does not flag it")
-            check(all(m["id"] != saved["id"] for m in http.get("/memories", headers=mgr).json()), "the national team cannot see the Quebec instruction")
-            gone = http.request("DELETE", f"/memories/{saved['id']}", headers=qc_mgr, json={"reason": "smoke test cleanup", "password": password})
-            check(gone.status_code == 204, "forgetting it needs the password and succeeds")
-
-    if args.audio:
-        print("\nAudio in and out")
-        from app.services import media
-
-        up = http.post("/assets", headers=mkt, files={"file": ("ad.mp3", media.synthesize_bytes(RUNNING), "audio/mpeg")}).json()
-        r = http.post("/compliance/check", headers=mkt, json={**AD, "channel": "radio", "file_id": up["file_id"], "name": "Smoke test radio spot", "save": True}).json()
-        check(r["verdict"] == "blocked" and r["campaign"]["modality"] == "audio", "uploaded audio is transcribed and reviewed", r.get("verdict"))
-        regen = http.post(f"/campaigns/{r['campaign']['id']}/regenerate", headers=mkt, json={}).json()
-        ok = regen.get("status") == "regenerated" and regen["campaign"]["asset"] and regen["campaign"]["asset"]["type"] == "audio"
-        if check(ok, "regenerated as a new recording"):
-            audio = http.get(regen["campaign"]["asset"]["url"], headers=mkt)
-            check(audio.status_code == 200 and audio.headers["content-type"].startswith("audio/"), "the new recording streams back")
+    print("\nQuestions and scope")
+    r = http.post("/chat", headers=support, json={"thread_id": f"smoke-support-{uuid.uuid4()}", "message": "A player saw an ad about setting limits. What did it say?"}).json()
+    card = next((c["data"] for c in r.get("cards", []) if c["type"] == "campaign"), {})
+    check(r.get("intent") == "ask" and card.get("status") == "released" and card.get("asset", {}).get("type") == "image", "support gets a released ad, with its image", f"{r.get('intent')} {card.get('name')} {card.get('status')}")
+    check(bool(r.get("grounding")), "the answer says where it came from", r.get("reply", "")[:140])
+    r = http.post("/chat", headers=support, json={"thread_id": f"smoke-support-{uuid.uuid4()}", "message": "From now on all ads must mention our app."}).json()
+    check(r.get("status") == "denied", "support cannot change team memory, and the refusal is recorded")
+    check(len(http.get("/memories", headers=alberta).json()) == 0, "the Alberta team sees none of Ontario's memories")
+    check(all(c["status"] == "released" for c in http.get("/campaigns", headers=support).json()), "support sees released ads only")
+    leadership = [m for m in http.get("/memories", headers=marketer).json() if (m.get("source") or {}).get("channel") == "leadership"]
+    check(not leadership and any((m.get("source") or {}).get("channel") == "leadership" for m in http.get("/memories", headers=legal).json()), "leadership-channel decisions are visible to managers only")
 
     failed = [what for ok, what in results if not ok]
     print(f"\n{len(results) - len(failed)} of {len(results)} checks passed.")

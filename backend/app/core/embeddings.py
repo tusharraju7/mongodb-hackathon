@@ -19,8 +19,11 @@ from app.core.config import get_settings
 
 DIMENSIONS = 1024
 _BATCH = 96
-_RETRIES = int(os.environ.get("EMBED_RETRIES", "3"))
-_RETRY_WAIT = float(os.environ.get("EMBED_RETRY_WAIT", "21"))
+# An unpaid Voyage account also allows only 10,000 tokens a minute, so one request stays well under that.
+_BATCH_TOKENS = int(os.environ.get("EMBED_BATCH_TOKENS", "6000"))
+_RETRIES = int(os.environ.get("EMBED_RETRIES", "4"))
+# A refused request still counts against the limit, so each wait is longer than the last.
+_RETRY_WAIT = float(os.environ.get("EMBED_RETRY_WAIT", "22"))
 _cache: dict[tuple[str, str, str], list[float]] = {}
 
 
@@ -41,9 +44,9 @@ def _request(texts: list[str], model: str, input_type: str) -> list[list[float]]
             if attempt == _RETRIES:
                 raise EmbeddingRateLimited(
                     "The embedding service is rate limited. Without a payment method a Voyage account allows "
-                    "three requests a minute; add one in the Voyage dashboard to lift the limit."
+                    "three requests and 10,000 tokens a minute; add one in the Voyage dashboard to lift the limit."
                 ) from exc
-            time.sleep(_RETRY_WAIT)
+            time.sleep(_RETRY_WAIT * (attempt + 1))
     return []
 
 
@@ -52,10 +55,22 @@ def _embed(texts: list[str], input_type: str) -> list[list[float]]:
         return []
     model = get_settings().voyage_model
     missing = list(dict.fromkeys(t for t in texts if (model, input_type, t) not in _cache))
-    for i in range(0, len(missing), _BATCH):
-        batch = missing[i : i + _BATCH]
+    batch: list[str] = []
+    size = 0
+
+    def flush() -> None:
         for text, vector in zip(batch, _request(batch, model, input_type)):
             _cache[(model, input_type, text)] = vector
+
+    for text in missing:
+        tokens = len(text) // 3 + 1  # a deliberate over-estimate
+        if batch and (len(batch) >= _BATCH or size + tokens > _BATCH_TOKENS):
+            flush()
+            batch, size = [], 0
+        batch.append(text)
+        size += tokens
+    if batch:
+        flush()
     return [_cache[(model, input_type, t)] for t in texts]
 
 

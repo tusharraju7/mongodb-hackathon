@@ -68,6 +68,98 @@ def recall_by_vector(identity: Identity, vector: list[float], kinds: list[str], 
     return [{"id": str(m["_id"]), "kind": m["kind"], "text": m["text"]} for m in hits]
 
 
+ALWAYS_ON_LIMIT = 5
+AUTHORITY_ORDER = {"binding": 0, "guidance": 1, "precedent": 2, "background": 3}
+# A small preference for sources that carry more weight, so a binding decision is not crowded out
+# by several loosely related slides. Starting values.
+AUTHORITY_BONUS = {"binding": 0.08, "guidance": 0.04, "precedent": 0.02, "background": 0.0}
+
+
+def authority_of(memory: dict) -> str:
+    return memory.get("authority") or {"episodic": "precedent", "procedural": "binding"}.get(memory.get("kind"), "background")
+
+
+def source_label(memory: dict) -> str:
+    src = memory.get("source") or {}
+    if src.get("type") == "slack":
+        return f"Slack #{src.get('channel')}" + (f", {', '.join(src['authors'])}" if src.get("authors") else "")
+    if src.get("type") == "strategy_deck":
+        return src.get("title") or "strategy deck"
+    if src.get("type") == "ad_decision":
+        return f"decision on ad {src.get('ref')}"
+    return {"manager_instruction": "manager instruction", "user_note": "personal note", "agent": "earlier review", "review_feedback": "review feedback"}.get(src.get("type"), "")
+
+
+def for_review(memory: dict, memory_id: str) -> dict:
+    """The fields a review needs from a memory, however it is stored."""
+    src = memory.get("source") or {}
+    when = src.get("date") or memory.get("created_at")
+    return {
+        "id": memory_id, "kind": memory["kind"], "text": memory["text"], "authority": authority_of(memory),
+        "materiality": memory.get("materiality"), "source_label": source_label(memory),
+        "date": when.date().isoformat() if hasattr(when, "date") else (str(when)[:10] if when else None),
+    }
+
+
+def select(scored: list[tuple[dict, float]], budget: int) -> list[dict]:
+    """Keep the `budget` most relevant memories, then present them by standing and recency.
+
+    `scored` holds (review-shaped memory, similarity). A memory found by several searches keeps its best score.
+    """
+    best: dict[str, tuple[dict, float]] = {}
+    for memory, score in scored:
+        if memory["id"] not in best or score > best[memory["id"]][1]:
+            best[memory["id"]] = (memory, score)
+    ranked = sorted(best.values(), key=lambda x: -(x[1] + AUTHORITY_BONUS[x[0]["authority"]]))
+    from app.core.profile import get_profile
+
+    quotas = get_profile()["memory"].get("quotas")
+    if quotas:
+        # Each standing gets its own share of the budget, so the most relevant binding decisions are
+        # always in view and are never crowded out by a run of loosely related slides.
+        taken: dict[str, int] = {}
+        chosen = []
+        for m, _ in ranked:
+            if taken.get(m["authority"], 0) < quotas.get(m["authority"], 0):
+                chosen.append(m)
+                taken[m["authority"]] = taken.get(m["authority"], 0) + 1
+    else:
+        chosen = [m for m, _ in ranked[:budget]]
+    return sorted(chosen, key=lambda m: (AUTHORITY_ORDER[m["authority"]], -(int((m["date"] or "0000-00-00").replace("-", "")))))
+
+
+def recall_many(identity: Identity, vectors: list[list[float]], kinds: list[str], per_query: int = 3, budget: int = 3, db=None) -> list[dict]:
+    """Search memory once per vector (the whole ad, then each claim) and merge. Scope is enforced in each search."""
+    db = db if db is not None else get_db()
+    at = _now()
+    scored: list[tuple[dict, float]] = []
+    for vector in vectors:
+        pipeline = [
+            {"$vectorSearch": {
+                "index": "memories_vec", "path": "embedding", "queryVector": vector, "numCandidates": 100, "limit": per_query * 3,
+                "filter": {"status": "active", "scope.team": identity.team, "visibility_roles": identity.role, "kind": {"$in": kinds}},
+            }},
+            {"$set": {"_score": {"$meta": "vectorSearchScore"}}},
+            {"$project": NO_VECTOR},
+        ]
+        hits = [m for m in db.memories.aggregate(pipeline) if _readable(m, identity, at)][:per_query]
+        scored += [(for_review(m, str(m["_id"])), 2 * m["_score"] - 1) for m in hits]
+    chosen = select(scored, budget)
+    # A manager's standing instruction for the whole team applies to every ad, whatever the ad is
+    # about, so it is fetched directly and not left to similarity. This also means it takes effect
+    # on the very next review, without waiting for the search index to catch up.
+    standing = db.memories.find(
+        {"status": "active", "scope.team": identity.team, "scope.user_id": None, "visibility_roles": identity.role, "always": True, "kind": {"$in": kinds}},
+        NO_VECTOR,
+    ).sort("created_at", -1).limit(ALWAYS_ON_LIMIT)
+    have = {m["id"] for m in chosen}
+    always = [for_review(m, str(m["_id"])) for m in standing if _readable(m, identity, at) and str(m["_id"]) not in have]
+    chosen = always + chosen
+    if chosen:
+        db.memories.update_many({"_id": {"$in": [oid(m["id"]) for m in chosen]}}, {"$inc": {"use_count": 1}, "$set": {"last_used_at": at}})
+    return chosen
+
+
 def recall(identity: Identity, query: str, *, kinds: list[str], k: int = 3, db=None) -> list[dict]:
     return recall_by_vector(identity, embeddings.embed_queries([query])[0], kinds, k, db)
 
@@ -122,6 +214,8 @@ def remember(
             "visibility_roles": visibility_roles or (["manager", "marketer"] if scope.get("user_id") is None else [identity.role]),
             "embedding": vector or embeddings.embed_documents([text])[0],
             "status": "active", "supersedes": supersedes,
+            # An instruction a manager gives the whole team is in view for every review of that team.
+            "always": source_type == "manager_instruction" and scope.get("user_id") is None and kind == "procedural",
             "expires_at": _now() + timedelta(days=ttl_days) if ttl_days else None,
             "source": {"run_id": run_id, "type": source_type},
             "created_by": identity.user_id, "created_at": _now(), "use_count": 0, "last_used_at": None,

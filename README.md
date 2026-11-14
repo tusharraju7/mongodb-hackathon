@@ -2,12 +2,12 @@
 
 MongoDB hackathon project. Team of 4, built in 4 hours.
 
-Greenlight is a marketing agent for an organisation. It reviews existing ad creative, as text, audio or image, against policy clauses and the approved offer record. On request it regenerates a version that passes the same review, in the ad's own form (ElevenLabs for audio, a brand template for images), and it gates release on a current approval. It lets the marketing manager update what the agent knows and remembers, and answers questions about an ad by returning the ad itself. The examples use a fictional Canadian bank advertising a cashback credit card, with a national team and a Quebec team. MongoDB Atlas is the identity, policy, audit and memory layer:
+Greenlight is a marketing agent for an organisation. It reviews existing ad creative, as text, audio or image, against policy clauses and the approved offer record. On request it regenerates a version that passes the same review, in the ad's own form (ElevenLabs for audio, a brand template for images), and it gates release on a current approval. It lets the marketing manager update what the agent knows and remembers, and answers questions about an ad by returning the ad itself. It runs on NorthPlay, a fictional Ontario sportsbook: 15 advertising regulations, 15 past ad decisions, and Slack decisions that are binding and stricter than the regulations. MongoDB Atlas is the identity, policy, audit and memory layer:
 
 - **Agents You Can Audit** — every action is tied to an identity, checked against policy before it runs, and written to an append-only ledger. Runs can be stopped and rolled back.
 - **Memory You Can Govern** — memory lives in Atlas with Vector Search (Voyage embeddings), scoped per team and role, with expiry, correction and forgetting, and a visible trace of which memories changed a result.
 
-**Status:** the backend is built on the `agent/ai-flows` branch and verified offline (52 tests) and, for the review itself, live against the seed files. The database and the web app are in progress. See [docs/BACKEND.md](docs/BACKEND.md).
+**Status:** the backend is built and the `greenlight` database is loaded with the NorthPlay data. Verified: 52 offline tests; 14 of 15 past ads match their recorded decision; the three demo ads come out as intended; 38 of 39 live end-to-end checks, with the one failure fixed and re-checked. The web app is in progress. See [docs/BACKEND.md](docs/BACKEND.md).
 
 ## Documents
 

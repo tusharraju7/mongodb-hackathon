@@ -13,6 +13,7 @@ from typing import Optional, Protocol
 
 from app.agent import prompts
 from app.core import embeddings, llm
+from app.core.profile import get_profile
 from app.models import (
     ComplianceReport,
     Extraction,
@@ -24,10 +25,21 @@ from app.models import (
 from app.services import compliance_rules as rules
 from app.services import confidence as conf
 
-MAX_JUDGE_CLAUSES = 12
+MAX_JUDGE_CLAUSES = 16
 SIMILAR_PER_QUERY = 2
-MEMORY_BUDGET = 3
-FULL_TEXT_LIMIT = 600  # clauses longer than this are shown to the judge as their summary
+FULL_TEXT_LIMIT = 1200  # clauses longer than this are shown to the judge as their summary
+
+# How a memory stands relative to policy. Stored on the memory as `authority`; derived from its kind when absent.
+STANDING = {
+    "binding": "binding internal decision",
+    "guidance": "team guidance",
+    "precedent": "past verdict",
+    "background": "background, may be out of date",
+}
+
+
+def authority_of(memory: dict) -> str:
+    return memory.get("authority") or {"episodic": "precedent", "procedural": "binding"}.get(memory.get("kind"), "background")
 
 
 class Sources(Protocol):
@@ -36,7 +48,7 @@ class Sources(Protocol):
     def offer(self, offer_id: str) -> Optional[dict]: ...
     def applicable_clauses(self, regions: list[str], product: str) -> list[dict]: ...
     def similar_clauses(self, vectors: list[list[float]], regions: list[str], product: str, k: int) -> list[list[tuple[dict, float]]]: ...
-    def recall(self, identity: Identity, vector: list[float], kinds: list[str], k: int) -> list[dict]: ...
+    def recall(self, identity: Identity, vectors: list[list[float]], kinds: list[str], per_query: int, budget: int) -> list[dict]: ...
 
 
 @dataclass
@@ -62,7 +74,7 @@ def extract_claims(text: str, ctx: dict, *, usage: Optional[llm.TokenUsage] = No
     form = {"audio": "a transcript of a spoken ad", "image": "text read from an image ad"}.get(ctx.get("modality"), "ad copy")
     user = f"Channel: {ctx.get('channel', 'unknown')}. Form: {form}.\n\n<ad>\n{text}\n</ad>"
     extraction = llm.call_structured(
-        llm.fast_model(), Extraction, system=prompts.EXTRACT_SYSTEM, user=user, label="extract_claims", usage=usage, run_id=run_id, intent="review"
+        llm.fast_model(), Extraction, system=prompts.extract_system(), user=user, label="extract_claims", usage=usage, run_id=run_id, intent="review"
     )
     # A claim whose quote is not in the ad cannot be trusted; drop it before anything is checked against it.
     extraction.claims = [c for c in extraction.claims if rules.quote_in_text(c.quote, text)]
@@ -113,7 +125,7 @@ def _required_lines_block(code_clauses: list[dict], ctx: dict, languages: list[s
     lines = []
     for clause in code_clauses:
         rule = clause.get("rule") or {}
-        if rule.get("type") != "required_line" or (rule.get("channel") and rule["channel"] != ctx.get("channel")):
+        if rule.get("type") not in ("required_line", "required_elements") or (rule.get("channel") and rule["channel"] != ctx.get("channel")):
             continue
         wording = clause.get("approved_fix") or rule.get("lines") or {}
         lines.append("- " + " / ".join(f"({lang}) {wording[lang]}" for lang in languages if wording.get(lang)))
@@ -121,7 +133,7 @@ def _required_lines_block(code_clauses: list[dict], ctx: dict, languages: list[s
 
 
 def _judge_user(
-    text: str, ctx: dict, extraction: Extraction, offer: dict, code_findings: list[dict], code_clauses: list[dict],
+    text: str, ctx: dict, extraction: Extraction, offer: Optional[dict], code_findings: list[dict], code_clauses: list[dict],
     clauses: list[tuple[dict, list[str]]], memories: list[dict],
 ) -> str:
     language = ctx.get("language") or extraction.language
@@ -135,12 +147,17 @@ def _judge_user(
         parts.append(f"<image_notes>\n{ctx['visual_notes']}\n</image_notes>")
     claim_lines = [f"- [{c.type}] \"{c.quote}\"" for c in extraction.claims] or ["- none"]
     parts.append("<claims>\n" + "\n".join(claim_lines) + "\n</claims>")
-    parts.append(_offer_block(offer))
+    if offer:
+        parts.append(_offer_block(offer))
     found = [f"- {f['fundamental_key']}: {f['explanation']} Fix: {f['fix']}" for f in code_findings] or ["- none"]
     parts.append("<already_found_by_automated_checks>\n" + "\n".join(found) + "\n</already_found_by_automated_checks>")
     parts.append(_required_lines_block(code_clauses, ctx, languages))
     parts.append("<policy_clauses>\n" + "\n".join(_clause_block(c, languages, m) for c, m in clauses) + "\n</policy_clauses>")
-    mem = [f"- id {m['id']} ({'standing instruction' if m['kind'] != 'episodic' else 'past verdict'}): {m['text']}" for m in memories] or ["- none"]
+    mem = []
+    for m in memories:
+        where = ", ".join(x for x in (m.get("source_label"), m.get("date")) if x)
+        mem.append(f"- id {m['id']} [{STANDING[authority_of(m)]}{'; ' + where if where else ''}]: {m['text']}")
+    mem = mem or ["- none"]
     parts.append("<team_memories>\n" + "\n".join(mem) + "\n</team_memories>")
     return "\n\n".join(parts)
 
@@ -161,10 +178,10 @@ def _missing_offer_report(offer_id: Optional[str]) -> ComplianceReport:
     )
 
 
-def _cache_key(text: str, offer: dict, clauses: list[dict], memories: list[dict], ctx: dict) -> str:
+def _cache_key(text: str, offer: Optional[dict], clauses: list[dict], memories: list[dict], ctx: dict) -> str:
     payload = {
         "text": rules.norm(text),
-        "offer": [offer["_id"], offer.get("version", 1)],
+        "offer": [offer["_id"], offer.get("version", 1)] if offer else None,
         "clauses": sorted([c["key"], c.get("version", 1)] for c in clauses),
         "memories": sorted(m["id"] for m in memories),
         "ctx": [ctx.get("region"), ctx.get("channel"), ctx.get("language"), ctx.get("team"), (ctx.get("budget") or {}).get("amount"), ctx.get("visual_notes")],
@@ -188,10 +205,15 @@ def review(
     sources = sources or default_sources()
     ctx = {**ctx, "team": ctx.get("team") or identity.team}
 
-    # 1. The offer is the system of record. Without it nothing is checked and nothing is invented.
-    offer = sources.offer(ctx["offer_id"]) if ctx.get("offer_id") else None
-    if offer is None:
-        return ReviewResult(report=_missing_offer_report(ctx.get("offer_id")))
+    profile = get_profile()
+
+    # 1. Where an ad names an offer, that record is the system of record: if it cannot be found,
+    #    nothing is checked and nothing is invented. An ad that names none is reviewed without one.
+    offer = None
+    if ctx.get("offer_id"):
+        offer = sources.offer(ctx["offer_id"])
+        if offer is None:
+            return ReviewResult(report=_missing_offer_report(ctx["offer_id"]))
 
     # 2. Claims, once.
     extraction = extraction or extract_claims(text, ctx, usage=usage, run_id=run_id)
@@ -199,8 +221,10 @@ def review(
     claims = [c.model_dump() for c in extraction.facts().claims]
 
     # 3. Checks in code.
-    regions = regions_for(ctx.get("region", "CA"))
-    product = ctx.get("product", "credit_card")
+    ctx["region"] = ctx.get("region") or profile["region"]
+    ctx["product"] = ctx.get("product") or profile["product"]
+    regions = regions_for(ctx["region"])
+    product = ctx["product"]
     applicable = sources.applicable_clauses(regions, product)
     code_clauses = [c for c in applicable if c.get("rule")]
     code_findings, passed = rules.run_hard_rules(text, ctx, claims, offer, code_clauses)
@@ -228,12 +252,19 @@ def review(
         general = not clause.get("claim_types")
         return (0 if mandatory_types(clause) else 1 if general else 2, -similarity.get(clause["key"], 0.0))
 
-    shown = sorted(judgeable, key=rank)[:MAX_JUDGE_CLAUSES]
-    shown = [c for c in shown if mandatory_types(c) or not c.get("claim_types") or c["key"] in similarity]
+    shown = sorted(judgeable, key=rank)
+    if len(shown) > MAX_JUDGE_CLAUSES:
+        # Too many to show them all: keep the mandatory and general ones, and the closest of the rest.
+        shown = [c for c in shown[:MAX_JUDGE_CLAUSES] if mandatory_types(c) or not c.get("claim_types") or c["key"] in similarity]
     consulted = shown + code_clauses
 
-    # 5. Memory: the team's standing instructions and past verdicts, scoped by the source.
-    memories = sources.recall(identity, vectors[0], ["procedural", "episodic"], MEMORY_BUDGET) if use_memory else []
+    # 5. Memory: binding decisions, guidance, past verdicts and background, scoped by the source and
+    #    searched once for the whole ad and once for each claim, so a single named person or phrase
+    #    can find the decision about it.
+    memories = (
+        sources.recall(identity, vectors, ["procedural", "episodic", "semantic"], profile["memory"]["per_query"], profile["memory"]["budget"])
+        if use_memory else []
+    )
 
     # 6. A stored verdict for exactly this text, offer, clause versions and memories skips the judge.
     key = _cache_key(text, offer, consulted, memories, ctx)
@@ -247,7 +278,7 @@ def review(
     judged: JudgeOutput = llm.call_structured(
         llm.main_model(),
         JudgeOutput,
-        system=prompts.JUDGE_SYSTEM,
+        system=prompts.judge_system(),
         user=_judge_user(text, ctx, extraction, offer, code_findings, code_clauses, [(c, mandatory_types(c)) for c in shown], memories),
         label="judge",
         usage=usage,
@@ -292,12 +323,13 @@ def review(
             memory = by_memory[jf.ref]
             v = {
                 "source": "memory", "basis": "model", "certainty": jf.certainty, "memory_id": memory["id"],
-                "materiality": "disclosure", "quote": jf.quote.strip(), "explanation": jf.explanation,
-                "reasoning": jf.reasoning, "evidence": {"memory_text": memory["text"]}, "fix": jf.fix,
+                # A binding decision can carry its own weight; a plain team instruction asks for changes.
+                "materiality": memory.get("materiality") or "disclosure", "quote": jf.quote.strip(), "explanation": jf.explanation,
+                "reasoning": jf.reasoning, "evidence": {"memory_text": memory["text"][:600]}, "fix": jf.fix,
             }
             v["confidence"] = conf.score_finding(
                 v, quality=quality, quality_reason=quality_reason, quote_verified=quote_ok,
-                standing_instruction=memory["kind"] != "episodic", past_verdict_agrees=agrees,
+                standing_instruction=authority_of(memory) in ("binding", "guidance"), past_verdict_agrees=agrees,
             )
         else:
             dropped += 1
@@ -311,7 +343,8 @@ def review(
     verdict, route, reason = conf.base_verdict(violations, [])
     coverage, uncovered = conf.claim_coverage(claims, consulted, best_for_claim)
     confidence = conf.verdict_confidence(
-        verdict, violations, [], quality=quality, quality_reason=quality_reason, claims=claims, coverage=coverage, uncovered=uncovered
+        verdict, violations, [], quality=quality, quality_reason=quality_reason, claims=claims, coverage=coverage, uncovered=uncovered,
+        complete=len(shown) == len(judgeable),
     )
     route, reason = conf.escalate(verdict, route, reason, confidence, violations)
 
@@ -322,6 +355,7 @@ def review(
 
     report = ComplianceReport(
         verdict=verdict,
+        decision=profile["decision_labels"].get(verdict),
         route=route,
         route_reason=reason,
         summary=judged.summary or _DEFAULT_PASS_SUMMARY,
@@ -331,7 +365,7 @@ def review(
         corrected_copy=corrected,
         corrected_language=corrected_language,
         checked_fundamentals=[{"key": c["key"], "version": c.get("version", 1)} for c in consulted],
-        offer_version=offer.get("version", 1),
+        offer_version=offer.get("version", 1) if offer else None,
         # Every recalled memory was in front of the judge, so every one may have shaped the result.
         # The ones a finding rests on are also named on that finding as `memory_id`.
         memories_used=[m["id"] for m in memories],
@@ -339,7 +373,7 @@ def review(
     return ReviewResult(report=report, extraction=extraction, offer=offer, cache_key=key, code_clauses=code_clauses)
 
 
-_DEFAULT_PASS_SUMMARY = "No problems were found. The ad matches the approved offer and the policies that apply to it."
+_DEFAULT_PASS_SUMMARY = "No problems were found. The ad meets the policies and internal decisions that apply to it."
 
 
 def check(text: str, ctx: dict, identity: Identity, run_id: str, *, use_memory: bool = True, sources: Optional[Sources] = None, usage: Optional[llm.TokenUsage] = None) -> ComplianceReport:
@@ -387,8 +421,9 @@ def regenerate_copy(
         return RegeneratedCopy("regenerated", candidate, first, 1)
 
     problems = "\n".join(f"- {v.explanation} Fix: {v.fix}" for v in first.report.violations)
-    user = f"<ad language=\"{copy_ctx.get('language', 'en')}\" channel=\"{copy_ctx.get('channel')}\">\n{candidate}\n</ad>\n\n{_offer_block(first.offer)}\n\n<problems>\n{problems}\n</problems>"
-    repaired = llm.call_structured(llm.main_model(), RepairOutput, system=prompts.REPAIR_SYSTEM, user=user, label="repair_copy", usage=usage, run_id=run_id, intent="regenerate")
+    offer_part = f"\n\n{_offer_block(first.offer)}" if first.offer else ""
+    user = f"<ad language=\"{copy_ctx.get('language', 'en')}\" channel=\"{copy_ctx.get('channel')}\">\n{candidate}\n</ad>{offer_part}\n\n<problems>\n{problems}\n</problems>"
+    repaired = llm.call_structured(llm.main_model(), RepairOutput, system=prompts.repair_system(), user=user, label="repair_copy", usage=usage, run_id=run_id, intent="regenerate")
     candidate = rules.ensure_required_lines(repaired.corrected_copy, copy_ctx, first.code_clauses)
     second = review(candidate, copy_ctx, identity, run_id, sources=sources, usage=usage)
     if second.report.verdict == "pass":

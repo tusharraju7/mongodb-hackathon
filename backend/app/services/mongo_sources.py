@@ -20,5 +20,5 @@ class MongoSources:
     def similar_clauses(self, vectors: list[list[float]], regions: list[str], product: str, k: int) -> list[list[tuple[dict, float]]]:
         return fundamentals.similar(vectors, regions, product, k, self._db)
 
-    def recall(self, identity: Identity, vector: list[float], kinds: list[str], k: int) -> list[dict]:
-        return memory.recall_by_vector(identity, vector, kinds, k, self._db)
+    def recall(self, identity: Identity, vectors: list[list[float]], kinds: list[str], per_query: int, budget: int) -> list[dict]:
+        return memory.recall_many(identity, vectors, kinds, per_query, budget, self._db)

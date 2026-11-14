@@ -5,12 +5,14 @@ from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, Field
 
+from app.core.profile import claim_types
+
 Role = Literal["manager", "marketer", "sales"]
-Team = Literal["national", "quebec"]
-Region = Literal["CA", "CA-QC"]
+Team = str      # the teams of the loaded data set; see profile.json
+Region = str    # "CA", "CA-ON", "CA-QC", ...
 Language = Literal["en", "fr"]
 Modality = Literal["text", "audio", "image"]
-ClaimType = Literal["approval", "intro_rate", "rewards_bonus", "annual_fee", "superlative", "testimonial", "other"]
+ClaimType = str  # one of the data set's claim types (profile.json), or "other"
 Materiality = Literal["material", "disclosure", "formatting"]
 Verdict = Literal["pass", "needs_changes", "blocked"]
 Route = Literal["none", "auto_correct", "draft_correction", "human_review"]
@@ -18,8 +20,9 @@ Band = Literal["high", "medium", "low"]
 
 
 def regions_for(ad_region: str) -> list[str]:
-    """A Quebec ad answers to global, Canadian and Quebec clauses; a national ad to the first two."""
-    return ["global", "CA", "CA-QC"] if ad_region == "CA-QC" else ["global", "CA"]
+    """An ad answers to global clauses and to each level of its own region: CA-ON -> global, CA, CA-ON."""
+    parts = (ad_region or "").split("-")
+    return ["global"] + ["-".join(parts[: i + 1]) for i in range(len(parts)) if parts[0]]
 
 
 class Identity(BaseModel):
@@ -34,10 +37,10 @@ class AdContext(BaseModel):
     """Chosen by the user in the form. The model never guesses these."""
 
     name: Optional[str] = None
-    product: str = "credit_card"
-    offer_id: Optional[str] = None
-    region: Region = "CA"
-    channel: Literal["email", "radio", "podcast", "social", "display"] = "email"
+    product: Optional[str] = None       # defaults to the data set's product
+    offer_id: Optional[str] = None      # only for data sets that have offer records
+    region: Optional[Region] = None     # defaults to the data set's region
+    channel: str = "unspecified"        # free text, e.g. "Instagram Stories (paid social)" or "Email (opted-in players)"
     language: Optional[Language] = None
     budget: Optional[dict] = None  # {amount, currency}
     campaign_id: Optional[str] = None
@@ -103,6 +106,7 @@ class PassedCheck(BaseModel):
 
 class ComplianceReport(BaseModel):
     verdict: Verdict
+    decision: Optional[str] = None  # the verdict in the team's own words: approved / approved_with_changes / rejected
     route: Route
     route_reason: str
     summary: str
@@ -128,7 +132,7 @@ class Grounding(BaseModel):
 
 
 class ExtractedClaim(BaseModel):
-    type: ClaimType = Field(description="The kind of claim. Use 'other' only when none of the named types fits.")
+    type: str = Field(description="The kind of claim: one of the claim types named in the instructions, or 'other' when none fits.")
     quote: str = Field(description="The exact words from the ad, copied character for character.")
     rate_percent: Optional[float] = Field(None, description="Interest rate stated in this claim, as a number.")
     months: Optional[int] = Field(None, description="Duration in months stated in this claim.")
@@ -148,7 +152,8 @@ class Extraction(BaseModel):
         claims = []
         for c in self.claims:
             values = ClaimValues(rate_percent=c.rate_percent, months=c.months, amount=c.amount, fee=c.fee)
-            claims.append(Claim(type=c.type, quote=c.quote, values=values if values.model_dump(exclude_none=True) else None))
+            ctype = c.type if c.type in claim_types() else "other"
+            claims.append(Claim(type=ctype, quote=c.quote, values=values if values.model_dump(exclude_none=True) else None))
         return Facts(claims=claims, cta=self.cta, tone=self.tone, language=self.language)
 
 

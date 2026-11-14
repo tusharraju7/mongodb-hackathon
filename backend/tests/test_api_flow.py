@@ -62,7 +62,7 @@ def canned(model, schema, *, system, user, label, usage=None, run_id=None, inten
             findings.append(JudgeFinding(source="policy", ref="credit.approval_claims", quote="Guaranteed approval!", explanation="Promises approval.", reasoning="The ad promises approval. Policy forbids it.", fix="Remove it.", certainty="clear"))
         if "INVENTED" in text:
             findings.append(JudgeFinding(source="policy", ref="credit.bonus_conditions", quote="words that are not in the ad", explanation="x", reasoning="x", fix="x", certainty="clear"))
-        memo = re.search(r"- id (\S+) \(standing instruction\): [^\n]*Sous réserve", user)
+        memo = re.search(r"- id (\S+) \[binding internal decision[^\]]*\]: [^\n]*Sous réserve", user)
         if memo and "Sous réserve" not in text:
             findings.append(JudgeFinding(source="memory", ref=memo.group(1), quote="", explanation="The required line is missing.", reasoning="The team requires the line. The ad does not carry it.", fix="Add the line.", certainty="clear"))
         french = "remise" in text
@@ -92,10 +92,10 @@ class FlowSources:
     def similar_clauses(self, vectors, regions, product, k):
         return [[] for _ in vectors]
 
-    def recall(self, identity, vector, kinds, k):
+    def recall(self, identity, vectors, kinds, per_query, budget):
         at = datetime.now(timezone.utc)
         hits = [m for m in self.db.memories.find({"kind": {"$in": kinds}}) if memory._readable(m, identity, at)]
-        return [{"id": str(m["_id"]), "kind": m["kind"], "text": m["text"]} for m in hits[:k]]
+        return memory.select([(memory.for_review(m, str(m["_id"])), 1.0) for m in hits], budget)
 
 
 @pytest.fixture

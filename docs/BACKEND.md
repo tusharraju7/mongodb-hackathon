@@ -1,40 +1,51 @@
 # The backend as built
 
-Branch `agent/ai-flows`. Everything under `backend/` except the two data scripts. This page says what exists, how to run it, what has and has not been verified, and what the data and web app owners need to match.
+Everything under `backend/`. This page says what exists, what data it runs on, how to run it, what has and has not been verified, and what the data and web app owners need to know.
 
-## What is there
+## Data set: NorthPlay
 
-| Piece | File | State |
+The backend now runs on `northplay-demo-data/`: NorthPlay, a fictional Ontario sportsbook. The shared `greenlight` database on the sandbox cluster holds it.
+
+| Source | Becomes | Count |
 |---|---|---|
-| Review engine (UC1) | `services/compliance.py`, `compliance_rules.py`, `confidence.py` | Built. Verified live on the seed files |
-| Policy gate and ledger | `core/gate.py` | Built. Verified offline |
-| Identity, tokens, step-up password | `core/security.py` | Built. Verified offline |
-| Chat graph: route → lane | `agent/graph.py`, `agent/lanes.py` | Built. Verified offline with model calls canned |
-| Regenerate a compliant version | `services/compliance.py`, `agent/lanes.py` | Built. Copy path verified live; filing verified offline |
-| Policy clauses: versioned edit, restore | `services/fundamentals.py` | Built. Verified offline |
-| Governed memory | `services/memory.py` | Built. Scoping and writes verified offline; vector recall not yet |
-| Ad library: versions, approve, gated release | `services/campaigns.py` | Built. Verified offline; vector search not yet |
-| Media in and out | `services/media.py` | Built. Speech, transcription, image reading and banner rendering verified live |
-| Audit, live stream, stop, rollback | `routers/audit.py`, `routers/runs.py` | Built. Verified offline, except the live stream |
-| API, 27 endpoints | `routers/*` | Built. Matches `CONTRACTS.md` section 7, with the differences listed below |
+| `regulations/regulations.json` | Policy clauses in `fundamentals` (`REG-01` … `REG-15`). Severity `blocker` → a finding that rejects; `major` → a finding that asks for changes | 15 |
+| `historical_ads/` | Ads in `campaigns`, each with its image in GridFS and its recorded decision. Approved ones are `released`; rejected are `rejected`; approved-with-changes are `pending_review` | 15 |
+| `historical_ads/` again | Past-verdict memories, one per ad | 15 |
+| `slack/slack_export/` | One memory per channel per day, with a standing (below) | 26 |
+| `strategy_decks/*.md` | One background memory per slide | 19 |
+| All of the above, unchanged | `regulations`, `ad_decisions`, `slack_messages`, `strategy_docs`, so every memory can be traced to its source | |
 
-**Verified live on Atlas, against a scratch database.** The shared `greenlight` database does not exist yet, so `scripts/fake_data.py` built `greenlight_test` on the sandbox cluster from `docs/MONGODB_SETUP.md` and `backend/seed/`, and the whole backend was run against it:
+`demo_ads/` is never loaded. Those three images are uploaded live.
 
-| Check | Result |
-|---|---|
-| `scripts/smoke.py --audio` | 36 of 36: review, regenerate, approve, stale release, rollback, questions, memory changing a verdict, team isolation, audio in and out |
-| Image in and out | A banner is read, reviewed with the same findings as its text version at lower confidence, and regenerated as a new banner |
-| Atlas vector search | Clauses, memories and ads, each with its team, role, region and status filters; a retired clause is never returned |
-| Live ledger stream | The allow decision reaches the stream while the review is still running; the stream closes when the run ends |
-| Stop | Requested mid-review; the run halted before filing and nothing was saved |
-| Conversation state | Stored in MongoDB; a follow-up "it" resolves to the ad just reviewed |
-| Expiry and validators | The five-minute memory was removed by the TTL index; the validators from `MONGODB_SETUP.md` accepted every document the backend wrote and rejected malformed ones |
+**Standing of a Slack memory**, decided when the seed is built:
 
-The image, stream, stop and conversation checks are saved as `scripts/smoke_extras.py`. That saved copy has one corrected expectation and has not itself been re-run.
+| Standing | Which threads | Effect of breaking it |
+|---|---|---|
+| Binding decision | Everything in `#legal-marketing`; decisions by the CEO, CMO or Senior Counsel elsewhere | Rejects the ad |
+| Team guidance | Other threads that give an instruction (brand and style notes) | Asks for changes |
+| Background | Everything else, and every deck slide | Never a finding on its own |
 
-Not checked: that two users' same-named threads stay separate (it follows from how thread ids are built, but no test exercises it), and how traces look in LangSmith.
+`#leadership` threads are visible to managers only. This classification is a rule of thumb in `scripts/build_seed.py`; Alton knows which six decisions were planted and may want to adjust it.
 
-**Not built:** reuse of a stored verdict for an unchanged ad (the key is stored, the lookup is not wired), the manager's "review our policies for gaps" request, a round-trip transcription check on regenerated audio, and turning reject feedback into a memory.
+**Users** (password: `SEED_PASSWORD` in `.env`):
+
+| Email | Role | Team |
+|---|---|---|
+| `ethan.cho@northplay.test` (Senior Counsel) | manager | ontario |
+| `priya.nair@northplay.test` (CMO) | manager | ontario |
+| `amira.haddad@northplay.test` (Creative Lead) | marketer | ontario |
+| `kevin.tran@northplay.test` (Growth Marketing) | marketer | ontario |
+| `jordan.blake@northplay.test` (Player Support; added for the demo) | sales | ontario |
+| `manager.alberta@northplay.test`, `marketer.alberta@northplay.test` (added for the demo) | manager, marketer | alberta |
+
+The Alberta team exists only to show that one team's memory does not reach another's.
+
+To rebuild from the source folder:
+
+```bash
+python -m scripts.build_seed                 # northplay-demo-data/ -> backend/seed/*.json   (--read-images re-reads the 15 ad images)
+python -m scripts.load_db --db greenlight --shared --password "$SEED_PASSWORD"
+```
 
 ## How a chat turn runs
 
@@ -45,80 +56,70 @@ An explicit graph with two steps, not a free tool-calling agent:
 
 No tool schema is ever sent to a model. The model is called for: routing, claim extraction, image reading, the verdict, one copy repair, drafting a memory change, and answering a question.
 
-## How a review chooses clauses
+## How a review decides
 
-1. Clauses that apply at all: right product, right region, approved, in effect today.
-2. Clauses with a rule (budget cap, required line, offer match) are decided in code and not shown to the judge.
-3. The judge is shown, at most twelve: clauses mandatory for a claim type the ad makes; then clauses with no claim type, which apply to every ad (language, tone, responsible borrowing); then other clauses the per-claim similarity search found.
+1. **Read.** An image is read once (all its text, plus notes on what is shown and whether the disclaimer is easy to read); audio is transcribed.
+2. **Claims.** The fast model lists the ad's claims by type (inducement, free or risk-free, odds or certainty, endorsement, and so on).
+3. **Checks in code.** The required disclaimer (a responsible gambling message and 19+), and whether it is legible.
+4. **Clauses.** Every clause that applies to the ad's product and region is shown to the judge; with 15 there is no need to pick.
+5. **Memory.** Searched once for the whole ad and once per claim, so a single name such as "Jake Moreau" finds the decision about it. Each standing has its own share of the result (5 binding, 2 guidance, 3 past verdicts, 2 background). A manager's team-wide instruction entered through the product is always in view, without relying on search.
+6. **Verdict.** The main model returns findings, each citing a clause or a memory, with the quote, reasoning and certainty. Policy is the floor; binding decisions add to it and the most recent wins; background never excuses a finding.
+7. **In code.** Findings that quote words not in the ad are dropped. Confidence is computed. A finding labelled unclear cannot reject an ad on its own; it sends it to a person. The decision is `approved`, `approved_with_changes` or `rejected`.
 
-General clauses are always included because a similarity search on an English credit card ad does not find "Quebec ads must be in French".
+## Verified
+
+| Check | Result |
+|---|---|
+| Offline tests (`pytest`) | 52 pass. They run on the earlier fictional-bank fixtures in `tests/fixtures/`, which exercise every code path including offer records |
+| The 15 past ads (`scripts/dry_run.py --suite`), each reviewed without the memory of its own decision | 14 match the recorded decision. `NP-H05` comes back stricter (below) |
+| The 3 demo ads, uploaded as images through the API | Demo 1 approved. Demo 2 rejected on `REG-12`, `REG-13` and a Slack decision. Demo 3 rejected on the Jake Moreau decision alone, with no regulation cited; replayed without memory it is not rejected |
+| Live end to end on Atlas (`scripts/smoke.py`, on a scratch copy) | 38 of 39. The one failure, a new team instruction not taking effect on the very next review, was fixed and re-checked live |
+| Regenerate | Demo 3 is regenerated as a new banner without the athlete and passes the same review |
+
+**`NP-H05`** (the opted-in bonus email, recorded as approved) is rejected today on two points: the creative shows no unsubscribe option (`REG-15`), and it says "any NFL game" after Legal's 20 October message that NorthPlay holds no NFL marks. Whether that is right is a call for Alton, who holds the answer keys.
+
+**Not verified:** the three demo ads against Alton's answer keys beyond what the README states; how traces look in LangSmith; that two users' same-named conversations stay separate (it follows from how thread ids are built, but nothing tests it).
+
+**Not built:** reuse of a stored verdict for an unchanged ad, the "review our policies for gaps" request, and turning reject feedback into a memory.
 
 ## Measured
 
 | | |
 |---|---|
-| Live suite, 9 seeded ads | 9 of 9 match the expected verdict |
-| Running example | Blocked, human review, the six expected clauses cited; its corrected copy passes on re-review |
-| One review | About 10 s and 5,400 input tokens (1,900 extraction, 3,500 verdict) at `LLM_EFFORT=low` |
-| Same review at `LLM_EFFORT=medium` | About 35 s, same findings |
-| Speech, 30 words | 2 s to synthesize; transcript came back accurate |
-| Image reading | 4 s; returned the banner's text exactly, fine print included |
+| One image review | About 9 to 14 s and 10,000 to 12,000 input tokens (image reading 2,000 to 3,500, claims 2,100, verdict 6,000 to 8,000) |
+| Verdict effort | `LLM_EFFORT=low`. Raising it to `medium` made reviews about three times slower with the same findings on the ads tried |
 
 ## Things that will bite
 
-- **Voyage rate limit.** A Voyage account without a payment method allows 3 requests a minute. A review makes 2 embedding requests (one for the ad and its claims, one for what it files), so the app waits and retries when limited. Adding a payment method in the Voyage dashboard lifts the limit; the free token allowance still applies.
+- **Voyage rate limit.** An account without a payment method allows 3 requests and 10,000 tokens a minute. A review makes 2 embedding requests, so the app waits and retries when limited, and a live demo can stall. Adding a payment method in the Voyage dashboard lifts it; the free token allowance still applies.
+- **"Image analyzers" are on the banned list.** All three demo ads are images. Keep the pitch on the governed decision (who decided, on which rule or Slack decision, and what changed), not on reading the image.
 - **LangSmith.** Set `LANGSMITH_PROJECT`, or the `LANGSMITH_AGENT_ID` / `LANGSMITH_AGENT_ENVIRONMENT` pair, never both. With both set LangSmith refuses to trace.
 - **Python.** 3.12 or later. On macOS the system `python3` is 3.9; use `python3.13`.
-- **Banner font.** Banners need a font with accented letters. Common system fonts are found automatically; otherwise set `BANNER_FONT` to a `.ttf` file. Without one, a French banner is refused, not rendered wrongly.
+- **Other docs.** `FLOWS.md`, `WORKED_EXAMPLE.md`, `CONTRACTS.md` section 3 and `DEMO.md` still use the earlier fictional-bank example. The mechanisms they describe are the ones running; the names and rules in them are not NorthPlay's.
 
 ## For the data owner
 
-`scripts/fake_data.py` is a working implementation of `MONGODB_SETUP.md` steps 2 to 6: it reads the validators and vector index definitions out of that document, loads `backend/seed/`, produces the seeded audio and banners, and upserts on natural keys. Use it as is, or as the reference for `setup_db.py` and `seed.py`:
-
-```bash
-python -m scripts.fake_data --db greenlight_test --password <test password>      # a scratch database
-python -m scripts.fake_data --db greenlight --shared --password <SEED_PASSWORD>  # the shared one
-```
-
-The backend reads the collections exactly as `CONTRACTS.md` and `MONGODB_SETUP.md` describe them. These details matter:
-
-| Topic | The backend expects |
-|---|---|
-| Embedded text for a clause | `fundamentals.clause_document(clause)`, which is `"{title}. {text}"` |
-| Embedded text for an ad | `campaigns.search_document(description, summary)`, which is `"{description} {summary}"` |
-| Embedded text for a memory | its `text` |
-| How to embed | `app.core.embeddings.embed_documents(texts)`: Voyage `voyage-3.5`, 1024 dimensions, `input_type="document"`. Import it; do not reimplement it |
-| Dates | BSON dates, never strings: `effective_from`, `effective_to`, `valid_from`, `valid_to`, `expires_at`, `created_at`, `ts` |
-| User ids | A user's id everywhere else is `str(users._id)`: `memories.scope.user_id`, `memories.created_by`, `campaigns.created_by`, `approval.by` |
-| Emails | Stored lowercase in `users.email` |
-| Passwords | `app.core.security.hash_password(SEED_PASSWORD)` into `users.password_hash` |
-| Ad status | `pending_review`, `approved`, `released`, `rejected`, `rolled_back`. Sales see `released` only |
-| Seeded approved and released ads | `compliance.verdict = "pass"`, `compliance.checked_fundamentals = [{key, version}]`, and `approval = {by, at, ad_version, policy_versions, offer_version}` with `policy_versions` equal to `checked_fundamentals`. Release compares these with the current versions |
-| Ad versions | `version` (int) and `history: []` on every ad |
-| Files | GridFS with `metadata: {mime, team, uploaded_by}`. An ad's `assets` is `[{type: "audio" or "image", file_id: "<string id>", mime}]` |
-| Producing seed audio and banners | `app.services.media.synthesize_bytes(text)` and `media.render_image_bytes(copy, language=..., card_name=...)` |
-| Vector index names | `fundamentals_vec`, `campaigns_vec`, `memories_vec`, with the filter fields in `MONGODB_SETUP.md` |
-| Search filters used | clauses: `status`, `region`, `product`. Ads: `team`, `status`. Memories: `status`, `scope.team`, `visibility_roles`, `kind` |
+- The mapping above lives in `scripts/build_seed.py`; the loader is `scripts/load_db.py`. Both can be run again safely.
+- Regulations are stored in `fundamentals`, not `policies`. In this backend `policies` holds the role permissions.
+- Text embedded for a clause is `"{title}. {rule, checks and fix}"`; for an ad, `"{description} {summary}"`; for a memory, its text. Voyage `voyage-3.5`, 1024 dimensions.
+- Things worth a look: which Slack threads count as binding; whether past approved-with-changes ads should sit as `pending_review`; and the `NP-H05` result.
 
 ## For the web app owner
 
 Base URL `http://localhost:8000`; interactive docs at `/docs`. Send `Authorization: Bearer <token>` on everything but `/auth/login`.
 
-Differences from, and additions to, `CONTRACTS.md` as first written:
-
 | Topic | What the backend does |
 |---|---|
-| Errors | Domain errors return `{ "error": "<code>", "message": "..." }`. Codes: `denied` 403, `step_up_failed` 401, `stale_approval` 409 (with `changes: [...]`), `not_approvable` 409, `stopped` 409, `not_found` 404, `unsupported_media` 415, `embedding_rate_limited` 429, `model_refused` / `model_failed` 502. Login and token failures use FastAPI's `{ "detail": "..." }` with 401 |
-| Reviewing pasted copy in chat | Send the copy as `ad.text` with the rest of the ad context. A request with `ad.text` or `file_id` is always a review |
-| Reviewing a library ad again | Send `ad: { campaign_id }`. The stored ad's own offer, region and channel are used |
-| Approve | Only an ad that is pending review **and passed** can be approved. Anything else returns 409 `not_approvable`: regenerate first |
-| Report | Adds `corrected_language`, set when the fix is to change language (an English ad for Quebec is corrected into French) |
-| `memories_used` on a report | Ids of every memory that was in front of the judge. A finding that rests on one names it in its own `memory_id` |
+| Reviewing an uploaded ad | `POST /assets` (multipart, image or audio) → `{ file_id, type }`, then `POST /chat` with `{ thread_id, run_id, file_id, ad: { name, channel } }`. `channel` is free text, for example "Instagram (paid social)" or "Email (opted-in players)"; some rules depend on it. Product and region default to NorthPlay's; there is no offer to pick |
+| Reviewing pasted copy | `POST /chat` with `ad: { text, name, channel }` |
+| Reviewing a library ad again | `ad: { campaign_id }` |
+| Report | `decision` is `approved`, `approved_with_changes` or `rejected`; `verdict` is the same thing as `pass`, `needs_changes`, `blocked`. Each finding has either `fundamental_key` (a regulation) or `memory_id` with `evidence.memory_text` (the Slack decision it rests on) |
+| Replay without memory | Same request with `use_memory: false`, or `POST /compliance/check { campaign_id, use_memory: false }` |
+| Memory list | `GET /memories` items carry `authority` (`binding`, `guidance`, `precedent`, `background`) and `source` (`{ type: "slack", channel, date, authors }`, `strategy_deck`, or `ad_decision`) |
+| Errors | `{ "error": "<code>", "message": "..." }`. Codes: `denied` 403, `step_up_failed` 401, `stale_approval` 409 (with `changes`), `not_approvable` 409, `stopped` 409, `not_found` 404, `unsupported_media` 415, `embedding_rate_limited` 429, `model_refused` / `model_failed` 502. Login and token failures use `{ "detail": "..." }` with 401 |
+| Approve | Only an ad that is pending review and approved by the review can be approved by a manager. Anything else returns 409 `not_approvable`: regenerate first |
 | `memory_change` card | `{ target: "fundamental" or "memory", id, key?, kind?, scope?, before, after, action: "create" / "correct" / "forget", status: "proposed", requires_password, version? }`. To apply: `PUT /fundamentals/{id}`, `POST /memories`, `PATCH /memories/{id}` or `DELETE /memories/{id}`, with `password` and `reason` when `requires_password` is true |
-| Denied in chat | `/chat` returns 200 with `status: "denied"` and a fixed reply; the refusal is on the ledger. Direct endpoints return 403 |
-| Stopped in chat | `/chat` returns 200 with `status: "stopped"` |
-| `/compliance/check` | Returns the report fields at the top level, plus `run_id`, `campaign` (when `save` is true), `memory_chips` and `tokens` |
-| `/campaigns/{id}/regenerate` | Returns `{ status, campaign, report, attempts, reply, run_id, tokens }` |
-| Run id on writes | Every write endpoint accepts an optional `run_id` and returns the one it used, so the page can call `/runs/{id}/rollback` or open `/audit/stream?run_id=` for it. `DELETE /memories/{id}` returns it in the `X-Run-Id` header |
+| Denied or stopped in chat | `/chat` returns 200 with `status: "denied"` or `"stopped"` and a fixed reply; the refusal is on the ledger. Direct endpoints return 403 or 409 |
+| `/campaigns/{id}/regenerate` | Returns `{ status, campaign, report, attempts, reply, run_id, tokens }`. A regenerated image is a new NorthPlay-styled banner carrying the corrected copy, not an edit of the original artwork |
+| Run id on writes | Every write endpoint accepts an optional `run_id` and returns the one it used, for `/runs/{id}/rollback` and `/audit/stream?run_id=`. `DELETE /memories/{id}` returns it in the `X-Run-Id` header |
 | Ad card | `asset` is `{ type, url }` or null; fetch `url` with `?token=<jwt>` for `<img>` and `<audio>`. `text` is always present and is what was reviewed |
-| Conversations | A thread is private to the user who started it |

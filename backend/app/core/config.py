@@ -10,9 +10,11 @@ from dotenv import load_dotenv
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 BACKEND_ROOT = REPO_ROOT / "backend"
-SEED_DIR = BACKEND_ROOT / "seed"
-
 load_dotenv(REPO_ROOT / ".env")
+
+# The data set the backend works on. Tests point this at their own fixtures.
+SEED_DIR = Path(os.environ.get("GREENLIGHT_SEED_DIR") or BACKEND_ROOT / "seed")
+SOURCE_DATA_DIR = REPO_ROOT / "northplay-demo-data"
 
 # LangSmith reads its settings from the process environment. Where traces go is set there, by either
 # LANGSMITH_PROJECT or the LANGSMITH_AGENT_ID / LANGSMITH_AGENT_ENVIRONMENT pair. Set one, never both:

@@ -1,5 +1,13 @@
 # MongoDB setup: collections, schema, indexes, example data
 
+> **Current data set: NorthPlay.** The database is built from `northplay-demo-data/` in two steps:
+> `python -m scripts.build_seed` turns that folder into `backend/seed/*.json`, and
+> `python -m scripts.load_db --db greenlight --shared --password <SEED_PASSWORD>` creates the collections,
+> validators and indexes below and loads the seed. It holds 7 users, 15 policy clauses, 15 past ads with
+> their images, 60 memories (Slack decisions, deck slides, past decisions) and the raw Slack, deck, regulation
+> and ad-decision records they came from. The "Example data" section at the end of this page still describes
+> the earlier fictional-bank fixtures, which the offline tests use; the validators and indexes are current.
+
 What to create in the shared Atlas cluster, in what order, and the data that has to be in it before anyone can build or demo. Field-by-field shapes are in [CONTRACTS.md](CONTRACTS.md); this file is the execution plan.
 
 Database: **`greenlight`** on the hackathon sandbox `Cluster0`.
@@ -76,7 +84,7 @@ Dates must be stored as BSON dates, not strings. The TTL index and the effective
     "email": { "bsonType": "string" },
     "name": { "bsonType": "string" },
     "role": { "enum": ["manager", "marketer", "sales"] },
-    "team": { "enum": ["national", "quebec"] },
+    "team": { "bsonType": "string" },
     "password_hash": { "bsonType": "string" },
     "created_at": { "bsonType": "date" } } }
 ```
@@ -87,9 +95,9 @@ Dates must be stored as BSON dates, not strings. The TTL index and the effective
   "required": ["_id", "product", "card_name", "teams", "standard_rate_percent", "annual_fee", "valid_from", "valid_to", "version"],
   "properties": {
     "_id": { "bsonType": "string" },
-    "product": { "enum": ["credit_card"] },
+    "product": { "bsonType": "string" },
     "card_name": { "bsonType": "string" },
-    "teams": { "bsonType": "array", "items": { "enum": ["national", "quebec"] } },
+    "teams": { "bsonType": "array", "items": { "bsonType": "string" } },
     "intro_rate": { "bsonType": ["object", "null"], "required": ["rate_percent", "months"],
       "properties": { "rate_percent": { "bsonType": ["int", "double"] }, "months": { "bsonType": "int" } } },
     "standard_rate_percent": { "bsonType": ["int", "double"] },
@@ -106,17 +114,16 @@ Dates must be stored as BSON dates, not strings. The TTL index and the effective
                "materiality", "status", "effective_from", "version", "updated_at"],
   "properties": {
     "key": { "bsonType": "string" },
-    "category": { "enum": ["brand", "company_policy", "budget", "regional", "consent", "legal"] },
-    "region": { "enum": ["global", "CA", "CA-QC"] },
-    "product": { "enum": ["credit_card", "all"] },
+    "category": { "bsonType": "string" },
+    "region": { "bsonType": "string" },
+    "product": { "bsonType": "string" },
     "title": { "bsonType": "string" }, "text": { "bsonType": "string" }, "summary": { "bsonType": "string" },
     "source_section": { "bsonType": "string" },
-    "claim_types": { "bsonType": "array", "items": { "enum": [
-      "approval", "intro_rate", "rewards_bonus", "annual_fee", "superlative", "testimonial", "other" ] } },
+    "claim_types": { "bsonType": "array", "items": { "bsonType": "string" } },
     "materiality": { "enum": ["material", "disclosure", "formatting"] },
     "approved_fix": { "bsonType": "object" },
     "rule": { "bsonType": "object", "required": ["type"],
-      "properties": { "type": { "enum": ["budget_cap", "banned_terms", "required_line", "offer_match"] } } },
+      "properties": { "type": { "enum": ["budget_cap", "banned_terms", "required_line", "required_elements", "offer_match"] } } },
     "status": { "enum": ["approved", "draft", "retired"] },
     "effective_from": { "bsonType": "date" },
     "effective_to": { "bsonType": ["date", "null"] },
@@ -140,14 +147,14 @@ Dates must be stored as BSON dates, not strings. The TTL index and the effective
 **`campaigns`** (warn)
 ```json
 { "bsonType": "object",
-  "required": ["team", "name", "product", "offer_id", "region", "channel", "language", "modality",
+  "required": ["team", "name", "product", "region", "channel", "language", "modality",
                "version", "text", "status", "created_by", "created_at"],
   "properties": {
-    "team": { "enum": ["national", "quebec"] },
-    "product": { "enum": ["credit_card"] },
-    "offer_id": { "bsonType": "string" },
-    "region": { "enum": ["CA", "CA-QC"] },
-    "channel": { "enum": ["email", "radio", "podcast", "social", "display"] },
+    "team": { "bsonType": "string" },
+    "product": { "bsonType": "string" },
+    "offer_id": { "bsonType": ["string", "null"] },
+    "region": { "bsonType": "string" },
+    "channel": { "bsonType": "string" },
     "language": { "enum": ["en", "fr"] },
     "modality": { "enum": ["text", "audio", "image"] },
     "version": { "bsonType": "int", "minimum": 1 },
@@ -168,12 +175,12 @@ Dates must be stored as BSON dates, not strings. The TTL index and the effective
     "kind": { "enum": ["semantic", "episodic", "procedural"] },
     "text": { "bsonType": "string" },
     "scope": { "bsonType": "object", "required": ["team"],
-      "properties": { "team": { "enum": ["national", "quebec"] }, "user_id": { "bsonType": ["string", "null"] } } },
+      "properties": { "team": { "bsonType": "string" }, "user_id": { "bsonType": ["string", "null"] } } },
     "visibility_roles": { "bsonType": "array", "minItems": 1, "items": { "enum": ["manager", "marketer", "sales"] } },
     "status": { "enum": ["active", "superseded", "forgotten"] },
     "expires_at": { "bsonType": ["date", "null"] },
     "source": { "bsonType": "object", "required": ["type"],
-      "properties": { "type": { "enum": ["agent", "manager_instruction", "review_feedback", "user_note"] } } },
+      "properties": { "type": { "enum": ["agent", "manager_instruction", "review_feedback", "user_note", "slack", "strategy_deck", "ad_decision"] } } },
     "embedding": { "bsonType": "array" },
     "created_at": { "bsonType": "date" } } }
 ```
@@ -188,7 +195,7 @@ Dates must be stored as BSON dates, not strings. The TTL index and the effective
     "actor": { "bsonType": "object", "required": ["user_id", "role"],
       "properties": { "user_id": { "bsonType": "string" },
                       "role": { "enum": ["manager", "marketer", "sales"] },
-                      "team": { "enum": ["national", "quebec"] } } },
+                      "team": { "bsonType": "string" } } },
     "event": { "enum": ["decision", "outcome", "stop", "rollback"] },
     "action": { "bsonType": "string" },
     "decision": { "enum": ["allow", "deny"] },

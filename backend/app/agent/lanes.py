@@ -283,7 +283,7 @@ def ask_lane(identity: Identity, run_id: str, *, question: str, thread_campaign_
             blocks = "\n\n".join(_ad_block(labels[i], c, offer_cache.get(c.get("offer_id")), with_text) for i, c in enumerate(candidates))
             if in_thread:
                 blocks += "\n\n<conversation>Ad A is the ad this conversation is about.</conversation>"
-            return llm.call_structured(llm.fast_model(), Answer, system=prompts.ANSWER_SYSTEM, user=f"{blocks}\n\n<question>\n{question}\n</question>", label="answer_full_text" if with_text else "answer", usage=usage, run_id=run_id, intent="ask")
+            return llm.call_structured(llm.fast_model(), Answer, system=prompts.answer_system(), user=f"{blocks}\n\n<question>\n{question}\n</question>", label="answer_full_text" if with_text else "answer", usage=usage, run_id=run_id, intent="ask")
 
         result = ask(False)
         band = "high"
@@ -340,7 +340,7 @@ def memory_update_lane(identity: Identity, run_id: str, *, message: str, usage: 
             parts.append("<policy_clauses>\n" + "\n".join(f"- {c['key']} (version {c.get('version', 1)}): {c['title']}. {c.get('summary', '')}" for c in clauses if c.get("status") == "approved") + "\n</policy_clauses>")
         parts.append("<memories>\n" + "\n".join(memory_lines) + "\n</memories>")
         parts.append(f"<message>\n{message}\n</message>")
-        d: DraftChange = llm.call_structured(llm.fast_model(), DraftChange, system=prompts.DRAFT_CHANGE_SYSTEM, user="\n\n".join(parts), label="draft_change", usage=usage, run_id=run_id, intent="memory_update")
+        d: DraftChange = llm.call_structured(llm.fast_model(), DraftChange, system=prompts.draft_change_system(), user="\n\n".join(parts), label="draft_change", usage=usage, run_id=run_id, intent="memory_update")
         return _proposal(d, identity, mine, db)
 
     proposal = gate.guarded(

@@ -112,7 +112,11 @@ class ImageReading(BaseModel):
     text: str = Field(description="Every piece of text in the image, exactly as written, in reading order.")
     visual_notes: str = Field(description="Two or three sentences on what the image shows.")
     fine_print_present: bool
-    fine_print_legible: bool = Field(description="False when fine print is present but too small or blurred to read reliably. True when there is none.")
+    fine_print_legible: bool = Field(
+        description="About the legal disclaimer line only (the age and responsible-use notice, usually at the very bottom), not other small "
+        "print such as offer terms: would an ordinary viewer read it at a glance? False only when it is clearly too small or too faint "
+        "against its background, even if you can make out the words yourself. True when it is readable, and true when there is none."
+    )
     people_present: bool
 
 
@@ -133,23 +137,32 @@ def read_image(file_id: str, db=None, **kw) -> dict:
 # ---------------------------------------------------------------- image out (brand template)
 
 WIDTH, HEIGHT = 1200, 628
-GREEN, CREAM, GOLD = (16, 60, 44), (245, 241, 230), (214, 178, 94)
-FINE_PRINT = re.compile(r"(subject to credit approval|conditions apply|sous réserve|des conditions s.appliquent|unsubscribe|se désabonner)", re.I)
+
+def _fine_print() -> "re.Pattern":
+    from app.core.profile import get_profile
+
+    patterns = get_profile()["fine_print_patterns"] or ["conditions apply"]
+    return re.compile("(" + "|".join(patterns) + ")", re.I)
+
 AMOUNT = re.compile(r"(\$\s?\d[\d,\.]*|\d[\d\s  ,\.]*\$)")
 
 
 def _sentences(copy: str) -> list[str]:
     # Split after sentence punctuation, but not inside a number such as 20.99 or a host such as tamarack.test.
-    parts = re.split(r"(?<=[.!?])\s+(?=[A-ZÀ-ÖØ-Þ0-9$«\"'])", copy.strip())
+    parts = re.split(r"(?<=[.!?”\"])\s+(?=[A-ZÀ-ÖØ-Þ0-9$«“\"'])", copy.strip())
     return [p.strip() for p in parts if p.strip()]
 
 
 def layout(copy: str) -> dict:
     """Split reviewed copy into headline, body and fine print. No wording is changed or dropped."""
+    from app.core.profile import get_profile
+
     sentences = _sentences(copy)
-    fine = [s for s in sentences if FINE_PRINT.search(s)]
+    fine_print = _fine_print()
+    fine = [s for s in sentences if fine_print.search(s)]
     rest = [s for s in sentences if s not in fine]
-    headline = next((s for s in rest if AMOUNT.search(s)), rest[0] if rest else "")
+    by_amount = get_profile()["banner"].get("headline") == "amount"
+    headline = next((s for s in rest if AMOUNT.search(s)), rest[0] if rest else "") if by_amount else (rest[0] if rest else "")
     body = [s for s in rest if s != headline]
     return {"headline": headline, "body": body, "fine_print": fine}
 
@@ -192,8 +205,14 @@ def _wrap(draw, text: str, font, max_width: int) -> list[str]:
     return lines + ([line] if line else [])
 
 
-def render_image_bytes(copy: str, *, language: str = "en", card_name: str = "Tamarack Cashback Card") -> bytes:
+def render_image_bytes(copy: str, *, language: str = "en", card_name: Optional[str] = None) -> bytes:
     from PIL import Image, ImageDraw
+
+    from app.core.profile import get_profile
+
+    look = get_profile()["banner"]
+    GREEN, CREAM, GOLD = tuple(look["background"]), tuple(look["text"]), tuple(look["accent"])
+    card_name = card_name or look.get("header") or get_profile()["brand"]
 
     # Pillow's built-in font has no accented letters. Rendering "crédit" with missing glyphs would
     # produce an image that does not say what was reviewed, so refuse instead.
@@ -243,5 +262,5 @@ def render_image_bytes(copy: str, *, language: str = "en", card_name: str = "Tam
 
 
 def render_image(copy: str, *, language: str = "en", offer: Optional[dict] = None, db=None) -> str:
-    name = (offer or {}).get("card_name_fr" if language == "fr" else "card_name") or "Tamarack Cashback Card"
+    name = (offer or {}).get("card_name_fr" if language == "fr" else "card_name")
     return store(render_image_bytes(copy, language=language, card_name=name), "image/png", "regenerated.png", db)

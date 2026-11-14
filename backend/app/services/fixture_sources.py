@@ -56,10 +56,10 @@ def embed_with_disk_cache(texts: list[str]) -> list[list[float]]:
 
 
 class SeedSources:
-    def __init__(self, *, extra_memories: Optional[list[dict]] = None, clause_overrides: Optional[dict[str, dict]] = None):
+    def __init__(self, *, extra_memories: Optional[list[dict]] = None, clause_overrides: Optional[dict[str, dict]] = None, exclude_memory_refs: Optional[set] = None):
         self._offers = {o["_id"]: o for o in load_seed("offers")}
         self._clauses = [{**c, **(clause_overrides or {}).get(c["key"], {})} for c in load_seed("fundamentals")]
-        self._memories = load_seed("memories") + (extra_memories or [])
+        self._memories = [m for m in load_seed("memories") + (extra_memories or []) if m["ref"] not in (exclude_memory_refs or set())]
         self._vectors: Optional[dict[str, list[float]]] = None
 
     def _load_vectors(self) -> dict[str, list[float]]:
@@ -85,7 +85,9 @@ class SeedSources:
             out.append(scored[:k])
         return out
 
-    def recall(self, identity: Identity, vector: list[float], kinds: list[str], k: int) -> list[dict]:
+    def recall(self, identity: Identity, vectors: list[list[float]], kinds: list[str], per_query: int, budget: int) -> list[dict]:
+        from app.services import memory as memory_service
+
         stored = self._load_vectors()
         visible = [
             m
@@ -96,8 +98,11 @@ class SeedSources:
             and m["kind"] in kinds
             and m.get("status", "active") == "active"
         ]
-        scored = sorted(visible, key=lambda m: -embeddings.cosine(vector, stored[m["text"]]))
-        return [{"id": m["ref"], "kind": m["kind"], "text": m["text"]} for m in scored[:k]]
+        scored = []
+        for vector in vectors:
+            ranked = sorted(((m, embeddings.cosine(vector, stored[m["text"]])) for m in visible), key=lambda x: -x[1])[:per_query]
+            scored += [(memory_service.for_review(m, m["ref"]), score) for m, score in ranked]
+        return memory_service.select(scored, budget)
 
 
 def seed_identity(email: str) -> Identity:

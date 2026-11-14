@@ -72,7 +72,7 @@ def route(state: ChatState) -> dict:
     recent = "\n".join(f"{t['role']}: {t['text'][:200]}" for t in (state.get("history") or [])[-4:]) or "(none)"
     has_ad = "yes" if state.get("last_campaign_id") or ad.get("campaign_id") else "no"
     user = f"<recent_turns>\n{recent}\n</recent_turns>\n<an_ad_is_under_discussion>{has_ad}</an_ad_is_under_discussion>\n\n<message>\n{state['message']}\n</message>"
-    decided: Route = llm.call_structured(llm.fast_model(), Route, system=prompts.ROUTER_SYSTEM, user=user, label="route", usage=usage, run_id=state["run_id"], intent="route")
+    decided: Route = llm.call_structured(llm.fast_model(), Route, system=prompts.router_system(), user=user, label="route", usage=usage, run_id=state["run_id"], intent="route")
     return {"intent": decided.intent, "tokens": usage.as_dict()}
 
 

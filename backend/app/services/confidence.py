@@ -106,7 +106,10 @@ def base_verdict(violations: list[dict], missing_inputs: list[str]) -> tuple[str
     """The business rule: findings decide the route. A similarity score never does."""
     if missing_inputs:
         return "blocked", "human_review", "Missing evidence: " + ", ".join(missing_inputs)
-    material = [v for v in violations if v["materiality"] == "material" or v["source"] == "offer"]
+    # A finding the judge labelled unclear never rejects an ad on its own. It keeps the ad from
+    # passing and sends it to a person, who decides.
+    firm = [v for v in violations if v.get("certainty") != "unclear"]
+    material = [v for v in firm if v["materiality"] == "material" or v["source"] == "offer"]
     if material:
         kinds = []
         if any(v["source"] == "offer" for v in material):
@@ -114,6 +117,8 @@ def base_verdict(violations: list[dict], missing_inputs: list[str]) -> tuple[str
         if any(v["source"] != "offer" for v in material):
             kinds.append("material policy conflict")
         return "blocked", "human_review", "Material finding: " + " and ".join(kinds)
+    if len(firm) < len(violations):
+        return "needs_changes", "human_review", "A finding is unclear and needs a person to decide"
     if any(v["materiality"] == "disclosure" for v in violations):
         return "needs_changes", "draft_correction", "Only missing disclosures, each with an approved fix"
     if violations:
@@ -143,9 +148,13 @@ def verdict_confidence(
     claims: list[dict],
     coverage: float,
     uncovered: int,
+    complete: bool = False,
 ) -> dict:
+    """`complete` means every applicable policy clause was in front of the judge, so no claim went unchecked."""
     if missing_inputs:
         return _conf(0, ["The ad could not be checked: " + ", ".join(missing_inputs)])
+    if verdict == "pass" and complete:
+        return _conf(100 * quality, [quality_reason, "Every policy clause that applies to this ad was checked"])
     if verdict == "pass":
         score = 100 * quality * coverage
         reasons = [quality_reason]
@@ -163,7 +172,7 @@ def verdict_confidence(
         return _conf(score, reasons)
     # Not a pass: one solid deciding finding is enough.
     if verdict == "blocked":
-        deciding = [v for v in violations if v["materiality"] == "material" or v["source"] == "offer"]
+        deciding = [v for v in violations if (v["materiality"] == "material" or v["source"] == "offer") and v.get("certainty") != "unclear"]
     else:
         deciding = [v for v in violations if v["materiality"] == "disclosure"] or violations
     strongest = max(deciding, key=lambda v: v["confidence"]["score"])
