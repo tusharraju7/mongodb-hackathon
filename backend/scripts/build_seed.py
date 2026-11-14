@@ -43,6 +43,21 @@ PROFILE = {
     "banner": {"header": "NORTHPLAY", "background": [11, 37, 54], "text": [240, 246, 244], "accent": [120, 222, 190], "headline": "first"},
     "fine_print_patterns": [r"19\+", "ontario only", "play responsibly", "connexontario"],
     "decision_labels": {"pass": "approved", "needs_changes": "approved_with_changes", "blocked": "rejected"},
+    # Domain notes given to the reviewer. They restate the regulations in plain words; they never encode
+    # an internal decision, which must reach the review through memory so that it can be traced and changed.
+    "guidance": [
+        "Channels come in three classes. Public: paid social, programmatic display, video platforms, TV, radio, podcasts, outdoor and search. Owned: the company's own site and app. Direct: email, SMS and push to players who have actively opted in.",
+        "An inducement is any bonus, bonus bet, deposit match, odds boost, credit, cash back or promo code, or any dollar amount tied to an offer. Inducements themselves are legal; advertising them is allowed only on owned channels and in direct marketing to opted-in players.",
+        "The legal age is 19. A person who is or looks under 19, and anything that would appeal mainly to people under 19, is a problem wherever it appears.",
+        "Showing odds as facts is allowed. Suggesting that a win is certain, likely or easy is not.",
+        "An active or retired athlete may appear only in a message whose sole purpose is responsible gambling, with no call to bet.",
+        "Every ad must carry a responsible gambling message and '19+'. That is checked automatically, so do not report it yourself.",
+    ],
+    "channel_classes": {
+        "direct": ["email", "sms", "push", "opted-in", "opted in", "direct marketing"],
+        "owned": ["on-site", "onsite", "website", "in-app", "app banner", "own site"],
+        "public": ["social", "instagram", "facebook", "tiktok", "snapchat", "youtube", "display", "programmatic", "tv", "radio", "podcast", "billboard", "outdoor", "search", "x (", "twitter"],
+    },
 }
 
 # Clauses tied to a kind of claim. The rest apply to every ad.

@@ -38,17 +38,21 @@ class TokenUsage:
 
     input: int = 0
     output: int = 0
+    cached: int = 0  # input tokens served from the prompt cache, billed at a fraction of the price
     calls: list[dict] = field(default_factory=list)
 
-    def add(self, label: str, usage: Optional[dict]) -> None:
+    def add(self, label: str, usage: Optional[dict], **extra) -> None:
         usage = usage or {}
         i, o = int(usage.get("input_tokens", 0)), int(usage.get("output_tokens", 0))
+        details = usage.get("input_token_details") or {}
+        cached = int(details.get("cache_read", 0) or 0)
         self.input += i
         self.output += o
-        self.calls.append({"step": label, "in": i, "out": o})
+        self.cached += cached
+        self.calls.append({"step": label, "in": i, "out": o, "cached": cached, "cache_written": int(details.get("cache_creation", 0) or 0), **extra})
 
     def as_dict(self) -> dict:
-        return {"in": self.input, "out": self.output}
+        return {"in": self.input, "out": self.output, **({"cached": self.cached} if self.cached else {})}
 
 
 @lru_cache
@@ -65,6 +69,18 @@ def fast_model():
     return init_chat_model(s.llm_fast_model, max_tokens=MAX_TOKENS, output_config={"effort": s.llm_fast_effort})
 
 
+def cached_system(stable: list[str]) -> list[dict]:
+    """A system prompt made of parts that do not change from call to call, marked for prompt caching.
+
+    Caching matches on an exact prefix, so only text that is identical every time belongs here.
+    Anything about the particular request goes in the user message.
+    """
+    blocks = [{"type": "text", "text": part} for part in stable if part]
+    if blocks:
+        blocks[-1]["cache_control"] = {"type": "ephemeral"}
+    return blocks
+
+
 def image_block(data: bytes, mime: str) -> dict:
     return {
         "type": "image",
@@ -76,14 +92,14 @@ def call_structured(
     model,
     schema: Type[T],
     *,
-    system: str,
+    system: Any,
     user: Any,
     label: str,
     usage: Optional[TokenUsage] = None,
     run_id: Optional[str] = None,
     intent: Optional[str] = None,
 ) -> T:
-    """One model call that returns `schema`. `user` is a string or a list of content blocks.
+    """One model call that returns `schema`. `system` and `user` are each a string or a list of content blocks.
 
     The run id and intent are attached as trace metadata so a ledger entry can be matched to its
     LangSmith trace. Never pass a password or a raw audio file through here.

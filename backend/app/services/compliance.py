@@ -13,7 +13,7 @@ from typing import Optional, Protocol
 
 from app.agent import prompts
 from app.core import embeddings, llm
-from app.core.profile import get_profile
+from app.core.profile import channel_class, get_profile
 from app.models import (
     ComplianceReport,
     Extraction,
@@ -107,19 +107,6 @@ def _offer_block(offer: dict) -> str:
     return "\n".join(lines)
 
 
-def _clause_block(clause: dict, languages: list[str], mandatory_types: list[str]) -> str:
-    body = clause["text"] if len(clause.get("text", "")) <= FULL_TEXT_LIMIT else clause.get("summary", "")
-    head = f"- {clause['key']} (version {clause.get('version', 1)}, {clause.get('materiality')})"
-    if mandatory_types:
-        head += f" [applies to the ad's {', '.join(mandatory_types)} claim]"
-    out = f"{head}: {body}"
-    wording = clause.get("approved_fix") or {}
-    for language in languages:
-        if wording.get(language):
-            out += f"\n  Approved wording ({language}): {wording[language]}"
-    return out
-
-
 def _required_lines_block(code_clauses: list[dict], ctx: dict, languages: list[str]) -> str:
     """The lines the corrected copy must carry, so the judge writes them in the right language."""
     lines = []
@@ -139,9 +126,10 @@ def _judge_user(
     language = ctx.get("language") or extraction.language
     # A Quebec ad may need to be rewritten in French, so the judge sees French wording as well.
     languages = list(dict.fromkeys([language] + (["fr"] if ctx.get("region") == "CA-QC" else [])))
-    form = {"audio": "transcript of a spoken ad", "image": "text read from an image"}.get(ctx.get("modality"), "typed text")
+    form = {"audio": "transcript of a spoken ad", "image": "text read from an image", "video": "spoken words and on-screen text of a video"}.get(ctx.get("modality"), "typed text")
     parts = [
-        f"<ad region=\"{ctx.get('region')}\" channel=\"{ctx.get('channel')}\" language=\"{language}\" form=\"{form}\">\n{text}\n</ad>",
+        f"<ad region=\"{ctx.get('region')}\" channel=\"{ctx.get('channel')}\" channel_class=\"{ctx.get('channel_class', 'unknown')}\" "
+        f"language=\"{language}\" form=\"{form}\">\n{text}\n</ad>",
     ]
     if ctx.get("visual_notes"):
         parts.append(f"<image_notes>\n{ctx['visual_notes']}\n</image_notes>")
@@ -152,7 +140,8 @@ def _judge_user(
     found = [f"- {f['fundamental_key']}: {f['explanation']} Fix: {f['fix']}" for f in code_findings] or ["- none"]
     parts.append("<already_found_by_automated_checks>\n" + "\n".join(found) + "\n</already_found_by_automated_checks>")
     parts.append(_required_lines_block(code_clauses, ctx, languages))
-    parts.append("<policy_clauses>\n" + "\n".join(_clause_block(c, languages, m) for c, m in clauses) + "\n</policy_clauses>")
+    tied = [f"- {c['key']}: tied to the ad's {', '.join(m)} claim" for c, m in clauses if m] or ["- none"]
+    parts.append("<clauses_tied_to_this_ads_claims>\n" + "\n".join(tied) + "\n</clauses_tied_to_this_ads_claims>")
     mem = []
     for m in memories:
         where = ", ".join(x for x in (m.get("source_label"), m.get("date")) if x)
@@ -221,6 +210,7 @@ def review(
     claims = [c.model_dump() for c in extraction.facts().claims]
 
     # 3. Checks in code.
+    ctx["channel_class"] = channel_class(ctx.get("channel", ""))
     ctx["region"] = ctx.get("region") or profile["region"]
     ctx["product"] = ctx.get("product") or profile["product"]
     regions = regions_for(ctx["region"])
@@ -275,10 +265,14 @@ def review(
             return ReviewResult(report=hit, extraction=extraction, offer=offer, cache_key=key, code_clauses=code_clauses)
 
     # 7. The verdict.
+    # The instructions and the clauses are the same from one review to the next, so they go in the
+    # system prompt in a fixed order and are cached. Everything about this ad goes in the user message.
+    clause_languages = list(dict.fromkeys([ctx["language"]] + (["fr"] if ctx.get("region") == "CA-QC" else [])))
+    system = llm.cached_system([prompts.judge_system(), prompts.clauses_block(shown, clause_languages, FULL_TEXT_LIMIT)])
     judged: JudgeOutput = llm.call_structured(
         llm.main_model(),
         JudgeOutput,
-        system=prompts.judge_system(),
+        system=system,
         user=_judge_user(text, ctx, extraction, offer, code_findings, code_clauses, [(c, mandatory_types(c)) for c in shown], memories),
         label="judge",
         usage=usage,
@@ -339,6 +333,23 @@ def review(
     if dropped:
         passed.append({"check": "dropped_findings", "detail": dropped})
 
+    # Where the judge says the sources disagree. A conflict naming a source that was not in front
+    # of it is dropped, the same way a finding is.
+    def source_ref(ref: str) -> Optional[dict]:
+        if ref in by_key or any(c["key"] == ref for c in code_clauses):
+            return {"type": "policy", "ref": ref, "label": ref}
+        if ref in by_memory:
+            m = by_memory[ref]
+            return {"type": "memory", "ref": ref, "label": ", ".join(x for x in (STANDING[authority_of(m)], m.get("source_label"), m.get("date")) if x)}
+        return None
+
+    conflicts = []
+    for c in judged.conflicts:
+        between = [r for r in (source_ref(x) for x in dict.fromkeys(c.between)) if r]
+        winner = source_ref(c.winner)
+        if len(between) >= 2 and winner:
+            conflicts.append({"between": between, "winner": winner, "explanation": c.explanation})
+
     # 9. Verdict, confidence and route, all in code.
     verdict, route, reason = conf.base_verdict(violations, [])
     coverage, uncovered = conf.claim_coverage(claims, consulted, best_for_claim)
@@ -362,6 +373,9 @@ def review(
         confidence=confidence,
         passed_checks=passed,
         violations=violations,
+        conflicts=conflicts,
+        channel_class=ctx["channel_class"],
+        prompt_version=prompts.PROMPT_VERSION,
         corrected_copy=corrected,
         corrected_language=corrected_language,
         checked_fundamentals=[{"key": c["key"], "version": c.get("version", 1)} for c in consulted],
