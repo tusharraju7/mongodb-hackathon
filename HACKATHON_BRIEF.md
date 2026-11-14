@@ -86,7 +86,7 @@ The official page's STRICTLY NO list:
 
 Do not treat a renamed prohibited idea as compliant. A UI or retrieval feature must support a qualifying agent workflow, and an ambiguous boundary still needs organizer clarification.
 
-Originality review status: OPEN. The team's final idea has not yet been confirmed to the project manager. Earlier brainstorms are not approved selections.
+Originality review status: Greenlight confirmed from main commit 223f3fa. Initial prior-art comparison complete; implementation and eligibility checks remain open. See [the originality review](HACKATHON_ORIGINALITY_REVIEW.md).
 
 ## Judging
 
