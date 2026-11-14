@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 from app.agent import prompts
 from app.core import embeddings, gate, llm
 from app.core.db import get_db
-from app.models import ComplianceReport, Grounding, Identity
+from app.models import ComplianceReport, Extraction, Grounding, Identity
 from app.services import campaigns, compliance, fundamentals, media, memory, offers
 from app.services.compliance import Sources, default_sources
 
@@ -54,6 +54,7 @@ def review_lane(
     ctx = {**ctx, "team": identity.team}
     modality, mime = "text", None
     existing = None
+    extraction = None
 
     # An ad already in the library: review its stored text; nothing is read again.
     if ctx.get("campaign_id") and not text and not file_id:
@@ -77,9 +78,10 @@ def review_lane(
         else:
             reading = gate.guarded(
                 identity, "compliance.check", {"step": "read_image", "file_id": file_id, "bytes": len(data)}, run_id,
-                lambda: media.read_image_bytes(data, mime, usage=usage, run_id=run_id), thread_id=thread_id, db=db,
+                lambda: media.read_image_and_claims(data, mime, ctx, usage=usage, run_id=run_id), thread_id=thread_id, db=db,
                 summarize=lambda r: {"status": "ok", "summary": f"Read {len(r['text'].split())} words from the image"},
             )
+            extraction = Extraction.model_validate(reading["extraction"])
             text = reading["text"]
             ctx["visual_notes"] = reading["visual_notes"]
             ctx["fine_print_legible"] = reading["fine_print_legible"]
@@ -91,7 +93,7 @@ def review_lane(
     result: compliance.ReviewResult = gate.guarded(
         identity, "compliance.check",
         {"step": "review", "modality": modality, "offer_id": ctx.get("offer_id"), "region": ctx.get("region"), "channel": ctx.get("channel"), "text": text},
-        run_id, lambda: compliance.review(text, ctx, identity, run_id, use_memory=use_memory, sources=sources, usage=usage),
+        run_id, lambda: compliance.review(text, ctx, identity, run_id, use_memory=use_memory, sources=sources, usage=usage, extraction=extraction),
         thread_id=thread_id, db=db,
         policy_refs=lambda r: r.report.checked_fundamentals, memories_used=lambda r: r.report.memories_used,
         summarize=_report_outcome, tokens=usage.as_dict,

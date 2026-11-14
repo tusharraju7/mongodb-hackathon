@@ -129,6 +129,25 @@ def read_image_bytes(data: bytes, mime: str, *, usage: Optional[llm.TokenUsage] 
     return reading.model_dump()
 
 
+def read_image_and_claims(data: bytes, mime: str, ctx: dict, *, usage=None, run_id=None) -> dict:
+    """Read pixels and extract grounded claims in a single fast-model call."""
+    from app.models import Extraction
+    from app.services.compliance_rules import quote_in_text
+
+    class ImageAssessmentInput(ImageReading):
+        extraction: Extraction
+
+    reading = llm.call_structured(
+        llm.fast_model(), ImageAssessmentInput,
+        system=prompts.READ_IMAGE_SYSTEM + "\n" + prompts.extract_system()
+        + "\nReturn the image reading and extraction together. Copy claim quotes exactly from your transcribed text.",
+        user=[llm.image_block(data, mime), {"type": "text", "text": f"Read this advertisement and extract its claims. Channel: {ctx.get('channel', 'unknown')}."}],
+        label="read_image_and_claims", usage=usage, run_id=run_id, intent="review",
+    )
+    reading.extraction.claims = [c for c in reading.extraction.claims if quote_in_text(c.quote, reading.text)]
+    return reading.model_dump()
+
+
 def read_image(file_id: str, db=None, **kw) -> dict:
     data, mime = open_file(file_id, db)
     return read_image_bytes(data, mime, **kw)
