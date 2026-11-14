@@ -1,177 +1,1091 @@
 [
   {
-    "ref": "nat-email-fall-cashback",
-    "team": "national", "name": "Fall cashback email",
-    "product": "credit_card", "offer_id": "TCB-FALL-2026",
-    "region": "CA", "channel": "email", "language": "en", "modality": "text",
-    "budget": { "amount": 12000, "currency": "CAD" },
-    "text": "Enjoy 0% interest on purchases for 10 months, then 20.99%. Earn $300 cash back after $1,500 in purchases in your first 3 months. Subject to credit approval. Conditions apply. Apply today at tamarack.test/cashback. Unsubscribe: tamarack.test/unsubscribe",
-    "description": "An email offering $300 cash back and 0% interest for 10 months on the Tamarack Cashback Card.",
-    "summary": "Email for the fall cashback offer: 0% on purchases for 10 months then 20.99%, and $300 cash back after $1,500 in purchases in the first 3 months. Subject to credit approval.",
+    "ref": "NP-H01",
+    "team": "ontario",
+    "name": "NP-H01 Saturday night. Every play, live.",
+    "product": "sportsbook",
+    "offer_id": null,
+    "region": "CA-ON",
+    "channel": "Instagram (paid social)",
+    "language": "en",
+    "modality": "image",
+    "budget": null,
+    "campaign": "Hockey Night Live Odds",
+    "text": "Saturday night. Every play, live. Toronto vs. Montreal. Live odds update with every shift. TORONTO +120 | MONTREAL -140 See live odds 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "visual_notes": "The ad uses a dark teal-to-navy gradient background with a mint-green accent colour for the logo, odds figures and call-to-action button. The layout is a clean vertical stack: logo, large white headline, subheading, two rounded panels showing team odds, a pill-shaped button, and a thin divider above the disclaimer. No people, mascots, cartoon characters or celebrities are shown, and the design has no features aimed at children or teenagers.",
+    "fine_print_legible": true,
+    "description": "Saturday night. Every play, live. Toronto vs. Montreal. Live odds update with every shift. (Hockey Night Live Odds, Instagram (paid social))",
+    "summary": "Hockey Night Live Odds ad for Instagram (paid social). Saturday night. Every play, live. Toronto vs. Montreal. Live odds update with every shift.",
     "facts": {
-      "claims": [
-        { "type": "intro_rate", "quote": "0% interest on purchases for 10 months, then 20.99%", "values": { "rate_percent": 0, "months": 10 } },
-        { "type": "rewards_bonus", "quote": "$300 cash back after $1,500 in purchases in your first 3 months", "values": { "amount": 300 } }
-      ],
-      "cta": "Apply today at tamarack.test/cashback", "tone": "plain", "language": "en"
+      "claims": [],
+      "cta": "See live odds",
+      "tone": null,
+      "language": "en",
+      "headline": "Saturday night. Every play, live.",
+      "odds": [
+        [
+          "TORONTO",
+          "+120"
+        ],
+        [
+          "MONTREAL",
+          "-140"
+        ]
+      ]
     },
-    "status": "released", "compliance": { "verdict": "pass", "route": "none" },
-    "created_by": "marketer.national@tamarack.test", "approved_by": "manager.national@tamarack.test"
+    "status": "released",
+    "decided_at": "2026-09-13T16:00:00Z",
+    "compliance": {
+      "verdict": "pass",
+      "route": "none",
+      "summary": "Product-focused ad showing live odds as plain information. No offers, no outcome promises, no people, and the full responsible gambling disclaimer is legible. Meets all applicable rules.",
+      "violations": [],
+      "corrected_copy": null,
+      "confidence": 95
+    },
+    "expected": {
+      "status": "approved",
+      "rules": [
+        "REG-14",
+        "REG-09",
+        "REG-12"
+      ]
+    },
+    "created_by": "amira.haddad@northplay.test",
+    "approved_by": "ethan.cho@northplay.test",
+    "asset_path": "historical_ads/images/NP-H01_approved_saturday_night_odds.png"
   },
   {
-    "ref": "nat-banner-fall-cashback",
-    "team": "national", "name": "Fall cashback banner",
-    "product": "credit_card", "offer_id": "TCB-FALL-2026",
-    "region": "CA", "channel": "display", "language": "en", "modality": "image",
-    "budget": { "amount": 8000, "currency": "CAD" },
-    "text": "$300 cash back. After $1,500 in purchases in your first 3 months. 0% interest on purchases for 10 months, then 20.99%. Tamarack Cashback Card. Subject to credit approval. Conditions apply.",
-    "visual_notes": "Dark green banner. Large headline '$300 cash back'. A picture of the card on the right. Fine print along the bottom edge, legible. No people shown.",
-    "description": "A dark green web banner with '$300 cash back' in large type and a picture of the Tamarack Cashback Card.",
-    "summary": "Display banner for the fall cashback offer: $300 cash back after $1,500 in purchases in the first 3 months, 0% on purchases for 10 months then 20.99%.",
+    "ref": "NP-H02",
+    "team": "ontario",
+    "name": "NP-H02 Set your limits. Then enjoy the game.",
+    "product": "sportsbook",
+    "offer_id": null,
+    "region": "CA-ON",
+    "channel": "Programmatic display",
+    "language": "en",
+    "modality": "image",
+    "budget": null,
+    "campaign": "Play Smart Brand",
+    "text": "Set your limits. Then enjoy the game. Deposit limits, time reminders and cool-off periods are built into every NorthPlay account. Learn about our tools 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "visual_notes": "The image uses a dark teal-to-navy gradient background with a green glow at the upper right. The brand logo is a mint green arrow-like mark beside the NORTHPLAY wordmark, and the large white headline dominates the layout, with three pill-shaped feature tags and a mint call-to-action button below. No people, mascots, cartoon characters or child-appealing elements appear; the design is sober and text-focused.",
+    "fine_print_legible": true,
+    "description": "Set your limits. Then enjoy the game. Deposit limits, time reminders and cool-off periods are built into every NorthPlay account. (Play Smart Brand, Programmatic display)",
+    "summary": "Play Smart Brand ad for Programmatic display. Set your limits. Then enjoy the game. Deposit limits, time reminders and cool-off periods are built into every NorthPlay account.",
     "facts": {
-      "claims": [
-        { "type": "rewards_bonus", "quote": "$300 cash back. After $1,500 in purchases in your first 3 months", "values": { "amount": 300 } },
-        { "type": "intro_rate", "quote": "0% interest on purchases for 10 months, then 20.99%", "values": { "rate_percent": 0, "months": 10 } }
-      ],
-      "cta": null, "tone": "plain", "language": "en"
+      "claims": [],
+      "cta": "Learn about our tools",
+      "tone": null,
+      "language": "en",
+      "headline": "Set your limits. Then enjoy the game.",
+      "odds": null
     },
-    "status": "released", "compliance": { "verdict": "pass", "route": "none" },
-    "created_by": "marketer.national@tamarack.test", "approved_by": "manager.national@tamarack.test"
+    "status": "released",
+    "decided_at": "2026-09-03T16:00:00Z",
+    "compliance": {
+      "verdict": "pass",
+      "route": "none",
+      "summary": "Responsible gambling brand ad. Describes player-protection tools factually with no betting call-to-action or offer. Low risk; approved.",
+      "violations": [],
+      "corrected_copy": null,
+      "confidence": 97
+    },
+    "expected": {
+      "status": "approved",
+      "rules": [
+        "REG-14",
+        "REG-06"
+      ]
+    },
+    "created_by": "amira.haddad@northplay.test",
+    "approved_by": "ethan.cho@northplay.test",
+    "asset_path": "historical_ads/images/NP-H02_approved_set_your_limits.png"
   },
   {
-    "ref": "nat-radio-slow-mornings",
-    "team": "national", "name": "Slow mornings radio spot",
-    "product": "credit_card", "offer_id": "TCB-FALL-2026",
-    "region": "CA", "channel": "radio", "language": "en", "modality": "audio",
-    "budget": { "amount": 20000, "currency": "CAD" },
-    "text": "Mornings are better when they are not rushed. With the Tamarack Cashback Card, earn 300 dollars cash back after 1,500 dollars in purchases in your first 3 months. And pay 0 percent interest on purchases for 10 months, then 20.99 percent. Subject to credit approval. Conditions apply. Tamarack Bank.",
-    "description": "A calm radio spot about slow, unhurried mornings that ends with the $300 cash back offer on the Tamarack Cashback Card.",
-    "summary": "Radio spot for the fall cashback offer, themed on unhurried mornings: $300 cash back after $1,500 in purchases in the first 3 months, 0% for 10 months then 20.99%.",
+    "ref": "NP-H03",
+    "team": "ontario",
+    "name": "NP-H03 Know your limit before kickoff.",
+    "product": "sportsbook",
+    "offer_id": null,
+    "region": "CA-ON",
+    "channel": "Instagram Stories (paid social)",
+    "language": "en",
+    "modality": "image",
+    "budget": null,
+    "campaign": "Play Smart Ambassadors",
+    "text": "Know your limit before kickoff. \"Set a budget before kickoff. Take breaks. Know when to walk away.\" - Marcus Doyle, retired CFL lineman Set a deposit limit 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "visual_notes": "A dark teal-to-navy gradient background with a mint-green triangular arrow logo and mint accent on the word PLAY in the NORTHPLAY wordmark. White bold headline quote and light grey attribution sit left-aligned with a mint pill-shaped call-to-action button below, and a thin divider line above the small disclaimer at the bottom. No people or illustrated characters are pictured; the only person is referenced by name and role in text, with no photograph.",
+    "fine_print_legible": true,
+    "description": "Know your limit before kickoff. \"Set a budget before kickoff. Take breaks. Know when to walk away.\" - Marcus Doyle, retired CFL lineman (Play Smart Ambassadors, Instagram Stories (paid social))",
+    "summary": "Play Smart Ambassadors ad for Instagram Stories (paid social). Know your limit before kickoff. \"Set a budget before kickoff. Take breaks. Know when to walk away.\" - Marcus Doyle, retired CFL lineman",
     "facts": {
-      "claims": [
-        { "type": "rewards_bonus", "quote": "earn 300 dollars cash back after 1,500 dollars in purchases in your first 3 months", "values": { "amount": 300 } },
-        { "type": "intro_rate", "quote": "0 percent interest on purchases for 10 months, then 20.99 percent", "values": { "rate_percent": 0, "months": 10 } }
-      ],
-      "cta": null, "tone": "calm", "language": "en"
+      "claims": [],
+      "cta": "Set a deposit limit",
+      "tone": null,
+      "language": "en",
+      "headline": "Know your limit before kickoff.",
+      "odds": null
     },
-    "status": "approved", "compliance": { "verdict": "pass", "route": "none" },
-    "created_by": "marketer.national@tamarack.test", "approved_by": "manager.national@tamarack.test"
+    "status": "released",
+    "decided_at": "2026-10-02T16:00:00Z",
+    "compliance": {
+      "verdict": "pass",
+      "route": "none",
+      "summary": "Uses a retired athlete, which is normally prohibited. The only exception is creative made exclusively to advocate responsible gambling. This ad contains only responsible gambling messaging and its CTA leads to deposit-limit settings, not betting. Exception applies; approved. Any future version that adds odds, offers or a 'bet now' CTA must be rejected.",
+      "violations": [],
+      "corrected_copy": null,
+      "confidence": 86
+    },
+    "expected": {
+      "status": "approved",
+      "rules": [
+        "REG-03",
+        "REG-14"
+      ]
+    },
+    "created_by": "amira.haddad@northplay.test",
+    "approved_by": "ethan.cho@northplay.test",
+    "asset_path": "historical_ads/images/NP-H03_approved_athlete_rg_exception.png"
   },
   {
-    "ref": "nat-email-best-card",
-    "team": "national", "name": "Best card email draft",
-    "product": "credit_card", "offer_id": "TCB-FALL-2026",
-    "region": "CA", "channel": "email", "language": "en", "modality": "text",
-    "budget": { "amount": 5000, "currency": "CAD" },
-    "text": "Canada's best cashback card! Get $300 in free money just for signing up. No annual fee. Apply now.",
-    "description": "A draft email calling the card Canada's best cashback card and promising $300 for signing up.",
-    "summary": "Draft email with an unsupported superlative, a 'free money' claim and a bonus stated without its conditions.",
+    "ref": "NP-H04",
+    "team": "ontario",
+    "name": "NP-H04 Build your parlay in seconds.",
+    "product": "sportsbook",
+    "offer_id": null,
+    "region": "CA-ON",
+    "channel": "Instagram (paid social)",
+    "language": "en",
+    "modality": "image",
+    "budget": null,
+    "campaign": "Product Feature: Parlay Builder",
+    "text": "Build your parlay in seconds. Pick your games, add your legs, see your odds update instantly. Try the parlay builder 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "visual_notes": "A dark teal-to-navy gradient background with a mint-green accent colour used for the logo mark, the eyebrow label and the call-to-action button. Large bold white headline dominates the upper half, followed by a subtitle, three pill-shaped feature tags and a rounded button, with a thin divider line above the disclaimer at the bottom. No people, characters, mascots or athletes are shown; the imagery is purely typographic with a simple arrow-shaped logo.",
+    "fine_print_legible": true,
+    "description": "Build your parlay in seconds. Pick your games, add your legs, see your odds update instantly. (Product Feature: Parlay Builder, Instagram (paid social))",
+    "summary": "Product Feature: Parlay Builder ad for Instagram (paid social). Build your parlay in seconds. Pick your games, add your legs, see your odds update instantly.",
     "facts": {
-      "claims": [
-        { "type": "superlative", "quote": "Canada's best cashback card" },
-        { "type": "rewards_bonus", "quote": "Get $300 in free money just for signing up", "values": { "amount": 300 } },
-        { "type": "annual_fee", "quote": "No annual fee", "values": { "fee": 0 } }
-      ],
-      "cta": "Apply now", "tone": "promotional", "language": "en"
+      "claims": [],
+      "cta": "Try the parlay builder",
+      "tone": null,
+      "language": "en",
+      "headline": "Build your parlay in seconds.",
+      "odds": null
     },
-    "status": "pending_review", "compliance": { "verdict": "blocked", "route": "human_review" },
-    "created_by": "marketer.national@tamarack.test"
+    "status": "released",
+    "decided_at": "2026-10-08T16:00:00Z",
+    "compliance": {
+      "verdict": "pass",
+      "route": "none",
+      "summary": "Feature ad explaining how the parlay builder works. No winning claims, offers or social pressure. Approved.",
+      "violations": [],
+      "corrected_copy": null,
+      "confidence": 92
+    },
+    "expected": {
+      "status": "approved",
+      "rules": [
+        "REG-09",
+        "REG-14"
+      ]
+    },
+    "created_by": "amira.haddad@northplay.test",
+    "approved_by": "ethan.cho@northplay.test",
+    "asset_path": "historical_ads/images/NP-H04_approved_parlay_builder.png"
   },
   {
-    "ref": "nat-social-rewards-switch",
-    "team": "national", "name": "Rewards card switch post",
-    "product": "credit_card", "offer_id": "TRC-WINTER-2026",
-    "region": "CA", "channel": "social", "language": "en", "modality": "text",
-    "budget": { "amount": 3000, "currency": "CAD" },
-    "text": "Tired of Northgate Bank? Switch to the Tamarack Rewards Card and get $150 cash back. No annual fee.",
-    "description": "A social post telling customers of another bank to switch to the Tamarack Rewards Card for $150 cash back.",
-    "summary": "Social post that names a competitor, states no annual fee where the offer has a $99 fee, and omits the bonus conditions.",
+    "ref": "NP-H05",
+    "team": "ontario",
+    "name": "NP-H05 Bet $50, get $50 in bonus bets",
+    "product": "sportsbook",
+    "offer_id": null,
+    "region": "CA-ON",
+    "channel": "Email (direct marketing, opted-in players only)",
+    "language": "en",
+    "modality": "image",
+    "budget": null,
+    "campaign": "Opted-in Player Offers: Week 6",
+    "text": "Bet $50, get $50 in bonus bets Place a $50 bet on any NFL game this week and receive $50 in bonus bets. Opted-in players only. Min. odds -200. Bonus bets expire 7 days after issue. 1x playthrough. Bonus bet stake not included in winnings. Full terms at northplay.example/terms. 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "visual_notes": "A dark teal-to-navy gradient background with a mint-green NorthPlay triangle logo and wordmark at top, over a white email-style card. The bold headline and a sub-headline promote a $50 bet offer on NFL games, with a grey box of offer terms beneath. No people, characters or cartoon imagery appear; the design is text-driven and corporate.",
+    "fine_print_legible": true,
+    "description": "Bet $50, get $50 in bonus bets Place a $50 bet on any NFL game this week and receive $50 in bonus bets. (Opted-in Player Offers: Week 6, Email (direct marketing, opted-in players only))",
+    "summary": "Opted-in Player Offers: Week 6 ad for Email (direct marketing, opted-in players only). Bet $50, get $50 in bonus bets Place a $50 bet on any NFL game this week and receive $50 in bonus bets.",
     "facts": {
-      "claims": [
-        { "type": "rewards_bonus", "quote": "get $150 cash back", "values": { "amount": 150 } },
-        { "type": "annual_fee", "quote": "No annual fee", "values": { "fee": 0 } }
-      ],
-      "cta": "Switch to the Tamarack Rewards Card", "tone": "promotional", "language": "en"
+      "claims": [],
+      "cta": null,
+      "tone": null,
+      "language": "en",
+      "headline": "Bet $50, get $50 in bonus bets",
+      "odds": null
     },
-    "status": "rejected", "compliance": { "verdict": "blocked", "route": "human_review" },
-    "review_feedback": "Names a competitor and misstates the annual fee. Do not resubmit in this form.",
-    "created_by": "marketer.national@tamarack.test", "rejected_by": "manager.national@tamarack.test"
+    "status": "released",
+    "decided_at": "2026-10-15T16:00:00Z",
+    "compliance": {
+      "verdict": "pass",
+      "route": "none",
+      "summary": "Bonus offer, but sent only by email to players who opted in, which is the permitted channel for inducements. Terms are shown up front, the offer is not called free or risk-free, and an unsubscribe option is included. Approved.",
+      "violations": [],
+      "corrected_copy": null,
+      "confidence": 88
+    },
+    "expected": {
+      "status": "approved",
+      "rules": [
+        "REG-12",
+        "REG-13",
+        "REG-15",
+        "REG-14"
+      ]
+    },
+    "created_by": "amira.haddad@northplay.test",
+    "approved_by": "ethan.cho@northplay.test",
+    "asset_path": "historical_ads/images/NP-H05_approved_consented_email_offer.png"
   },
   {
-    "ref": "qc-radio-remises",
-    "team": "quebec", "name": "Message radio remises d'automne",
-    "product": "credit_card", "offer_id": "TCB-FALL-2026",
-    "region": "CA-QC", "channel": "radio", "language": "fr", "modality": "audio",
-    "budget": { "amount": 10000, "currency": "CAD" },
-    "text": "Avec la Carte Remises Tamarack, obtenez 300 dollars de remise en argent après 1 500 dollars d'achats au cours de vos 3 premiers mois. Profitez aussi d'un taux d'intérêt de 0 pour cent sur les achats pendant 10 mois, puis de 20,99 pour cent. Sous réserve de l'approbation du crédit. Des conditions s'appliquent. Banque Tamarack.",
-    "description": "Un message radio en français qui annonce 300 $ de remise en argent avec la Carte Remises Tamarack.",
-    "summary": "French radio spot for the fall cashback offer: $300 cash back after $1,500 in purchases in the first 3 months, 0% for 10 months then 20.99%. Subject to credit approval.",
+    "ref": "NP-H06",
+    "team": "ontario",
+    "name": "NP-H06 Get $500 in bonus bets when you sign up!",
+    "product": "sportsbook",
+    "offer_id": null,
+    "region": "CA-ON",
+    "channel": "Instagram (paid social)",
+    "language": "en",
+    "modality": "image",
+    "budget": null,
+    "campaign": "Fall Acquisition Push",
+    "text": "Get $500 in bonus bets when you sign up! New players only. Join NorthPlay today. Claim your bonus 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "visual_notes": "A dark teal-to-navy gradient background with a green glow at the top right, and a mint-green accent colour used for the logo, the $500 figure and the call-to-action button. The layout is left-aligned with a large bold white headline, a pink 'LIMITED TIME' tag, and a thin divider line above the small disclaimer at the bottom. No people, mascots, cartoon characters or child-oriented imagery appear; the only visual elements are the logo mark, text and button.",
+    "fine_print_legible": true,
+    "description": "Get $500 in bonus bets when you sign up! New players only. Join NorthPlay today. (Fall Acquisition Push, Instagram (paid social))",
+    "summary": "Fall Acquisition Push ad for Instagram (paid social). Get $500 in bonus bets when you sign up! New players only. Join NorthPlay today.",
     "facts": {
-      "claims": [
-        { "type": "rewards_bonus", "quote": "300 dollars de remise en argent après 1 500 dollars d'achats au cours de vos 3 premiers mois", "values": { "amount": 300 } },
-        { "type": "intro_rate", "quote": "taux d'intérêt de 0 pour cent sur les achats pendant 10 mois, puis de 20,99 pour cent", "values": { "rate_percent": 0, "months": 10 } }
-      ],
-      "cta": null, "tone": "calm", "language": "fr"
+      "claims": [],
+      "cta": "Claim your bonus",
+      "tone": null,
+      "language": "en",
+      "headline": "Get $500 in bonus bets when you sign up!",
+      "odds": null
     },
-    "status": "released", "compliance": { "verdict": "pass", "route": "none" },
-    "created_by": "marketer.quebec@tamarack.test", "approved_by": "manager.quebec@tamarack.test"
+    "status": "rejected",
+    "decided_at": "2026-09-18T16:00:00Z",
+    "compliance": {
+      "verdict": "blocked",
+      "route": "human_review",
+      "summary": "Advertises a $500 sign-up bonus on public paid social. Ontario prohibits public advertising of bonuses, credits and inducements; they may only appear on NorthPlay's own site or in direct marketing to opted-in players. Rejected.",
+      "violations": [
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-12",
+          "version": 1,
+          "materiality": "material",
+          "quote": "",
+          "explanation": "Public paid-social ad communicates a sign-up bonus. Inducements may only be advertised on-site or to consented players.",
+          "reasoning": "Public paid-social ad communicates a sign-up bonus. Inducements may only be advertised on-site or to consented players.",
+          "evidence": {},
+          "fix": "Remove the bonus offer from all public creative. Move the offer to the on-site promotions page or consented email/SMS.",
+          "confidence": {
+            "score": 99,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        }
+      ],
+      "corrected_copy": null,
+      "confidence": 99
+    },
+    "expected": {
+      "status": "rejected",
+      "rules": [
+        "REG-12"
+      ]
+    },
+    "created_by": "amira.haddad@northplay.test",
+    "rejected_by": "ethan.cho@northplay.test",
+    "review_feedback": "Advertises a $500 sign-up bonus on public paid social. Ontario prohibits public advertising of bonuses, credits and inducements; they may only appear on NorthPlay's own site or in direct marketing to opted-in players. Rejected.",
+    "asset_path": "historical_ads/images/NP-H06_rejected_public_bonus_offer.png"
   },
   {
-    "ref": "qc-email-remises",
-    "team": "quebec", "name": "Courriel remises d'automne",
-    "product": "credit_card", "offer_id": "TCB-FALL-2026",
-    "region": "CA-QC", "channel": "email", "language": "fr", "modality": "text",
-    "budget": { "amount": 6000, "currency": "CAD" },
-    "text": "Obtenez 300 $ de remise en argent après 1 500 $ d'achats au cours de vos 3 premiers mois. Taux d'intérêt de 0 % sur les achats pendant 10 mois, puis 20,99 %. Des conditions s'appliquent. Faites votre demande dès aujourd'hui. Se désabonner : tamarack.test/desabonnement",
-    "description": "Un courriel en français qui annonce 300 $ de remise en argent et un taux de 0 % pendant 10 mois.",
-    "summary": "French email for the fall cashback offer. Passes today. It does not contain the line 'Sous réserve de l'approbation du crédit.', so it is the ad used to show a new Quebec team instruction changing the verdict.",
+    "ref": "NP-H07",
+    "team": "ontario",
+    "name": "NP-H07 Your first bet is RISK-FREE.",
+    "product": "sportsbook",
+    "offer_id": null,
+    "region": "CA-ON",
+    "channel": "Instagram Stories (paid social)",
+    "language": "en",
+    "modality": "image",
+    "budget": null,
+    "campaign": "Fall Acquisition Push",
+    "text": "Your first bet is RISK-FREE. Up to $250 back if your first bet loses. Deposit required. Bet risk-free 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "visual_notes": "A dark teal-to-navy gradient background with a mint-green arrow logo and NORTHPLAY wordmark at top. Large bold white and mint headline text dominates, with a mint pill-shaped call-to-action button and a thin divider line above the small disclaimer at the bottom. No people, characters, or illustrations appear; the layout is text-only and minimalist.",
+    "fine_print_legible": true,
+    "description": "Your first bet is RISK-FREE. Up to $250 back if your first bet loses. Deposit required. (Fall Acquisition Push, Instagram Stories (paid social))",
+    "summary": "Fall Acquisition Push ad for Instagram Stories (paid social). Your first bet is RISK-FREE. Up to $250 back if your first bet loses. Deposit required.",
     "facts": {
-      "claims": [
-        { "type": "rewards_bonus", "quote": "300 $ de remise en argent après 1 500 $ d'achats au cours de vos 3 premiers mois", "values": { "amount": 300 } },
-        { "type": "intro_rate", "quote": "Taux d'intérêt de 0 % sur les achats pendant 10 mois, puis 20,99 %", "values": { "rate_percent": 0, "months": 10 } }
-      ],
-      "cta": "Faites votre demande dès aujourd'hui", "tone": "plain", "language": "fr"
+      "claims": [],
+      "cta": "Bet risk-free",
+      "tone": null,
+      "language": "en",
+      "headline": "Your first bet is RISK-FREE.",
+      "odds": null
     },
-    "status": "pending_review", "compliance": { "verdict": "pass", "route": "none" },
-    "created_by": "marketer.quebec@tamarack.test"
+    "status": "rejected",
+    "decided_at": "2026-09-19T16:00:00Z",
+    "compliance": {
+      "verdict": "blocked",
+      "route": "human_review",
+      "summary": "Two blocking issues. It advertises an inducement on a public channel, and it calls the bet 'risk-free' when the player has to deposit and stake their own money. A bet is only risk-free if the player cannot lose their own money. Rejected.",
+      "violations": [
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-12",
+          "version": 1,
+          "materiality": "material",
+          "quote": "",
+          "explanation": "Public ad communicates an inducement (refund on first bet).",
+          "reasoning": "Public ad communicates an inducement (refund on first bet).",
+          "evidence": {},
+          "fix": "Remove the offer from public creative. Never use 'risk-free' for offers that require the player's own money.",
+          "confidence": {
+            "score": 99,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        },
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-13",
+          "version": 1,
+          "materiality": "material",
+          "quote": "",
+          "explanation": "Described as 'risk-free' although the player must deposit and risk their own money.",
+          "reasoning": "Described as 'risk-free' although the player must deposit and risk their own money.",
+          "evidence": {},
+          "fix": "Remove the offer from public creative. Never use 'risk-free' for offers that require the player's own money.",
+          "confidence": {
+            "score": 99,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        }
+      ],
+      "corrected_copy": null,
+      "confidence": 99
+    },
+    "expected": {
+      "status": "rejected",
+      "rules": [
+        "REG-12",
+        "REG-13"
+      ]
+    },
+    "created_by": "amira.haddad@northplay.test",
+    "rejected_by": "ethan.cho@northplay.test",
+    "review_feedback": "Two blocking issues. It advertises an inducement on a public channel, and it calls the bet 'risk-free' when the player has to deposit and stake their own money. A bet is only risk-free if the player cannot lose their own money. Rejected.",
+    "asset_path": "historical_ads/images/NP-H07_rejected_risk_free_first_bet.png"
   },
   {
-    "ref": "qc-banner-remises",
-    "team": "quebec", "name": "Bannière remises d'automne",
-    "product": "credit_card", "offer_id": "TCB-FALL-2026",
-    "region": "CA-QC", "channel": "display", "language": "fr", "modality": "image",
-    "budget": { "amount": 5000, "currency": "CAD" },
-    "text": "300 $ de remise en argent. Après 1 500 $ d'achats au cours de vos 3 premiers mois. Taux d'intérêt de 0 % sur les achats pendant 10 mois, puis 20,99 %. Carte Remises Tamarack. Sous réserve de l'approbation du crédit. Des conditions s'appliquent.",
-    "visual_notes": "Dark green banner. Large headline '300 $ de remise en argent'. A picture of the card on the right. Fine print along the bottom edge, legible. No people shown.",
-    "description": "Une bannière web vert foncé avec « 300 $ de remise en argent » en gros caractères et une image de la Carte Remises Tamarack.",
-    "summary": "French display banner for the fall cashback offer: $300 cash back after $1,500 in purchases in the first 3 months, 0% for 10 months then 20.99%.",
+    "ref": "NP-H08",
+    "team": "ontario",
+    "name": "NP-H08 Get in the game with Jake Moreau.",
+    "product": "sportsbook",
+    "offer_id": null,
+    "region": "CA-ON",
+    "channel": "Programmatic display",
+    "language": "en",
+    "modality": "image",
+    "budget": null,
+    "campaign": "NorthPlay Ambassadors",
+    "text": "Get in the game with Jake Moreau. \"I've played the game. Now I bet on it. Join me on NorthPlay.\" - Jake Moreau, NorthPlay ambassador and former NHL star Bet with Jake 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "visual_notes": "Dark navy-to-green gradient background with a mint-green accent colour for the logo arrow, subheading and call-to-action button. Layout is left-aligned with a bold white headline quote, a grey attribution line, a pill-shaped button, and a thin divider above the small disclaimer line at the bottom. No product imagery, mascot or cartoon characters are shown, and no photograph of any person appears; the endorsement is by text attribution to a named former NHL star.",
+    "fine_print_legible": true,
+    "description": "Get in the game with Jake Moreau. \"I've played the game. Now I bet on it. Join me on NorthPlay.\" - Jake Moreau, NorthPlay ambassador and former NHL star (NorthPlay Ambassadors, Programmatic display)",
+    "summary": "NorthPlay Ambassadors ad for Programmatic display. Get in the game with Jake Moreau. \"I've played the game. Now I bet on it. Join me on NorthPlay.\" - Jake Moreau, NorthPlay ambassador and former NHL star",
     "facts": {
-      "claims": [
-        { "type": "rewards_bonus", "quote": "300 $ de remise en argent. Après 1 500 $ d'achats au cours de vos 3 premiers mois", "values": { "amount": 300 } },
-        { "type": "intro_rate", "quote": "Taux d'intérêt de 0 % sur les achats pendant 10 mois, puis 20,99 %", "values": { "rate_percent": 0, "months": 10 } }
-      ],
-      "cta": null, "tone": "plain", "language": "fr"
+      "claims": [],
+      "cta": "Bet with Jake",
+      "tone": null,
+      "language": "en",
+      "headline": "Get in the game with Jake Moreau.",
+      "odds": null
     },
-    "status": "approved", "compliance": { "verdict": "pass", "route": "none" },
-    "created_by": "marketer.quebec@tamarack.test", "approved_by": "manager.quebec@tamarack.test"
+    "status": "rejected",
+    "decided_at": "2026-09-25T16:00:00Z",
+    "compliance": {
+      "verdict": "blocked",
+      "route": "human_review",
+      "summary": "A retired NHL player under a paid NorthPlay arrangement directly promotes betting ('Bet with Jake'). Ontario bans athletes in gambling ads except for messages made exclusively to promote responsible gambling. Compare NP-H03, which was approved because it contained only responsible gambling content. Rejected.",
+      "violations": [
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-03",
+          "version": 1,
+          "materiality": "material",
+          "quote": "",
+          "explanation": "Retired professional athlete with a paid ambassador arrangement promotes betting. Not a responsible gambling message, so the exception does not apply.",
+          "reasoning": "Retired professional athlete with a paid ambassador arrangement promotes betting. Not a responsible gambling message, so the exception does not apply.",
+          "evidence": {},
+          "fix": "Remove the athlete, or rebuild as a responsible-gambling-only message with no betting call-to-action.",
+          "confidence": {
+            "score": 98,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        },
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-11",
+          "version": 1,
+          "materiality": "disclosure",
+          "quote": "",
+          "explanation": "Implies betting is linked to the athlete's success and status.",
+          "reasoning": "Implies betting is linked to the athlete's success and status.",
+          "evidence": {},
+          "fix": "Remove the athlete, or rebuild as a responsible-gambling-only message with no betting call-to-action.",
+          "confidence": {
+            "score": 98,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        }
+      ],
+      "corrected_copy": null,
+      "confidence": 98
+    },
+    "expected": {
+      "status": "rejected",
+      "rules": [
+        "REG-03",
+        "REG-11"
+      ]
+    },
+    "created_by": "amira.haddad@northplay.test",
+    "rejected_by": "ethan.cho@northplay.test",
+    "review_feedback": "A retired NHL player under a paid NorthPlay arrangement directly promotes betting ('Bet with Jake'). Ontario bans athletes in gambling ads except for messages made exclusively to promote responsible gambling. Compare NP-H03, which was approved because it contained only responsible gambling content. Rejected.",
+    "asset_path": "historical_ads/images/NP-H08_rejected_athlete_endorsement.png"
   },
   {
-    "ref": "qc-email-english-only",
-    "team": "quebec", "name": "English email sent to Quebec list",
-    "product": "credit_card", "offer_id": "TCB-FALL-2026",
-    "region": "CA-QC", "channel": "email", "language": "en", "modality": "text",
-    "budget": { "amount": 4000, "currency": "CAD" },
-    "text": "Get $300 cash back with the Tamarack Cashback Card after $1,500 in purchases in your first 3 months. 0% interest on purchases for 10 months, then 20.99%. Conditions apply. Unsubscribe: tamarack.test/unsubscribe",
-    "description": "An English-only email about $300 cash back, addressed to the Quebec mailing list.",
-    "summary": "English-only email for the fall cashback offer, targeted at Quebec. Its terms are correct but it is not in French.",
+    "ref": "NP-H09",
+    "team": "ontario",
+    "name": "NP-H09 Rent due? Your next parlay could cover it.",
+    "product": "sportsbook",
+    "offer_id": null,
+    "region": "CA-ON",
+    "channel": "Facebook (paid social)",
+    "language": "en",
+    "modality": "image",
+    "budget": null,
+    "campaign": "Payday Weekend",
+    "text": "Rent due? Your next parlay could cover it. Turn Sunday into payday. Build a parlay 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "visual_notes": "Dark navy-to-green gradient background with a mint-green accent. Bold white headline dominates the layout, with a mint-green pill-shaped call-to-action button below and a thin divider line above the disclaimer at the bottom. No product imagery, mascots, characters, or people appear in the image.",
+    "fine_print_legible": true,
+    "description": "Rent due? Your next parlay could cover it. Turn Sunday into payday. (Payday Weekend, Facebook (paid social))",
+    "summary": "Payday Weekend ad for Facebook (paid social). Rent due? Your next parlay could cover it. Turn Sunday into payday.",
     "facts": {
-      "claims": [
-        { "type": "rewards_bonus", "quote": "$300 cash back with the Tamarack Cashback Card after $1,500 in purchases in your first 3 months", "values": { "amount": 300 } },
-        { "type": "intro_rate", "quote": "0% interest on purchases for 10 months, then 20.99%", "values": { "rate_percent": 0, "months": 10 } }
-      ],
-      "cta": null, "tone": "plain", "language": "en"
+      "claims": [],
+      "cta": "Build a parlay",
+      "tone": null,
+      "language": "en",
+      "headline": "Rent due? Your next parlay could cover it.",
+      "odds": null
     },
-    "status": "pending_review", "compliance": { "verdict": "blocked", "route": "human_review" },
-    "created_by": "marketer.quebec@tamarack.test"
+    "status": "rejected",
+    "decided_at": "2026-09-27T16:00:00Z",
+    "compliance": {
+      "verdict": "blocked",
+      "route": "human_review",
+      "summary": "Frames betting as a way to cover rent and earn income. Gambling may not be promoted as a solution to financial problems or an alternative to employment. Targeting people under financial pressure also exploits potentially high-risk persons. Rejected.",
+      "violations": [
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-07",
+          "version": 1,
+          "materiality": "material",
+          "quote": "",
+          "explanation": "Presents betting as a way to pay rent and as a source of income ('payday').",
+          "reasoning": "Presents betting as a way to pay rent and as a source of income ('payday').",
+          "evidence": {},
+          "fix": "Remove all financial-outcome framing (rent, payday, income).",
+          "confidence": {
+            "score": 99,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        },
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-09",
+          "version": 1,
+          "materiality": "material",
+          "quote": "",
+          "explanation": "Implies winning is a realistic outcome.",
+          "reasoning": "Implies winning is a realistic outcome.",
+          "evidence": {},
+          "fix": "Remove all financial-outcome framing (rent, payday, income).",
+          "confidence": {
+            "score": 99,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        },
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-06",
+          "version": 1,
+          "materiality": "disclosure",
+          "quote": "",
+          "explanation": "Exploits financial pressure, which targets potentially high-risk persons.",
+          "reasoning": "Exploits financial pressure, which targets potentially high-risk persons.",
+          "evidence": {},
+          "fix": "Remove all financial-outcome framing (rent, payday, income).",
+          "confidence": {
+            "score": 99,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        }
+      ],
+      "corrected_copy": null,
+      "confidence": 99
+    },
+    "expected": {
+      "status": "rejected",
+      "rules": [
+        "REG-07",
+        "REG-09",
+        "REG-06"
+      ]
+    },
+    "created_by": "amira.haddad@northplay.test",
+    "rejected_by": "ethan.cho@northplay.test",
+    "review_feedback": "Frames betting as a way to cover rent and earn income. Gambling may not be promoted as a solution to financial problems or an alternative to employment. Targeting people under financial pressure also exploits potentially high-risk persons. Rejected.",
+    "asset_path": "historical_ads/images/NP-H09_rejected_rent_parlay.png"
+  },
+  {
+    "ref": "NP-H10",
+    "team": "ontario",
+    "name": "NP-H10 Rough Sunday? Win it all back Monday night.",
+    "product": "sportsbook",
+    "offer_id": null,
+    "region": "CA-ON",
+    "channel": "Instagram (paid social)",
+    "language": "en",
+    "modality": "image",
+    "budget": null,
+    "campaign": "Monday Night Retention",
+    "text": "Rough Sunday? Win it all back Monday night. Kansas City vs. Buffalo. One game to turn your weekend around. Bet Monday night 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "visual_notes": "A dark teal-to-navy gradient background with a mint-green accent, featuring the NORTHPLAY logo with an upward arrow mark at top left. Large bold white and mint headlines dominate the layout, followed by a mint pill-shaped call-to-action button, with a thin divider line and small disclaimer text at the bottom. No people, mascots, cartoon characters or child-appealing imagery appear; the image is purely typographic.",
+    "fine_print_legible": true,
+    "description": "Rough Sunday? Win it all back Monday night. Kansas City vs. Buffalo. One game to turn your weekend around. (Monday Night Retention, Instagram (paid social))",
+    "summary": "Monday Night Retention ad for Instagram (paid social). Rough Sunday? Win it all back Monday night. Kansas City vs. Buffalo. One game to turn your weekend around.",
+    "facts": {
+      "claims": [],
+      "cta": "Bet Monday night",
+      "tone": null,
+      "language": "en",
+      "headline": "Rough Sunday? Win it all back Monday night.",
+      "odds": null
+    },
+    "status": "rejected",
+    "decided_at": "2026-10-05T16:00:00Z",
+    "compliance": {
+      "verdict": "blocked",
+      "route": "human_review",
+      "summary": "Tells players who lost on Sunday to 'win it all back' on Monday. Encouraging play to recover losses is prohibited because loss-chasing is a core warning sign of problem gambling. Rejected.",
+      "violations": [
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-08",
+          "version": 1,
+          "materiality": "material",
+          "quote": "",
+          "explanation": "Encourages betting to recover previous losses ('win it all back').",
+          "reasoning": "Encourages betting to recover previous losses ('win it all back').",
+          "evidence": {},
+          "fix": "Remove any reference to previous losses or recovering money. A neutral game-preview version would be acceptable.",
+          "confidence": {
+            "score": 98,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        },
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-06",
+          "version": 1,
+          "materiality": "disclosure",
+          "quote": "",
+          "explanation": "Targets players who have just lost, a potentially high-risk group.",
+          "reasoning": "Targets players who have just lost, a potentially high-risk group.",
+          "evidence": {},
+          "fix": "Remove any reference to previous losses or recovering money. A neutral game-preview version would be acceptable.",
+          "confidence": {
+            "score": 98,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        }
+      ],
+      "corrected_copy": null,
+      "confidence": 98
+    },
+    "expected": {
+      "status": "rejected",
+      "rules": [
+        "REG-08",
+        "REG-06"
+      ]
+    },
+    "created_by": "amira.haddad@northplay.test",
+    "rejected_by": "ethan.cho@northplay.test",
+    "review_feedback": "Tells players who lost on Sunday to 'win it all back' on Monday. Encouraging play to recover losses is prohibited because loss-chasing is a core warning sign of problem gambling. Rejected.",
+    "asset_path": "historical_ads/images/NP-H10_rejected_win_it_back.png"
+  },
+  {
+    "ref": "NP-H11",
+    "team": "ontario",
+    "name": "NP-H11 Tonight's LOCK: Toronto ML. Easy money.",
+    "product": "sportsbook",
+    "offer_id": null,
+    "region": "CA-ON",
+    "channel": "TikTok (paid social)",
+    "language": "en",
+    "modality": "image",
+    "budget": null,
+    "campaign": "Tonight's Picks",
+    "text": "Tonight's LOCK: Toronto ML. Easy money. The more you bet, the more you win. Lock it in 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "visual_notes": "Dark teal-to-navy gradient background with mint green and white bold sans-serif type and a pink tilted LOCK tag. A mint pill-shaped button reads Lock it in, with a thin divider line above the fine print at the bottom. No people, characters, or cartoon elements appear; the layout is a clean, text-heavy betting promotion.",
+    "fine_print_legible": true,
+    "description": "Tonight's LOCK: Toronto ML. Easy money. The more you bet, the more you win. (Tonight's Picks, TikTok (paid social))",
+    "summary": "Tonight's Picks ad for TikTok (paid social). Tonight's LOCK: Toronto ML. Easy money. The more you bet, the more you win.",
+    "facts": {
+      "claims": [],
+      "cta": "Lock it in",
+      "tone": null,
+      "language": "en",
+      "headline": "Tonight's LOCK: Toronto ML. Easy money.",
+      "odds": null
+    },
+    "status": "rejected",
+    "decided_at": "2026-10-10T16:00:00Z",
+    "compliance": {
+      "verdict": "blocked",
+      "route": "human_review",
+      "summary": "Presents a bet as a sure thing ('lock', 'easy money') and claims that betting more means winning more. Ads may not present winning as the probable outcome or suggest that spending more improves the odds. Rejected.",
+      "violations": [
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-09",
+          "version": 1,
+          "materiality": "material",
+          "quote": "",
+          "explanation": "'Lock' and 'easy money' present winning as certain; 'the more you bet, the more you win' implies spending more improves the chance of winning.",
+          "reasoning": "'Lock' and 'easy money' present winning as certain; 'the more you bet, the more you win' implies spending more improves the chance of winning.",
+          "evidence": {},
+          "fix": "Remove certainty language and any claim linking stake size to winning.",
+          "confidence": {
+            "score": 99,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        }
+      ],
+      "corrected_copy": null,
+      "confidence": 99
+    },
+    "expected": {
+      "status": "rejected",
+      "rules": [
+        "REG-09"
+      ]
+    },
+    "created_by": "amira.haddad@northplay.test",
+    "rejected_by": "ethan.cho@northplay.test",
+    "review_feedback": "Presents a bet as a sure thing ('lock', 'easy money') and claims that betting more means winning more. Ads may not present winning as the probable outcome or suggest that spending more improves the odds. Rejected.",
+    "asset_path": "historical_ads/images/NP-H11_rejected_lock_easy_money.png"
+  },
+  {
+    "ref": "NP-H12",
+    "team": "ontario",
+    "name": "NP-H12 No cap, this parlay is bussin.",
+    "product": "sportsbook",
+    "offer_id": null,
+    "region": "CA-ON",
+    "channel": "YouTube Shorts (paid social)",
+    "language": "en",
+    "modality": "image",
+    "budget": null,
+    "campaign": "Pucky Launch",
+    "text": "No cap, this parlay is bussin. Pucky says: bet with your squad! Bet with Pucky 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "visual_notes": "A bright pink-to-orange-to-yellow gradient background with a white bold headline on the right and a cartoon black hockey puck mascot named Pucky with large googly eyes, a pink smile and a stick on the left. A mint green button labelled Bet with Pucky sits below the tagline, and a thin divider line separates the small disclaimer text at the bottom. No real people are shown; the only character is the illustrated puck mascot, which is cartoonish and appeals to a youthful audience through slang and playful styling.",
+    "fine_print_legible": true,
+    "description": "No cap, this parlay is bussin. Pucky says: bet with your squad! (Pucky Launch, YouTube Shorts (paid social))",
+    "summary": "Pucky Launch ad for YouTube Shorts (paid social). No cap, this parlay is bussin. Pucky says: bet with your squad!",
+    "facts": {
+      "claims": [],
+      "cta": "Bet with Pucky",
+      "tone": null,
+      "language": "en",
+      "headline": "No cap, this parlay is bussin.",
+      "odds": null
+    },
+    "status": "rejected",
+    "decided_at": "2026-10-17T16:00:00Z",
+    "compliance": {
+      "verdict": "blocked",
+      "route": "human_review",
+      "summary": "A cartoon mascot combined with teen slang makes the ad likely to appeal to minors, and 'bet with your squad' adds peer pressure. Ontario bans cartoon figures and youth-oriented themes or language in gambling ads. Rejected.",
+      "violations": [
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-02",
+          "version": 1,
+          "materiality": "material",
+          "quote": "",
+          "explanation": "Cartoon mascot ('Pucky') is the focal point and is likely to appeal to minors.",
+          "reasoning": "Cartoon mascot ('Pucky') is the focal point and is likely to appeal to minors.",
+          "evidence": {},
+          "fix": "Remove the mascot. Rewrite the copy in neutral adult language. Remove peer-pressure framing.",
+          "confidence": {
+            "score": 97,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        },
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-01",
+          "version": 1,
+          "materiality": "material",
+          "quote": "",
+          "explanation": "Youth slang ('no cap', 'bussin', 'squad') appeals primarily to minors.",
+          "reasoning": "Youth slang ('no cap', 'bussin', 'squad') appeals primarily to minors.",
+          "evidence": {},
+          "fix": "Remove the mascot. Rewrite the copy in neutral adult language. Remove peer-pressure framing.",
+          "confidence": {
+            "score": 97,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        },
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-11",
+          "version": 1,
+          "materiality": "disclosure",
+          "quote": "",
+          "explanation": "'Bet with your squad' implies peer pressure.",
+          "reasoning": "'Bet with your squad' implies peer pressure.",
+          "evidence": {},
+          "fix": "Remove the mascot. Rewrite the copy in neutral adult language. Remove peer-pressure framing.",
+          "confidence": {
+            "score": 97,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        }
+      ],
+      "corrected_copy": null,
+      "confidence": 97
+    },
+    "expected": {
+      "status": "rejected",
+      "rules": [
+        "REG-02",
+        "REG-01",
+        "REG-11"
+      ]
+    },
+    "created_by": "amira.haddad@northplay.test",
+    "rejected_by": "ethan.cho@northplay.test",
+    "review_feedback": "A cartoon mascot combined with teen slang makes the ad likely to appeal to minors, and 'bet with your squad' adds peer pressure. Ontario bans cartoon figures and youth-oriented themes or language in gambling ads. Rejected.",
+    "asset_path": "historical_ads/images/NP-H12_rejected_cartoon_mascot_youth.png"
+  },
+  {
+    "ref": "NP-H13",
+    "team": "ontario",
+    "name": "NP-H13 Ottawa vs. Edmonton. Odds are live.",
+    "product": "sportsbook",
+    "offer_id": null,
+    "region": "CA-ON",
+    "channel": "Instagram (paid social)",
+    "language": "en",
+    "modality": "image",
+    "budget": null,
+    "campaign": "Hockey Night Live Odds",
+    "text": "Ottawa vs. Edmonton. Odds are live. Every goal moves the line. See live odds",
+    "visual_notes": "A dark teal-to-navy gradient background with a green glow at the top right, and a mint-green arrow logo beside the NORTHPLAY wordmark. Large white bold headline text sits on the left, with two rounded translucent cards showing team names and mint-coloured odds, and a mint pill-shaped call-to-action button. No people, mascots, cartoon characters or product imagery are shown, and the design is text-and-graphic only.",
+    "fine_print_legible": true,
+    "description": "Ottawa vs. Edmonton. Odds are live. Every goal moves the line. (Hockey Night Live Odds, Instagram (paid social))",
+    "summary": "Hockey Night Live Odds ad for Instagram (paid social). Ottawa vs. Edmonton. Odds are live. Every goal moves the line.",
+    "facts": {
+      "claims": [],
+      "cta": "See live odds",
+      "tone": null,
+      "language": "en",
+      "headline": "Ottawa vs. Edmonton. Odds are live.",
+      "odds": null
+    },
+    "status": "pending_review",
+    "decided_at": "2026-10-22T16:00:00Z",
+    "compliance": {
+      "verdict": "needs_changes",
+      "route": "draft_correction",
+      "summary": "The creative itself is compliant: factual live odds with no offers or claims. However, it has no responsible gambling message, which every gambling ad must include. Approved on condition that the full house disclaimer is added.",
+      "violations": [
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-14",
+          "version": 1,
+          "materiality": "disclosure",
+          "quote": "",
+          "explanation": "No responsible gambling message, age statement or Ontario-only statement.",
+          "reasoning": "No responsible gambling message, age statement or Ontario-only statement.",
+          "evidence": {},
+          "fix": "Add the full house disclaimer as a legible footer.",
+          "confidence": {
+            "score": 93,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        }
+      ],
+      "corrected_copy": {
+        "disclaimer_text": "19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600."
+      },
+      "confidence": 93
+    },
+    "expected": {
+      "status": "approved_with_changes",
+      "rules": [
+        "REG-14"
+      ]
+    },
+    "created_by": "amira.haddad@northplay.test",
+    "asset_path": "historical_ads/images/NP-H13_changes_missing_disclaimer.png"
+  },
+  {
+    "ref": "NP-H14",
+    "team": "ontario",
+    "name": "NP-H14 Turned 19? Welcome to the big leagues.",
+    "product": "sportsbook",
+    "offer_id": null,
+    "region": "CA-ON",
+    "channel": "Snapchat (paid social)",
+    "language": "en",
+    "modality": "image",
+    "budget": null,
+    "campaign": "New Player Welcome",
+    "text": "Turned 19? Welcome to the big leagues. Your first bet is a milestone. Make it count. Place your first bet 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "visual_notes": "A dark navy-to-green gradient background with a mint-green logo mark and wordmark at top left, large bold white headline, and a mint-green pill-shaped call-to-action button. No people, characters, or mascots are shown; the layout is text-driven with a thin divider line above the small disclaimer at the bottom. The headline's 'Turned 19?' and 'big leagues' wording directly targets newly-of-age adults, though the imagery itself is abstract.",
+    "fine_print_legible": true,
+    "description": "Turned 19? Welcome to the big leagues. Your first bet is a milestone. Make it count. (New Player Welcome, Snapchat (paid social))",
+    "summary": "New Player Welcome ad for Snapchat (paid social). Turned 19? Welcome to the big leagues. Your first bet is a milestone. Make it count.",
+    "facts": {
+      "claims": [],
+      "cta": "Place your first bet",
+      "tone": null,
+      "language": "en",
+      "headline": "Turned 19? Welcome to the big leagues.",
+      "odds": null
+    },
+    "status": "pending_review",
+    "decided_at": "2026-10-28T16:00:00Z",
+    "compliance": {
+      "verdict": "needs_changes",
+      "route": "draft_correction",
+      "summary": "Frames turning 19 and placing a first bet as a coming-of-age milestone, which is prohibited rite-of-passage messaging. The placement also skews toward young audiences. The ad's goal (onboarding new adult players) is fine, so it is approved with a rewrite and a placement restriction.",
+      "violations": [
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-11",
+          "version": 1,
+          "materiality": "disclosure",
+          "quote": "",
+          "explanation": "Frames gambling as a rite of passage tied to turning 19.",
+          "reasoning": "Frames gambling as a rite of passage tied to turning 19.",
+          "evidence": {},
+          "fix": "Replace rite-of-passage copy with a neutral explainer. Restrict placement to verified 19+ audiences, 25+ preferred.",
+          "confidence": {
+            "score": 84,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        },
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-05",
+          "version": 1,
+          "materiality": "material",
+          "quote": "",
+          "explanation": "Snapchat audience skews young; placement must be restricted to verified 19+ adult-majority audiences.",
+          "reasoning": "Snapchat audience skews young; placement must be restricted to verified 19+ adult-majority audiences.",
+          "evidence": {},
+          "fix": "Replace rite-of-passage copy with a neutral explainer. Restrict placement to verified 19+ audiences, 25+ preferred.",
+          "confidence": {
+            "score": 84,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        }
+      ],
+      "corrected_copy": {
+        "headline": "New to NorthPlay? Learn how betting works.",
+        "body_copy": "Odds, bet types and limit tools explained in 2 minutes.",
+        "cta": "Read the guide"
+      },
+      "confidence": 84
+    },
+    "expected": {
+      "status": "approved_with_changes",
+      "rules": [
+        "REG-11",
+        "REG-05"
+      ]
+    },
+    "created_by": "amira.haddad@northplay.test",
+    "asset_path": "historical_ads/images/NP-H14_changes_rite_of_passage.png"
+  },
+  {
+    "ref": "NP-H15",
+    "team": "ontario",
+    "name": "NP-H15 Tip-off is tonight.",
+    "product": "sportsbook",
+    "offer_id": null,
+    "region": "CA-ON",
+    "channel": "Instagram Stories (paid social)",
+    "language": "en",
+    "modality": "image",
+    "budget": null,
+    "campaign": "Basketball Tip-Off",
+    "text": "Tip-off is tonight. Toronto vs. Boston. Bet player props, live. TORONTO +210 | BOSTON -250 Explore props 19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.",
+    "visual_notes": "Dark teal-to-navy gradient background with a mint-green accent colour used for the logo mark, the sport label, the odds and the call-to-action button. The layout is a vertical stack: logo at top, large bold white headline, subtitle, two odds cards side by side, and a pill-shaped button, with a thin rule and disclaimer at the bottom. No people, mascots, cartoon characters or product imagery appear; the only graphic is an abstract arrow-shaped logo mark.",
+    "fine_print_legible": false,
+    "description": "Tip-off is tonight. Toronto vs. Boston. Bet player props, live. (Basketball Tip-Off, Instagram Stories (paid social))",
+    "summary": "Basketball Tip-Off ad for Instagram Stories (paid social). Tip-off is tonight. Toronto vs. Boston. Bet player props, live.",
+    "facts": {
+      "claims": [],
+      "cta": "Explore props",
+      "tone": null,
+      "language": "en",
+      "headline": "Tip-off is tonight.",
+      "odds": [
+        [
+          "TORONTO",
+          "+210"
+        ],
+        [
+          "BOSTON",
+          "-250"
+        ]
+      ]
+    },
+    "status": "pending_review",
+    "decided_at": "2026-11-03T16:00:00Z",
+    "compliance": {
+      "verdict": "needs_changes",
+      "route": "draft_correction",
+      "summary": "Content is compliant, but the required disclaimer is so small and faint that a viewer could not read it. A disclaimer only counts if it is legible. Approved once the disclaimer is enlarged and given proper contrast.",
+      "violations": [
+        {
+          "source": "fundamental",
+          "basis": "model",
+          "certainty": "clear",
+          "fundamental_key": "REG-14",
+          "version": 1,
+          "materiality": "disclosure",
+          "quote": "",
+          "explanation": "Disclaimer is present but rendered at a tiny size with very low contrast, so it is effectively unreadable.",
+          "reasoning": "Disclaimer is present but rendered at a tiny size with very low contrast, so it is effectively unreadable.",
+          "evidence": {},
+          "fix": "Increase disclaimer size to at least 24px at 1080x1920 with high contrast.",
+          "confidence": {
+            "score": 90,
+            "band": "high",
+            "reasons": [
+              "Recorded decision"
+            ]
+          }
+        }
+      ],
+      "corrected_copy": null,
+      "confidence": 90
+    },
+    "expected": {
+      "status": "approved_with_changes",
+      "rules": [
+        "REG-14"
+      ]
+    },
+    "created_by": "amira.haddad@northplay.test",
+    "asset_path": "historical_ads/images/NP-H15_changes_illegible_disclaimer.png"
   }
 ]

@@ -6,8 +6,8 @@
 |---|---|---|
 | Web app | Next.js (App Router, client components), Tailwind | Pages: login, chat, library, fundamentals, memory, audit |
 | Backend | Python 3.11+, FastAPI | One service, port 8000 |
-| Agent | LangGraph prebuilt tool-calling agent | Tools are built per request from the caller's role and the routed intent |
-| LLM | LangChain `init_chat_model` | `LLM_MODEL` (compliance verdict), `LLM_FAST_MODEL` (router, Q&A, extraction, drafting). Defaults: `anthropic:claude-opus-5-5` and `anthropic:claude-haiku-5-5`. Teammates with OpenAI keys set `openai:<model>` |
+| Agent | An explicit LangGraph graph: route → lane | The model classifies the intent; code checks the role and runs the lane. No tool schemas are sent to the model. See [BACKEND.md](BACKEND.md) |
+| LLM | LangChain `init_chat_model` | `LLM_MODEL` (compliance verdict), `LLM_FAST_MODEL` (router, Q&A, extraction, drafting). Anthropic only: `anthropic:claude-opus-5-5` and `anthropic:claude-haiku-5-5`. Structured output uses the native JSON-schema method, since these models reject forced tool choice and sampling parameters |
 | Embeddings | Voyage AI `voyage-3.5`, 1024 dimensions | `input_type="document"` on write, `"query"` on search. Frozen for the whole team |
 | Database | MongoDB Atlas Sandbox, `Cluster0` (M10, MongoDB 9.0), database `greenlight` | Identity, policy, audit, memory and content all live here |
 | Vector search | Atlas `$vectorSearch` with pre-filters | Three indexes: fundamentals, campaigns, memories |
@@ -37,7 +37,7 @@ flowchart TB
       AUTH["Auth<br/>login, JWT, step-up password"]
       ROUTER["Intent router<br/>fast model"]
       GATE["Policy gate<br/>every action passes here first"]
-      AGENT["LangGraph agent<br/>tools chosen by role and intent"]
+      AGENT["LangGraph graph<br/>one lane per intent"]
       COMP["Compliance engine"]
       MEM["Memory service"]
       LIB["Ad library service"]
@@ -60,7 +60,7 @@ flowchart TB
     CON[("Content<br/>campaigns: vector<br/>offers: approved terms<br/>GridFS audio and images")]
   end
 
-  LLM["LLM via LangChain<br/>Claude or OpenAI"]
+  LLM["Claude via LangChain<br/>Opus 5.5 and Haiku 5.5"]
   VOY["Voyage AI<br/>voyage-3.5 embeddings"]
   EL["ElevenLabs<br/>Scribe speech-to-text,<br/>text-to-speech"]
 
@@ -100,7 +100,7 @@ guarded(identity, action, params, run_id, fn, undo=None)
 ```
 
 - **Before, not after.** The decision event is written before `fn()` runs. A denied action never executes.
-- **In code, not in the prompt.** A sales user's agent is never handed `update_memory` or `review_creative`. If a tool were called anyway, step 2 denies it.
+- **In code, not in the prompt.** The model only classifies what was asked. Whether the role may do it is decided by step 2, in code, from the `policies` collection.
 - **Append-only by design.** The ledger is a stream of events (`decision`, `outcome`, `stop`, `rollback`). Application code only inserts; nothing is updated in place. A `$jsonSchema` validator rejects events with no actor, action or timestamp. Database-enforced immutability (an insert-only role) is a P2 task; do not claim it until it ships.
 - **Approval is bound to versions.** An approval records the ad version, the policy versions and the offer version that were reviewed. Release goes through the gate and is refused if any of them has changed since.
 - **Reconstructable.** All events of one request share a `run_id`; sorting them by time replays the run with who, what, which policy versions, which memories, and the result.

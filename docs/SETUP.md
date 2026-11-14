@@ -34,7 +34,7 @@ Before kickoff the repo owner confirms that this project was created from the ha
 | Key | Where from | Used by |
 |---|---|---|
 | MongoDB connection string | repo owner, privately | everyone |
-| LLM key (Anthropic or OpenAI) | your own or the team's | streams B, C; anyone running the backend |
+| Anthropic API key | your own or the team's | streams B, C; anyone running the backend |
 | Voyage AI key | Atlas (AI model API keys) or the Voyage dashboard; one shared team key is fine | streams A, B, C |
 | ElevenLabs key | hackathon credits; one shared team key | stream C; anyone reviewing or regenerating audio ads, or running the seed script |
 
@@ -49,7 +49,7 @@ MONGODB_DB=greenlight
 LLM_MODEL=anthropic:claude-opus-5-5        # compliance verdict
 LLM_FAST_MODEL=anthropic:claude-haiku-5-5  # router, Q&A, extraction, drafting
 ANTHROPIC_API_KEY=
-OPENAI_API_KEY=              # only if you set the two models to openai:<model>
+LLM_EFFORT=low               # low | medium | high; low is about 10 s per review, medium about 35 s
 
 VOYAGE_API_KEY=
 VOYAGE_MODEL=voyage-3.5      # do not change: indexes are 1024-dimensional

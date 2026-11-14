@@ -27,10 +27,10 @@ Three use cases, in build priority order. For each: the flow, how it authenticat
 flowchart TD
   IN["Message + JWT"] --> AUTH["1 AUTH<br/>verify JWT, load identity: user, role, team<br/>code, 0 tokens"]
   AUTH -->|"invalid token"| R401["401"]
-  AUTH --> ROUTE["2 ROUTE<br/>intent classifier on the fast model, about 150 tokens<br/>offered only the intents this role may use"]
+  AUTH --> ROUTE["2 ROUTE<br/>a file or pasted ad is a review, no model call<br/>otherwise the fast model classifies the intent"]
   ROUTE --> ACCESS{"3 ACCESS<br/>policy gate:<br/>does the role hold the action?"}
   ACCESS -->|"no"| DENY["Fixed denial text<br/>ledger event: deny<br/>no further model call"]
-  ACCESS -->|"yes"| SCOPE["4 SCOPE<br/>load this intent's tools only<br/>lookups pre-filtered by team, role, status"]
+  ACCESS -->|"yes"| SCOPE["4 SCOPE<br/>run this intent's lane only<br/>lookups pre-filtered by team, role, status"]
   SCOPE --> UC1["UC1 Review existing creative"]
   SCOPE --> UC4["UC4 Memory updates"]
   SCOPE --> UC5["UC5 Questions about an ad"]
@@ -304,7 +304,7 @@ sequenceDiagram
 ## Token rules (apply to every flow)
 
 1. **Deny before spending.** Authentication and role checks are code. A refused request costs at most the router call.
-2. **One intent, one small tool set.** The model never sees tool schemas for flows the role or the intent does not need.
+2. **One intent, one lane.** The model classifies the intent and code runs the lane. No tool schemas are sent to the model at all.
 3. **Filter before retrieving.** Team, role, product, region, status and effective dates are filters inside the vector search. Out-of-scope documents cost nothing and cannot leak.
 4. **Summaries, not documents.** `summary` (60 words or fewer) and `facts` are computed once at write time. Full text is loaded only for the item being cited or edited. Embeddings are never returned.
 5. **Fixed lookup budgets.** Policies: 2 per claim plus the mandatory ones, at most 8 in total. Memories 3. Ads 1.

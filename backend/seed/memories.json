@@ -1,83 +1,1456 @@
 [
   {
-    "ref": "nat-proc-unsubscribe-last",
-    "kind": "procedural",
-    "text": "National email ads put the unsubscribe line last, after 'Conditions apply.'",
-    "team": "national", "user_email": null,
-    "visibility_roles": ["manager", "marketer"],
-    "source_type": "manager_instruction", "created_by": "manager.national@tamarack.test",
-    "ttl_days": null
-  },
-  {
-    "ref": "nat-sem-english-only",
+    "ref": "slack-leadership-2026-10-02",
     "kind": "semantic",
-    "text": "The national team produces English creative only. French creative is handled by the Quebec team.",
-    "team": "national", "user_email": null,
-    "visibility_roles": ["manager", "marketer"],
-    "source_type": "manager_instruction", "created_by": "manager.national@tamarack.test",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #leadership, 2026-10-02.\nRachel Bouchard (CEO): Reminder: 2027 strategy offsite is Oct 9. Priya, please bring a view on how we shift away from bonus-led acquisition.",
+    "visibility_roles": [
+      "manager"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "leadership",
+      "date": "2026-10-02",
+      "authors": [
+        "Rachel Bouchard"
+      ],
+      "message_ts": [
+        "1790975100.000003"
+      ]
+    },
     "ttl_days": null
   },
   {
-    "ref": "nat-epi-instant-approval",
-    "kind": "episodic",
-    "text": "A national email ad for TCB-FALL-2026 was blocked for saying 'instant approval'. The version saying 'Subject to credit approval' was approved.",
-    "team": "national", "user_email": null,
-    "visibility_roles": ["manager", "marketer"],
-    "source_type": "agent", "created_by": "marketer.national@tamarack.test",
-    "ttl_days": 30
-  },
-  {
-    "ref": "nat-epi-rewards-hold",
-    "kind": "episodic",
-    "text": "Temporary: hold all Tamarack Rewards Card social posts until the annual fee change is confirmed.",
-    "team": "national", "user_email": null,
-    "visibility_roles": ["manager", "marketer"],
-    "source_type": "manager_instruction", "created_by": "manager.national@tamarack.test",
-    "ttl_minutes": 5
-  },
-  {
-    "ref": "nat-note-short-copy",
+    "ref": "slack-leadership-2026-10-09",
     "kind": "semantic",
-    "text": "I prefer corrected copy to stay under 60 words.",
-    "team": "national", "user_email": "marketer.national@tamarack.test",
-    "visibility_roles": ["marketer"],
-    "source_type": "user_note", "created_by": "marketer.national@tamarack.test",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #leadership, 2026-10-09.\nPriya Nair (Chief Marketing Officer): Offsite takeaway: we cut bonus-led acquisition from 45% to ~10% of budget in 2027, and offers move to opted-in channels only. Deck v1.2 goes out next week.\nLiam Fraser (CFO): Supportive. Acquisition cost is up 38% YoY, so the bonus treadmill isn't working anyway.",
+    "visibility_roles": [
+      "manager"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "leadership",
+      "date": "2026-10-09",
+      "authors": [
+        "Priya Nair",
+        "Liam Fraser"
+      ],
+      "message_ts": [
+        "1791588600.000007",
+        "1791589260.000008"
+      ]
+    },
     "ttl_days": null
   },
   {
-    "ref": "qc-proc-remise-en-argent",
-    "kind": "procedural",
-    "text": "Quebec ads say 'remise en argent'. They never use the English word 'cashback'.",
-    "team": "quebec", "user_email": null,
-    "visibility_roles": ["manager", "marketer"],
-    "source_type": "manager_instruction", "created_by": "manager.quebec@tamarack.test",
-    "ttl_days": null
-  },
-  {
-    "ref": "qc-proc-banner-sizes",
-    "kind": "procedural",
-    "text": "Quebec display banners are produced in two sizes: 300 by 250 and 728 by 90.",
-    "team": "quebec", "user_email": null,
-    "visibility_roles": ["manager", "marketer"],
-    "source_type": "manager_instruction", "created_by": "manager.quebec@tamarack.test",
-    "ttl_days": null
-  },
-  {
-    "ref": "qc-sem-french-first",
+    "ref": "slack-leadership-2026-10-14",
     "kind": "semantic",
-    "text": "The Quebec team writes and reviews the French copy first. Any English version is adapted from the approved French.",
-    "team": "quebec", "user_email": null,
-    "visibility_roles": ["manager", "marketer"],
-    "source_type": "manager_instruction", "created_by": "manager.quebec@tamarack.test",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #leadership, 2026-10-14.\nRachel Bouchard (CEO): 2027 Business Strategy v1.2 is final and posted in the drive. Trust-first, product-led, hockey-first.",
+    "visibility_roles": [
+      "manager"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "leadership",
+      "date": "2026-10-14",
+      "authors": [
+        "Rachel Bouchard"
+      ],
+      "message_ts": [
+        "1792015200.000012"
+      ]
+    },
     "ttl_days": null
   },
   {
-    "ref": "qc-epi-fine-print",
+    "ref": "slack-leadership-2026-10-30",
+    "kind": "procedural",
+    "authority": "binding",
+    "materiality": "material",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #leadership, 2026-10-30.\nRachel Bouchard (CEO): Confidential: we have terminated our agreement with Jake Moreau effective today, following the issues raised last week. Please make sure no Jake Moreau content of any kind runs again.\nEthan Cho (Senior Counsel, Legal & Compliance): Confirmed. That covers every format, including responsible gambling messaging. We no longer have the rights to his name, image or voice. I'll post the guidance in #legal-marketing.",
+    "visibility_roles": [
+      "manager"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "leadership",
+      "date": "2026-10-30",
+      "authors": [
+        "Rachel Bouchard",
+        "Ethan Cho"
+      ],
+      "message_ts": [
+        "1793380500.000022",
+        "1793380920.000023"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-leadership-2026-11-05",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #leadership, 2026-11-05.\nLiam Fraser (CFO): Budget check: Q1 marketing is $3.3M. TikTok/Snap is $0.3M of that.",
+    "visibility_roles": [
+      "manager"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "leadership",
+      "date": "2026-11-05",
+      "authors": [
+        "Liam Fraser"
+      ],
+      "message_ts": [
+        "1793889000.000032"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-leadership-2026-11-06",
+    "kind": "procedural",
+    "authority": "binding",
+    "materiality": "material",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #leadership, 2026-11-06.\nPriya Nair (Chief Marketing Officer): Decision: we are pausing ALL paid TikTok and Snapchat activity, effective today, until further notice. Even with 25+ targeting we can't verify audience age to our standard, and it doesn't fit trust-first. Moving the $0.3M to CTV and podcast.\nRachel Bouchard (CEO): Agreed. The Q1 deck still lists TikTok/Snap. Treat this message as overriding it.",
+    "visibility_roles": [
+      "manager"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "leadership",
+      "date": "2026-11-06",
+      "authors": [
+        "Priya Nair",
+        "Rachel Bouchard"
+      ],
+      "message_ts": [
+        "1793981400.000033",
+        "1793981880.000034"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-leadership-2026-11-12",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #leadership, 2026-11-12.\nRachel Bouchard (CEO): Board asked about compliance. Ethan, can you confirm we've had zero regulatory findings this year?\nEthan Cho (Senior Counsel, Legal & Compliance): Zero findings. One AGCO inquiry (the 'free' language one, industry-wide) and we responded same day. The agent is catching the bulk of issues pre-launch.",
+    "visibility_roles": [
+      "manager"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "leadership",
+      "date": "2026-11-12",
+      "authors": [
+        "Rachel Bouchard",
+        "Ethan Cho"
+      ],
+      "message_ts": [
+        "1794492900.000045",
+        "1794494400.000046"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-marketing-2026-10-01",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #marketing, 2026-10-01.\nDaniel Okafor (Head of Performance Marketing): Morning all. Q4 hockey flight is live as of today. Saturday night odds creative (H01) cleared legal yesterday, nice work Amira.\nAmira Haddad (Creative Lead): Thanks! Marcus Doyle Play Smart story (H03) also cleared. Agent flagged that it only passes because there's zero betting CTA, so let's keep it that way.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "amira.haddad@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "marketing",
+      "date": "2026-10-01",
+      "authors": [
+        "Daniel Okafor",
+        "Amira Haddad"
+      ],
+      "message_ts": [
+        "1790863920.000001",
+        "1790864400.000002"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-marketing-2026-10-10",
+    "kind": "procedural",
+    "authority": "guidance",
+    "materiality": "disclosure",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #marketing, 2026-10-10.\nKevin Tran (Growth Marketing Manager): Tonight's picks TikTok (H11) got rejected for 'lock' and 'easy money'. Fair. I'll rework it.\nSofia Marchetti (Brand Manager): Brand note: 'lock', 'easy money', 'guaranteed' and 'can't lose' are off-brand regardless of what the agent says. Adding them to the voice guide.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "kevin.tran@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "marketing",
+      "date": "2026-10-10",
+      "authors": [
+        "Kevin Tran",
+        "Sofia Marchetti"
+      ],
+      "message_ts": [
+        "1791658920.000009",
+        "1791659340.000010"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-marketing-2026-10-17",
+    "kind": "procedural",
+    "authority": "guidance",
+    "materiality": "disclosure",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #marketing, 2026-10-17.\nAmira Haddad (Creative Lead): Okay, the Pucky mascot test (H12) got destroyed by the agent. Cartoon + slang = minors. Pucky is retired.\nSofia Marchetti (Brand Manager): Retired permanently please. No mascots at all, and no orange/pink gradient palettes either. Navy, rink green and mint only.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "amira.haddad@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "marketing",
+      "date": "2026-10-17",
+      "authors": [
+        "Amira Haddad",
+        "Sofia Marchetti"
+      ],
+      "message_ts": [
+        "1792268520.000013",
+        "1792269000.000014"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-marketing-2026-10-22",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #marketing, 2026-10-22.\nDaniel Okafor (Head of Performance Marketing): Ottawa vs. Edmonton (H13) came back 'approved with changes': we forgot the disclaimer entirely. Amira, footer added, re-trafficking today.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "marketing",
+      "date": "2026-10-22",
+      "authors": [
+        "Daniel Okafor"
+      ],
+      "message_ts": [
+        "1792692600.000018"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-marketing-2026-10-26",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #marketing, 2026-10-26.\nPriya Nair (Chief Marketing Officer): Q1 2027 Marketing & Brand Plan draft is coming together. Calendar: Hockey Night Live, NFL playoffs + the Big Game, Play Smart refresh with NorthPlay Limits, basketball tip-off.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "marketing",
+      "date": "2026-10-26",
+      "authors": [
+        "Priya Nair"
+      ],
+      "message_ts": [
+        "1793026800.000019"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-marketing-2026-10-28",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #marketing, 2026-10-28.\nPriya Nair (Chief Marketing Officer): Q1 plan v1.0 is posted. Channel mix is Meta, YouTube/CTV, programmatic, TikTok/Snap (25+ only), radio/podcast and opted-in email/SMS.\nKevin Tran (Growth Marketing Manager): 'Turned 19?' Snapchat (H14) came back approved with changes. Rewriting to 'New to NorthPlay? Learn how betting works.'",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "marketing",
+      "date": "2026-10-28",
+      "authors": [
+        "Priya Nair",
+        "Kevin Tran"
+      ],
+      "message_ts": [
+        "1793223900.000020",
+        "1793224920.000021"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-marketing-2026-11-03",
+    "kind": "procedural",
+    "authority": "guidance",
+    "materiality": "disclosure",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #marketing, 2026-11-03.\nDaniel Okafor (Head of Performance Marketing): Tip-off story (H15) came back: the disclaimer was there but basically invisible. Remember 24px minimum on stories.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "marketing",
+      "date": "2026-11-03",
+      "authors": [
+        "Daniel Okafor"
+      ],
+      "message_ts": [
+        "1793733300.000037"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-marketing-2026-11-06",
+    "kind": "procedural",
+    "authority": "binding",
+    "materiality": "material",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #marketing, 2026-11-06.\nPriya Nair (Chief Marketing Officer): Team: TikTok and Snapchat are paused for all paid creative, effective today. Do not submit or traffic anything for those placements. The Q1 deck will be updated later; this overrides it.\nKevin Tran (Growth Marketing Manager): Pulling the two TikTok cuts we had in the queue.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "marketing",
+      "date": "2026-11-06",
+      "authors": [
+        "Priya Nair",
+        "Kevin Tran"
+      ],
+      "message_ts": [
+        "1793982900.000035",
+        "1793983260.000036"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-marketing-2026-11-09",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #marketing, 2026-11-09.\nAmira Haddad (Creative Lead): Starting Hockey Night Live Q1 concepts. Thinking 'Puck drops at 7' as the hero line with live odds cards. Same layout as H01.\nSofia Marchetti (Brand Manager): Love it. Keep it city names only and the full disclaimer at 24px+.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "amira.haddad@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "marketing",
+      "date": "2026-11-09",
+      "authors": [
+        "Amira Haddad",
+        "Sofia Marchetti"
+      ],
+      "message_ts": [
+        "1794236700.000038",
+        "1794237120.000039"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-marketing-2026-11-11",
+    "kind": "procedural",
+    "authority": "guidance",
+    "materiality": "disclosure",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #marketing, 2026-11-11.\nKevin Tran (Growth Marketing Manager): Growth idea for the Big Game: 'Deposit $50, get a $100 bonus bet' on Instagram stories to drive sign-ups?\nDaniel Okafor (Head of Performance Marketing): Can't run offers on public social, that's the H06/H07 lesson. Opted-in email/SMS only, and no 'free'.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "kevin.tran@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "marketing",
+      "date": "2026-11-11",
+      "authors": [
+        "Kevin Tran",
+        "Daniel Okafor"
+      ],
+      "message_ts": [
+        "1794433200.000043",
+        "1794433920.000044"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-marketing-2026-11-12",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #marketing, 2026-11-12.\nSofia Marchetti (Brand Manager): NorthPlay Limits launch: Marcus Doyle hero line will be quote (3) 'Set your limit before the puck drops.' Amira is on the creative.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "marketing",
+      "date": "2026-11-12",
+      "authors": [
+        "Sofia Marchetti"
+      ],
+      "message_ts": [
+        "1794508200.000047"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-marketing-2026-11-13",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #marketing, 2026-11-13.\nAmira Haddad (Creative Lead): Sharing three Q1 drafts for agent review next week: Hockey Night Live hero, a Big Game parlay builder spot, and the Limits launch with Marcus.\nDaniel Okafor (Head of Performance Marketing): Reminder that nothing traffics without an approval ID from the agent.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "amira.haddad@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "marketing",
+      "date": "2026-11-13",
+      "authors": [
+        "Amira Haddad",
+        "Daniel Okafor"
+      ],
+      "message_ts": [
+        "1794583200.000048",
+        "1794583860.000049"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-legal-marketing-2026-10-05",
+    "kind": "procedural",
+    "authority": "binding",
+    "materiality": "material",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #legal-marketing, 2026-10-05.\nEthan Cho (Senior Counsel, Legal & Compliance): FYI, the 'win it all back Monday' concept (H10) is rejected and I agree with the agent. Loss-chasing language is a hard no. Please don't re-submit variations like 'bounce back' or 'redemption bet'.\nKevin Tran (Growth Marketing Manager): Understood. Is a neutral game preview for Monday night OK?\nEthan Cho (Senior Counsel, Legal & Compliance): Yes, a neutral game preview with odds and the full disclaimer is fine.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "legal-marketing",
+      "date": "2026-10-05",
+      "authors": [
+        "Ethan Cho",
+        "Kevin Tran"
+      ],
+      "message_ts": [
+        "1791217860.000004",
+        "1791218640.000005",
+        "1791219120.000006"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-legal-marketing-2026-10-14",
+    "kind": "procedural",
+    "authority": "binding",
+    "materiality": "material",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #legal-marketing, 2026-10-14.\nEthan Cho (Senior Counsel, Legal & Compliance): Week 6 opted-in email (H05) is approved. Terms are up front and the unsubscribe link is in place. This is the template for any offer going forward.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "legal-marketing",
+      "date": "2026-10-14",
+      "authors": [
+        "Ethan Cho"
+      ],
+      "message_ts": [
+        "1791990900.000011"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-legal-marketing-2026-10-20",
+    "kind": "procedural",
+    "authority": "binding",
+    "materiality": "material",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #legal-marketing, 2026-10-20.\nEthan Cho (Senior Counsel, Legal & Compliance): Heads up on the Big Game in February. We do NOT hold NFL marks. Never say 'Super Bowl' in any creative, copy, hashtag or audio. Use 'the Big Game'. Same for team names and logos across NFL and NHL: city names only (e.g. 'Toronto vs. Montreal'). No logos, no jerseys.\nAmira Haddad (Creative Lead): Does that include the team colours on the odds cards?\nEthan Cho (Senior Counsel, Legal & Compliance): Generic colours are fine. Avoid anything that looks like a team logo or uniform.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "legal-marketing",
+      "date": "2026-10-20",
+      "authors": [
+        "Ethan Cho",
+        "Amira Haddad"
+      ],
+      "message_ts": [
+        "1792507200.000015",
+        "1792507620.000016",
+        "1792508100.000017"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-legal-marketing-2026-10-30",
+    "kind": "procedural",
+    "authority": "binding",
+    "materiality": "material",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #legal-marketing, 2026-10-30.\nEthan Cho (Senior Counsel, Legal & Compliance): IMPORTANT: The Jake Moreau partnership is terminated as of today. Do not use his name, image, likeness, voice or quotes in ANY creative, including Play Smart / responsible gambling messaging. Pull anything in flight. Any submission featuring him must be rejected.\nAmira Haddad (Creative Lead): We had a Play Smart cut with Jake drafted for December ('take a break between periods'). Killing it.\nEthan Cho (Senior Counsel, Legal & Compliance): Correct. Even though an RG-only athlete message would normally pass AGCO rules, we don't have the rights. Reject.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "legal-marketing",
+      "date": "2026-10-30",
+      "authors": [
+        "Ethan Cho",
+        "Amira Haddad"
+      ],
+      "message_ts": [
+        "1793383500.000024",
+        "1793383920.000025",
+        "1793384100.000026"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-legal-marketing-2026-11-02",
+    "kind": "procedural",
+    "authority": "binding",
+    "materiality": "material",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #legal-marketing, 2026-11-02.\nSofia Marchetti (Brand Manager): Marcus Doyle question: can we write new quotes for him for the Limits launch?\nEthan Cho (Senior Counsel, Legal & Compliance): Not without his written sign-off. His renewed contract (through Dec 2027) limits us to the approved quote bank. Approved quotes: (1) 'Set a budget before kickoff. Take breaks. Know when to walk away.' (2) 'The best fans know their limits.' (3) 'Set your limit before the puck drops.' Anything else needs his agent's written approval before it goes to the agent for review.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "legal-marketing",
+      "date": "2026-11-02",
+      "authors": [
+        "Sofia Marchetti",
+        "Ethan Cho"
+      ],
+      "message_ts": [
+        "1793632800.000027",
+        "1793634060.000028"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-legal-marketing-2026-11-04",
+    "kind": "procedural",
+    "authority": "binding",
+    "materiality": "material",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #legal-marketing, 2026-11-04.\nEthan Cho (Senior Counsel, Legal & Compliance): We received an inquiry from the AGCO about 'free' language in the market. Effective immediately, NorthPlay will not use the word 'free' (or 'on us', 'no risk', 'risk-free') in ANY marketing, including on-site banners and opted-in emails, even where the regs would technically allow it. Use 'bonus bets' with full terms.\nDaniel Okafor (Head of Performance Marketing): Does this apply to the H05-style opted-in email template?\nEthan Cho (Senior Counsel, Legal & Compliance): Yes. H05 is fine because it says 'bonus bets', not 'free'. Keep it that way.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "legal-marketing",
+      "date": "2026-11-04",
+      "authors": [
+        "Ethan Cho",
+        "Daniel Okafor"
+      ],
+      "message_ts": [
+        "1793824200.000029",
+        "1793824920.000030",
+        "1793825220.000031"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "slack-legal-marketing-2026-11-10",
+    "kind": "procedural",
+    "authority": "binding",
+    "materiality": "material",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Slack #legal-marketing, 2026-11-10.\nKevin Tran (Growth Marketing Manager): Idea for holiday: World Juniors creative over Boxing Day? Huge hockey moment in Ontario.\nEthan Cho (Senior Counsel, Legal & Compliance): No. World Juniors and all junior hockey (OHL/CHL, U18, World Juniors) are off-limits in any NorthPlay creative. Most of those players are under 19, so it puts minors at the centre of a gambling ad. That includes odds graphics, game previews and 'watch with us' posts. Senior national team and NHL only.\nKevin Tran (Growth Marketing Manager): Got it, scrapping.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "kevin.tran@northplay.test",
+    "source": {
+      "type": "slack",
+      "channel": "legal-marketing",
+      "date": "2026-11-10",
+      "authors": [
+        "Kevin Tran",
+        "Ethan Cho"
+      ],
+      "message_ts": [
+        "1794337200.000040",
+        "1794338520.000041",
+        "1794338700.000042"
+      ]
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_2027_business_strategy-01",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "NorthPlay 2027 Business Strategy (2026-10-14), Slide 2: 2026 in review.\n- **212K**: active players (Oct 2026)\n- **$41M**: net gaming revenue YTD\n- **31%**: players with a limit set\n- **$148**: avg. acquisition cost, up 38% YoY\n\n- Live betting and the parlay builder now drive 54% of handle\n- Acquisition costs rose sharply after Ontario's ban on public bonus advertising\n- Two creative escalations from compliance in 2026, both tied to bonus language",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "NorthPlay 2027 Business Strategy",
+      "date": "2026-10-14",
+      "section": "Slide 2: 2026 in review"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_2027_business_strategy-02",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "NorthPlay 2027 Business Strategy (2026-10-14), Slide 3: Market context.\n- Ontario is a mature, crowded regulated market with 45+ operators competing for the same players\n- The regulator keeps tightening: athlete ban (Feb 2024), public inducement ban, closer scrutiny of 'free' offers\n- Bonus-led acquisition is no longer a durable advantage; brand trust and product are\n- Regulatory findings now carry real financial penalties and public reputational damage",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "NorthPlay 2027 Business Strategy",
+      "date": "2026-10-14",
+      "section": "Slide 3: Market context"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_2027_business_strategy-03",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "NorthPlay 2027 Business Strategy (2026-10-14), Slide 4: Our ambition.\n**Be the sportsbook Ontario adults trust most.**\n\n- Mission: make following the game more fun, without putting players at risk\n- North Star metric: 90-day retained players who have at least one NorthPlay Limits tool enabled\n- We win on product and trust, not on bonuses",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "NorthPlay 2027 Business Strategy",
+      "date": "2026-10-14",
+      "section": "Slide 4: Our ambition"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_2027_business_strategy-04",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "NorthPlay 2027 Business Strategy (2026-10-14), Slide 5: Three strategic pillars.\n- **1. Trust-first brand**: Responsible gambling is our brand differentiator, not a disclaimer. Every touchpoint is factual, calm and compliant.\n- **2. Product-led growth**: Invest in live betting, same-game parlays and micro-markets. Let features, not offers, sell the app.\n- **3. Hockey-first**: Own NHL betting in Ontario. Hockey is ~40% of our handle and our strongest brand association.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "NorthPlay 2027 Business Strategy",
+      "date": "2026-10-14",
+      "section": "Slide 5: Three strategic pillars"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_2027_business_strategy-05",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "NorthPlay 2027 Business Strategy (2026-10-14), Slide 6: Who we serve.\n- Core: sports fans aged 25-54 in Ontario who already watch NHL, NFL and NBA\n- We do not build campaigns aimed at 19-24 year olds; minimum targeting age is 25 on all paid channels\n- We do not target lapsed players with re-activation offers\n- Messaging assumes an experienced, entertainment-minded fan, not someone looking to make money",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "NorthPlay 2027 Business Strategy",
+      "date": "2026-10-14",
+      "section": "Slide 6: Who we serve"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_2027_business_strategy-06",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "NorthPlay 2027 Business Strategy (2026-10-14), Slide 7: Shifting the growth model.\n|  | 2026 | 2027 plan |\n|---|---|---|\n| Bonus-led acquisition | 45% of marketing budget | 10% (opted-in direct only) |\n| Brand and product marketing | 35% | 60% |\n| Retention and CRM | 20% | 30% |\n| Target acquisition cost | $148 | $120 |\n\n- All inducements move to on-site and consented direct channels only",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "NorthPlay 2027 Business Strategy",
+      "date": "2026-10-14",
+      "section": "Slide 7: Shifting the growth model"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_2027_business_strategy-07",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "NorthPlay 2027 Business Strategy (2026-10-14), Slide 8: Responsible gambling as a differentiator.\n- Launch 'NorthPlay Limits', a single hub for deposit, time and loss limits (Q1 2027)\n- Target: 40% of active players with a limit set by Dec 2027\n- Retired CFL lineman Marcus Doyle stays on as Play Smart ambassador, for responsible gambling messaging only\n- Publish an annual Player Protection Report",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "NorthPlay 2027 Business Strategy",
+      "date": "2026-10-14",
+      "section": "Slide 8: Responsible gambling as a differentiator"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_2027_business_strategy-08",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "NorthPlay 2027 Business Strategy (2026-10-14), Slide 9: 2027 roadmap.\n| Quarter | Product | Marketing |\n|---|---|---|\n| Q1 | NorthPlay Limits hub, faster live odds | Hockey Night Live; NFL playoffs; Play Smart refresh |\n| Q2 | Micro-markets for NHL playoffs | NHL playoff campaign; NBA playoffs |\n| Q3 | Personalized odds feed | Football kickoff; brand platform refresh |\n| Q4 | Parlay builder v2 | Holiday hockey; Player Protection Report |",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "NorthPlay 2027 Business Strategy",
+      "date": "2026-10-14",
+      "section": "Slide 9: 2027 roadmap"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_2027_business_strategy-09",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "NorthPlay 2027 Business Strategy (2026-10-14), Slide 10: Risks and guardrails.\n- Regulatory risk: any finding damages the trust-first strategy. Zero tolerance on compliance shortcuts\n- All creative is reviewed by the Legal Approver Agent before trafficking; target turnaround under 24 hours\n- Legal decisions made in #legal-marketing are binding and take effect immediately, even before decks are updated\n- Partner and ambassador use requires a current, signed agreement",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "NorthPlay 2027 Business Strategy",
+      "date": "2026-10-14",
+      "section": "Slide 10: Risks and guardrails"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_2027_business_strategy-10",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "NorthPlay 2027 Business Strategy (2026-10-14), Slide 11: 2027 targets.\n- **260K**: active players\n- **$58M**: net gaming revenue\n- **40%**: players with a limit set\n- **0**: regulatory findings",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "NorthPlay 2027 Business Strategy",
+      "date": "2026-10-14",
+      "section": "Slide 11: 2027 targets"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_q1_2027_marketing_and_brand_plan-01",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Q1 2027 Marketing & Brand Plan (2026-10-28), Slide 2: Q1 objectives.\n- Grow active players to 225K (+6% QoQ)\n- Launch the NorthPlay Limits hub with a responsible gambling brand campaign\n- Own hockey: be the most-recalled sportsbook brand among Ontario NHL fans\n- Keep acquisition cost under $130 with no public bonus advertising",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "Q1 2027 Marketing & Brand Plan",
+      "date": "2026-10-28",
+      "section": "Slide 2: Q1 objectives"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_q1_2027_marketing_and_brand_plan-02",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Q1 2027 Marketing & Brand Plan (2026-10-28), Slide 3: Campaign calendar.\n| Campaign | Dates | Focus |\n|---|---|---|\n| Hockey Night Live | Jan 3 - Mar 28 | Live odds, NHL micro-markets |\n| NFL Playoffs + the Big Game | Jan 9 - Feb 7 | Parlay builder, live betting |\n| Play Smart refresh | Jan 15 - Feb 28 | NorthPlay Limits launch, Marcus Doyle |\n| Basketball tip-off | Feb 13 - Mar 31 | Player props |",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "Q1 2027 Marketing & Brand Plan",
+      "date": "2026-10-28",
+      "section": "Slide 3: Campaign calendar"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_q1_2027_marketing_and_brand_plan-03",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Q1 2027 Marketing & Brand Plan (2026-10-28), Slide 4: Channel mix and budget.\n| Channel | Q1 budget | Notes |\n|---|---|---|\n| Meta (Instagram, Facebook) | $1.1M | Square and story formats |\n| YouTube and CTV | $0.9M | 15s and 30s video |\n| Programmatic display | $0.5M | Adult-verified inventory only |\n| TikTok and Snapchat | $0.3M | 25+ targeting |\n| Radio and podcast | $0.4M | Sports talk, hockey pods |\n| Email and SMS (opted-in) | $0.1M | Only channel for offers |",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "Q1 2027 Marketing & Brand Plan",
+      "date": "2026-10-28",
+      "section": "Slide 4: Channel mix and budget"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_q1_2027_marketing_and_brand_plan-04",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Q1 2027 Marketing & Brand Plan (2026-10-28), Slide 5: Brand voice.\n- **We are**: Confident, factual, calm, fan-first. We talk about the game, the odds and the product.\n- **We never**: Use hype or certainty words ('lock', 'easy money', 'guaranteed'), slang, urgency ('last chance'), or talk about money outcomes.\n- **We always**: Show odds as information, include the full disclaimer, and assume an experienced adult fan.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "Q1 2027 Marketing & Brand Plan",
+      "date": "2026-10-28",
+      "section": "Slide 5: Brand voice"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_q1_2027_marketing_and_brand_plan-05",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Q1 2027 Marketing & Brand Plan (2026-10-28), Slide 6: Visual identity.\n- Palette: Deep Navy #06141F, Rink Green #145C4A, Mint #7FE0C4. No neon, pink or orange gradients\n- Typography: Inter / Inter Display\n- No cartoon characters or mascots\n- No people who look under 25. Hands, crowds and arenas are preferred over faces\n- Logo: the NorthPlay arrow and wordmark, always top-left",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "Q1 2027 Marketing & Brand Plan",
+      "date": "2026-10-28",
+      "section": "Slide 6: Visual identity"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_q1_2027_marketing_and_brand_plan-06",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Q1 2027 Marketing & Brand Plan (2026-10-28), Slide 7: Messaging pillars.\n- **Every play, live**: Live odds and in-game betting for hockey fans\n- **Built for the game**: Parlay builder, props, micro-markets\n- **Play smart**: NorthPlay Limits, taking breaks, setting a budget",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "Q1 2027 Marketing & Brand Plan",
+      "date": "2026-10-28",
+      "section": "Slide 7: Messaging pillars"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_q1_2027_marketing_and_brand_plan-07",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Q1 2027 Marketing & Brand Plan (2026-10-28), Slide 8: Ambassadors and partnerships.\n- Marcus Doyle (retired CFL lineman): Play Smart ambassador, responsible gambling messaging only, no odds or betting CTAs in his creative\n- No other athlete ambassadors in Q1\n- Team and league marks may only be used under a signed license. We hold no NHL or NFL licenses\n- Influencer and creator partnerships are not planned for Q1",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "Q1 2027 Marketing & Brand Plan",
+      "date": "2026-10-28",
+      "section": "Slide 8: Ambassadors and partnerships"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_q1_2027_marketing_and_brand_plan-08",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Q1 2027 Marketing & Brand Plan (2026-10-28), Slide 9: Mandatory creative elements.\n- Full disclaimer on every asset: '19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.'\n- Minimum disclaimer size: 24px on 1080x1080 and 1080x1920; 18px on 1200x628\n- Audio: the disclaimer is read at normal pace, never sped up\n- Offers appear only in opted-in email/SMS and on-site, with full terms at first presentation",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "Q1 2027 Marketing & Brand Plan",
+      "date": "2026-10-28",
+      "section": "Slide 9: Mandatory creative elements"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "deck-northplay_q1_2027_marketing_and_brand_plan-09",
+    "kind": "semantic",
+    "authority": "background",
+    "materiality": null,
+    "team": "ontario",
+    "user_email": null,
+    "text": "Q1 2027 Marketing & Brand Plan (2026-10-28), Slide 10: Approval workflow.\n- 1. Creative team uploads the asset to the Legal Approver Agent\n- 2. Agent returns approve / approve with changes / reject, with cited rules and precedents\n- 3. Rejections are escalated to Legal (#legal-marketing) only if the team disputes them\n- 4. Nothing is trafficked without an approval ID\n- Turnaround target: under 24 hours",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "manager_instruction",
+    "created_by": "priya.nair@northplay.test",
+    "source": {
+      "type": "strategy_deck",
+      "title": "Q1 2027 Marketing & Brand Plan",
+      "date": "2026-10-28",
+      "section": "Slide 10: Approval workflow"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "decision-NP-H01",
     "kind": "episodic",
-    "text": "A Quebec banner was sent back because the fine print was too small to read. The corrected version used the standard footer size and was approved.",
-    "team": "quebec", "user_email": null,
-    "visibility_roles": ["manager", "marketer"],
-    "source_type": "agent", "created_by": "marketer.quebec@tamarack.test",
-    "ttl_days": 30
+    "authority": "precedent",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Past decision on ad NP-H01 \"Saturday night. Every play, live.\" (Instagram (paid social)): approved. Rules: REG-14 (Full house disclaimer present and legible.); REG-09 (Odds shown factually; no promise of winning.); REG-12 (No bonus, credit or inducement in public creative.). Product-focused ad showing live odds as plain information. No offers, no outcome promises, no people, and the full responsible gambling disclaimer is legible. Meets all applicable rules.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "agent",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "ad_decision",
+      "ref": "NP-H01",
+      "date": "2026-09-13"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "decision-NP-H02",
+    "kind": "episodic",
+    "authority": "precedent",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Past decision on ad NP-H02 \"Set your limits. Then enjoy the game.\" (Programmatic display): approved. Rules: REG-14 (Disclaimer present.); REG-06 (Promotes responsible gambling tools; no enticement of high-risk players.). Responsible gambling brand ad. Describes player-protection tools factually with no betting call-to-action or offer. Low risk; approved.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "agent",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "ad_decision",
+      "ref": "NP-H02",
+      "date": "2026-09-03"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "decision-NP-H03",
+    "kind": "episodic",
+    "authority": "precedent",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Past decision on ad NP-H03 \"Know your limit before kickoff.\" (Instagram Stories (paid social)): approved. Rules: REG-03 (Retired athlete used exclusively to advocate responsible gambling. No odds, offers or betting call-to-action in the creative, so the exception applies.); REG-14 (Disclaimer present.). Uses a retired athlete, which is normally prohibited. The only exception is creative made exclusively to advocate responsible gambling. This ad contains only responsible gambling messaging and its CTA leads to deposit-limit settings, not betting. Exception applies; approved. Any future version that adds odds, offers or a 'bet now' CTA must be rejected.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "agent",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "ad_decision",
+      "ref": "NP-H03",
+      "date": "2026-10-02"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "decision-NP-H04",
+    "kind": "episodic",
+    "authority": "precedent",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Past decision on ad NP-H04 \"Build your parlay in seconds.\" (Instagram (paid social)): approved. Rules: REG-09 (Describes a feature; no claim that parlays are likely to win.); REG-14 (Disclaimer present.). Feature ad explaining how the parlay builder works. No winning claims, offers or social pressure. Approved.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "agent",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "ad_decision",
+      "ref": "NP-H04",
+      "date": "2026-10-08"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "decision-NP-H05",
+    "kind": "episodic",
+    "authority": "precedent",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Past decision on ad NP-H05 \"Bet $50, get $50 in bonus bets\" (Email (direct marketing, opted-in players only)): approved. Rules: REG-12 (Inducement delivered by direct marketing to opted-in players, which is a permitted channel.); REG-13 (Offer not described as free or risk-free; material terms shown at first presentation.); REG-15 (Opt-in confirmed and unsubscribe link present. Audience scrubbed against self-exclusion list per campaign brief.); REG-14 (Disclaimer present.). Bonus offer, but sent only by email to players who opted in, which is the permitted channel for inducements. Terms are shown up front, the offer is not called free or risk-free, and an unsubscribe option is included. Approved.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "agent",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "ad_decision",
+      "ref": "NP-H05",
+      "date": "2026-10-15"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "decision-NP-H06",
+    "kind": "episodic",
+    "authority": "precedent",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Past decision on ad NP-H06 \"Get $500 in bonus bets when you sign up!\" (Instagram (paid social)): rejected. Rules: REG-12 (Public paid-social ad communicates a sign-up bonus. Inducements may only be advertised on-site or to consented players.). Advertises a $500 sign-up bonus on public paid social. Ontario prohibits public advertising of bonuses, credits and inducements; they may only appear on NorthPlay's own site or in direct marketing to opted-in players. Rejected. Required changes: Remove the bonus offer from all public creative. Move the offer to the on-site promotions page or consented email/SMS.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "agent",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "ad_decision",
+      "ref": "NP-H06",
+      "date": "2026-09-18"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "decision-NP-H07",
+    "kind": "episodic",
+    "authority": "precedent",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Past decision on ad NP-H07 \"Your first bet is RISK-FREE.\" (Instagram Stories (paid social)): rejected. Rules: REG-12 (Public ad communicates an inducement (refund on first bet).); REG-13 (Described as 'risk-free' although the player must deposit and risk their own money.). Two blocking issues. It advertises an inducement on a public channel, and it calls the bet 'risk-free' when the player has to deposit and stake their own money. A bet is only risk-free if the player cannot lose their own money. Rejected. Required changes: Remove the offer from public creative. Never use 'risk-free' for offers that require the player's own money.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "agent",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "ad_decision",
+      "ref": "NP-H07",
+      "date": "2026-09-19"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "decision-NP-H08",
+    "kind": "episodic",
+    "authority": "precedent",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Past decision on ad NP-H08 \"Get in the game with Jake Moreau.\" (Programmatic display): rejected. Rules: REG-03 (Retired professional athlete with a paid ambassador arrangement promotes betting. Not a responsible gambling message, so the exception does not apply.); REG-11 (Implies betting is linked to the athlete's success and status.). A retired NHL player under a paid NorthPlay arrangement directly promotes betting ('Bet with Jake'). Ontario bans athletes in gambling ads except for messages made exclusively to promote responsible gambling. Compare NP-H03, which was approved because it contained only responsible gambling content. Rejected. Required changes: Remove the athlete, or rebuild as a responsible-gambling-only message with no betting call-to-action.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "agent",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "ad_decision",
+      "ref": "NP-H08",
+      "date": "2026-09-25"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "decision-NP-H09",
+    "kind": "episodic",
+    "authority": "precedent",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Past decision on ad NP-H09 \"Rent due? Your next parlay could cover it.\" (Facebook (paid social)): rejected. Rules: REG-07 (Presents betting as a way to pay rent and as a source of income ('payday').); REG-09 (Implies winning is a realistic outcome.); REG-06 (Exploits financial pressure, which targets potentially high-risk persons.). Frames betting as a way to cover rent and earn income. Gambling may not be promoted as a solution to financial problems or an alternative to employment. Targeting people under financial pressure also exploits potentially high-risk persons. Rejected. Required changes: Remove all financial-outcome framing (rent, payday, income).",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "agent",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "ad_decision",
+      "ref": "NP-H09",
+      "date": "2026-09-27"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "decision-NP-H10",
+    "kind": "episodic",
+    "authority": "precedent",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Past decision on ad NP-H10 \"Rough Sunday? Win it all back Monday night.\" (Instagram (paid social)): rejected. Rules: REG-08 (Encourages betting to recover previous losses ('win it all back').); REG-06 (Targets players who have just lost, a potentially high-risk group.). Tells players who lost on Sunday to 'win it all back' on Monday. Encouraging play to recover losses is prohibited because loss-chasing is a core warning sign of problem gambling. Rejected. Required changes: Remove any reference to previous losses or recovering money. A neutral game-preview version would be acceptable.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "agent",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "ad_decision",
+      "ref": "NP-H10",
+      "date": "2026-10-05"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "decision-NP-H11",
+    "kind": "episodic",
+    "authority": "precedent",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Past decision on ad NP-H11 \"Tonight's LOCK: Toronto ML. Easy money.\" (TikTok (paid social)): rejected. Rules: REG-09 ('Lock' and 'easy money' present winning as certain; 'the more you bet, the more you win' implies spending more improves the chance of winning.). Presents a bet as a sure thing ('lock', 'easy money') and claims that betting more means winning more. Ads may not present winning as the probable outcome or suggest that spending more improves the odds. Rejected. Required changes: Remove certainty language and any claim linking stake size to winning.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "agent",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "ad_decision",
+      "ref": "NP-H11",
+      "date": "2026-10-10"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "decision-NP-H12",
+    "kind": "episodic",
+    "authority": "precedent",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Past decision on ad NP-H12 \"No cap, this parlay is bussin.\" (YouTube Shorts (paid social)): rejected. Rules: REG-02 (Cartoon mascot ('Pucky') is the focal point and is likely to appeal to minors.); REG-01 (Youth slang ('no cap', 'bussin', 'squad') appeals primarily to minors.); REG-11 ('Bet with your squad' implies peer pressure.). A cartoon mascot combined with teen slang makes the ad likely to appeal to minors, and 'bet with your squad' adds peer pressure. Ontario bans cartoon figures and youth-oriented themes or language in gambling ads. Rejected. Required changes: Remove the mascot. Rewrite the copy in neutral adult language. Remove peer-pressure framing.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "agent",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "ad_decision",
+      "ref": "NP-H12",
+      "date": "2026-10-17"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "decision-NP-H13",
+    "kind": "episodic",
+    "authority": "precedent",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Past decision on ad NP-H13 \"Ottawa vs. Edmonton. Odds are live.\" (Instagram (paid social)): approved with changes. Rules: REG-14 (No responsible gambling message, age statement or Ontario-only statement.). The creative itself is compliant: factual live odds with no offers or claims. However, it has no responsible gambling message, which every gambling ad must include. Approved on condition that the full house disclaimer is added. Required changes: Add the full house disclaimer as a legible footer.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "agent",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "ad_decision",
+      "ref": "NP-H13",
+      "date": "2026-10-22"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "decision-NP-H14",
+    "kind": "episodic",
+    "authority": "precedent",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Past decision on ad NP-H14 \"Turned 19? Welcome to the big leagues.\" (Snapchat (paid social)): approved with changes. Rules: REG-11 (Frames gambling as a rite of passage tied to turning 19.); REG-05 (Snapchat audience skews young; placement must be restricted to verified 19+ adult-majority audiences.). Frames turning 19 and placing a first bet as a coming-of-age milestone, which is prohibited rite-of-passage messaging. The placement also skews toward young audiences. The ad's goal (onboarding new adult players) is fine, so it is approved with a rewrite and a placement restriction. Required changes: Replace rite-of-passage copy with a neutral explainer. Restrict placement to verified 19+ audiences, 25+ preferred.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "agent",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "ad_decision",
+      "ref": "NP-H14",
+      "date": "2026-10-28"
+    },
+    "ttl_days": null
+  },
+  {
+    "ref": "decision-NP-H15",
+    "kind": "episodic",
+    "authority": "precedent",
+    "team": "ontario",
+    "user_email": null,
+    "text": "Past decision on ad NP-H15 \"Tip-off is tonight.\" (Instagram Stories (paid social)): approved with changes. Rules: REG-14 (Disclaimer is present but rendered at a tiny size with very low contrast, so it is effectively unreadable.). Content is compliant, but the required disclaimer is so small and faint that a viewer could not read it. A disclaimer only counts if it is legible. Approved once the disclaimer is enlarged and given proper contrast. Required changes: Increase disclaimer size to at least 24px at 1080x1920 with high contrast.",
+    "visibility_roles": [
+      "manager",
+      "marketer"
+    ],
+    "source_type": "agent",
+    "created_by": "ethan.cho@northplay.test",
+    "source": {
+      "type": "ad_decision",
+      "ref": "NP-H15",
+      "date": "2026-11-03"
+    },
+    "ttl_days": null
   }
 ]
