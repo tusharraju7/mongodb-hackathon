@@ -1,0 +1,20 @@
+# Top-level dependencies. requirements.txt holds the pinned versions that resolved on Python 3.13.
+fastapi
+uvicorn[standard]
+pymongo
+pydantic
+python-dotenv
+pyjwt
+bcrypt
+python-multipart
+langgraph
+langgraph-checkpoint-mongodb
+langchain
+langchain-anthropic
+langsmith
+voyageai
+elevenlabs
+pillow
+pytest
+mongomock
+httpx

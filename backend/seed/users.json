@@ -1,8 +1,55 @@
 [
-  { "email": "manager.national@tamarack.test",  "name": "Dana Whitfield",   "role": "manager",  "team": "national" },
-  { "email": "marketer.national@tamarack.test", "name": "Marcus Oyelaran",  "role": "marketer", "team": "national" },
-  { "email": "sales.national@tamarack.test",    "name": "Tessa Lindqvist",  "role": "sales",    "team": "national" },
-  { "email": "manager.quebec@tamarack.test",    "name": "Élodie Tremblay",  "role": "manager",  "team": "quebec" },
-  { "email": "marketer.quebec@tamarack.test",   "name": "Mathieu Gagnon",   "role": "marketer", "team": "quebec" },
-  { "email": "sales.quebec@tamarack.test",      "name": "Camille Roy",      "role": "sales",    "team": "quebec" }
+  {
+    "email": "ethan.cho@northplay.test",
+    "name": "Ethan Cho",
+    "title": "Senior Counsel, Legal & Compliance",
+    "role": "manager",
+    "team": "ontario",
+    "slack_id": "U03EC"
+  },
+  {
+    "email": "priya.nair@northplay.test",
+    "name": "Priya Nair",
+    "title": "Chief Marketing Officer",
+    "role": "manager",
+    "team": "ontario",
+    "slack_id": "U02PN"
+  },
+  {
+    "email": "amira.haddad@northplay.test",
+    "name": "Amira Haddad",
+    "title": "Creative Lead",
+    "role": "marketer",
+    "team": "ontario",
+    "slack_id": "U06AH"
+  },
+  {
+    "email": "kevin.tran@northplay.test",
+    "name": "Kevin Tran",
+    "title": "Growth Marketing Manager",
+    "role": "marketer",
+    "team": "ontario",
+    "slack_id": "U07KT"
+  },
+  {
+    "email": "jordan.blake@northplay.test",
+    "name": "Jordan Blake",
+    "title": "Player Support Lead (added for the demo)",
+    "role": "sales",
+    "team": "ontario"
+  },
+  {
+    "email": "manager.alberta@northplay.test",
+    "name": "Morgan Reid",
+    "title": "Counsel, Alberta launch (added for the demo)",
+    "role": "manager",
+    "team": "alberta"
+  },
+  {
+    "email": "marketer.alberta@northplay.test",
+    "name": "Sam Okoye",
+    "title": "Marketing, Alberta launch (added for the demo)",
+    "role": "marketer",
+    "team": "alberta"
+  }
 ]

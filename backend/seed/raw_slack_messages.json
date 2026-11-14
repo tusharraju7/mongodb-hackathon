@@ -1,0 +1,748 @@
+[
+  {
+    "channel": "leadership",
+    "date": "2026-10-02",
+    "ts": "1790975100.000003",
+    "user": "U01RB",
+    "author": "Rachel Bouchard",
+    "title": "CEO",
+    "text": "Reminder: 2027 strategy offsite is Oct 9. Priya, please bring a view on how we shift away from bonus-led acquisition.",
+    "reactions": [
+      {
+        "name": "eyes",
+        "users": [
+          "U02PN",
+          "U08LF"
+        ],
+        "count": 2
+      }
+    ]
+  },
+  {
+    "channel": "leadership",
+    "date": "2026-10-09",
+    "ts": "1791588600.000007",
+    "user": "U02PN",
+    "author": "Priya Nair",
+    "title": "Chief Marketing Officer",
+    "text": "Offsite takeaway: we cut bonus-led acquisition from 45% to ~10% of budget in 2027, and offers move to opted-in channels only. Deck v1.2 goes out next week.",
+    "reactions": [
+      {
+        "name": "100",
+        "users": [
+          "U01RB",
+          "U08LF"
+        ],
+        "count": 2
+      }
+    ]
+  },
+  {
+    "channel": "leadership",
+    "date": "2026-10-09",
+    "ts": "1791589260.000008",
+    "user": "U08LF",
+    "author": "Liam Fraser",
+    "title": "CFO",
+    "text": "Supportive. Acquisition cost is up 38% YoY, so the bonus treadmill isn't working anyway.",
+    "reactions": []
+  },
+  {
+    "channel": "leadership",
+    "date": "2026-10-14",
+    "ts": "1792015200.000012",
+    "user": "U01RB",
+    "author": "Rachel Bouchard",
+    "title": "CEO",
+    "text": "2027 Business Strategy v1.2 is final and posted in the drive. Trust-first, product-led, hockey-first.",
+    "reactions": [
+      {
+        "name": "tada",
+        "users": [
+          "U02PN",
+          "U03EC",
+          "U08LF"
+        ],
+        "count": 3
+      }
+    ]
+  },
+  {
+    "channel": "leadership",
+    "date": "2026-10-30",
+    "ts": "1793380500.000022",
+    "user": "U01RB",
+    "author": "Rachel Bouchard",
+    "title": "CEO",
+    "text": "Confidential: we have terminated our agreement with Jake Moreau effective today, following the issues raised last week. Please make sure no Jake Moreau content of any kind runs again.",
+    "reactions": [
+      {
+        "name": "eyes",
+        "users": [
+          "U02PN",
+          "U03EC",
+          "U08LF"
+        ],
+        "count": 3
+      }
+    ]
+  },
+  {
+    "channel": "leadership",
+    "date": "2026-10-30",
+    "ts": "1793380920.000023",
+    "user": "U03EC",
+    "author": "Ethan Cho",
+    "title": "Senior Counsel, Legal & Compliance",
+    "text": "Confirmed. That covers every format, including responsible gambling messaging. We no longer have the rights to his name, image or voice. I'll post the guidance in #legal-marketing.",
+    "reactions": []
+  },
+  {
+    "channel": "leadership",
+    "date": "2026-11-05",
+    "ts": "1793889000.000032",
+    "user": "U08LF",
+    "author": "Liam Fraser",
+    "title": "CFO",
+    "text": "Budget check: Q1 marketing is $3.3M. TikTok/Snap is $0.3M of that.",
+    "reactions": []
+  },
+  {
+    "channel": "leadership",
+    "date": "2026-11-06",
+    "ts": "1793981400.000033",
+    "user": "U02PN",
+    "author": "Priya Nair",
+    "title": "Chief Marketing Officer",
+    "text": "Decision: we are pausing ALL paid TikTok and Snapchat activity, effective today, until further notice. Even with 25+ targeting we can't verify audience age to our standard, and it doesn't fit trust-first. Moving the $0.3M to CTV and podcast.",
+    "reactions": [
+      {
+        "name": "+1",
+        "users": [
+          "U01RB",
+          "U03EC",
+          "U08LF"
+        ],
+        "count": 3
+      }
+    ]
+  },
+  {
+    "channel": "leadership",
+    "date": "2026-11-06",
+    "ts": "1793981880.000034",
+    "user": "U01RB",
+    "author": "Rachel Bouchard",
+    "title": "CEO",
+    "text": "Agreed. The Q1 deck still lists TikTok/Snap. Treat this message as overriding it.",
+    "reactions": []
+  },
+  {
+    "channel": "leadership",
+    "date": "2026-11-12",
+    "ts": "1794492900.000045",
+    "user": "U01RB",
+    "author": "Rachel Bouchard",
+    "title": "CEO",
+    "text": "Board asked about compliance. Ethan, can you confirm we've had zero regulatory findings this year?",
+    "reactions": []
+  },
+  {
+    "channel": "leadership",
+    "date": "2026-11-12",
+    "ts": "1794494400.000046",
+    "user": "U03EC",
+    "author": "Ethan Cho",
+    "title": "Senior Counsel, Legal & Compliance",
+    "text": "Zero findings. One AGCO inquiry (the 'free' language one, industry-wide) and we responded same day. The agent is catching the bulk of issues pre-launch.",
+    "reactions": [
+      {
+        "name": "raised_hands",
+        "users": [
+          "U01RB",
+          "U02PN"
+        ],
+        "count": 2
+      }
+    ]
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-10-01",
+    "ts": "1790863920.000001",
+    "user": "U04DO",
+    "author": "Daniel Okafor",
+    "title": "Head of Performance Marketing",
+    "text": "Morning all. Q4 hockey flight is live as of today. Saturday night odds creative (H01) cleared legal yesterday, nice work Amira.",
+    "reactions": [
+      {
+        "name": "tada",
+        "users": [
+          "U06AH",
+          "U05SM"
+        ],
+        "count": 2
+      }
+    ]
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-10-01",
+    "ts": "1790864400.000002",
+    "user": "U06AH",
+    "author": "Amira Haddad",
+    "title": "Creative Lead",
+    "text": "Thanks! Marcus Doyle Play Smart story (H03) also cleared. Agent flagged that it only passes because there's zero betting CTA, so let's keep it that way.",
+    "reactions": [
+      {
+        "name": "+1",
+        "users": [
+          "U05SM"
+        ],
+        "count": 1
+      }
+    ]
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-10-10",
+    "ts": "1791658920.000009",
+    "user": "U07KT",
+    "author": "Kevin Tran",
+    "title": "Growth Marketing Manager",
+    "text": "Tonight's picks TikTok (H11) got rejected for 'lock' and 'easy money'. Fair. I'll rework it.",
+    "reactions": []
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-10-10",
+    "ts": "1791659340.000010",
+    "user": "U05SM",
+    "author": "Sofia Marchetti",
+    "title": "Brand Manager",
+    "text": "Brand note: 'lock', 'easy money', 'guaranteed' and 'can't lose' are off-brand regardless of what the agent says. Adding them to the voice guide.",
+    "reactions": [
+      {
+        "name": "white_check_mark",
+        "users": [
+          "U06AH"
+        ],
+        "count": 1
+      }
+    ]
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-10-17",
+    "ts": "1792268520.000013",
+    "user": "U06AH",
+    "author": "Amira Haddad",
+    "title": "Creative Lead",
+    "text": "Okay, the Pucky mascot test (H12) got destroyed by the agent. Cartoon + slang = minors. Pucky is retired.",
+    "reactions": [
+      {
+        "name": "joy",
+        "users": [
+          "U07KT",
+          "U04DO"
+        ],
+        "count": 2
+      },
+      {
+        "name": "skull",
+        "users": [
+          "U05SM"
+        ],
+        "count": 1
+      }
+    ]
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-10-17",
+    "ts": "1792269000.000014",
+    "user": "U05SM",
+    "author": "Sofia Marchetti",
+    "title": "Brand Manager",
+    "text": "Retired permanently please. No mascots at all, and no orange/pink gradient palettes either. Navy, rink green and mint only.",
+    "reactions": [
+      {
+        "name": "+1",
+        "users": [
+          "U02PN"
+        ],
+        "count": 1
+      }
+    ]
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-10-22",
+    "ts": "1792692600.000018",
+    "user": "U04DO",
+    "author": "Daniel Okafor",
+    "title": "Head of Performance Marketing",
+    "text": "Ottawa vs. Edmonton (H13) came back 'approved with changes': we forgot the disclaimer entirely. Amira, footer added, re-trafficking today.",
+    "reactions": []
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-10-26",
+    "ts": "1793026800.000019",
+    "user": "U02PN",
+    "author": "Priya Nair",
+    "title": "Chief Marketing Officer",
+    "text": "Q1 2027 Marketing & Brand Plan draft is coming together. Calendar: Hockey Night Live, NFL playoffs + the Big Game, Play Smart refresh with NorthPlay Limits, basketball tip-off.",
+    "reactions": [
+      {
+        "name": "eyes",
+        "users": [
+          "U04DO",
+          "U05SM",
+          "U06AH",
+          "U07KT"
+        ],
+        "count": 4
+      }
+    ]
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-10-28",
+    "ts": "1793223900.000020",
+    "user": "U02PN",
+    "author": "Priya Nair",
+    "title": "Chief Marketing Officer",
+    "text": "Q1 plan v1.0 is posted. Channel mix is Meta, YouTube/CTV, programmatic, TikTok/Snap (25+ only), radio/podcast and opted-in email/SMS.",
+    "reactions": [
+      {
+        "name": "+1",
+        "users": [
+          "U04DO",
+          "U07KT"
+        ],
+        "count": 2
+      }
+    ]
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-10-28",
+    "ts": "1793224920.000021",
+    "user": "U07KT",
+    "author": "Kevin Tran",
+    "title": "Growth Marketing Manager",
+    "text": "'Turned 19?' Snapchat (H14) came back approved with changes. Rewriting to 'New to NorthPlay? Learn how betting works.'",
+    "reactions": []
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-11-03",
+    "ts": "1793733300.000037",
+    "user": "U04DO",
+    "author": "Daniel Okafor",
+    "title": "Head of Performance Marketing",
+    "text": "Tip-off story (H15) came back: the disclaimer was there but basically invisible. Remember 24px minimum on stories.",
+    "reactions": [
+      {
+        "name": "sweat_smile",
+        "users": [
+          "U06AH"
+        ],
+        "count": 1
+      }
+    ]
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-11-06",
+    "ts": "1793982900.000035",
+    "user": "U02PN",
+    "author": "Priya Nair",
+    "title": "Chief Marketing Officer",
+    "text": "Team: TikTok and Snapchat are paused for all paid creative, effective today. Do not submit or traffic anything for those placements. The Q1 deck will be updated later; this overrides it.",
+    "reactions": [
+      {
+        "name": "white_check_mark",
+        "users": [
+          "U04DO",
+          "U05SM",
+          "U06AH",
+          "U07KT"
+        ],
+        "count": 4
+      }
+    ]
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-11-06",
+    "ts": "1793983260.000036",
+    "user": "U07KT",
+    "author": "Kevin Tran",
+    "title": "Growth Marketing Manager",
+    "text": "Pulling the two TikTok cuts we had in the queue.",
+    "reactions": []
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-11-09",
+    "ts": "1794236700.000038",
+    "user": "U06AH",
+    "author": "Amira Haddad",
+    "title": "Creative Lead",
+    "text": "Starting Hockey Night Live Q1 concepts. Thinking 'Puck drops at 7' as the hero line with live odds cards. Same layout as H01.",
+    "reactions": [
+      {
+        "name": "fire",
+        "users": [
+          "U05SM",
+          "U04DO"
+        ],
+        "count": 2
+      }
+    ]
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-11-09",
+    "ts": "1794237120.000039",
+    "user": "U05SM",
+    "author": "Sofia Marchetti",
+    "title": "Brand Manager",
+    "text": "Love it. Keep it city names only and the full disclaimer at 24px+.",
+    "reactions": []
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-11-11",
+    "ts": "1794433200.000043",
+    "user": "U07KT",
+    "author": "Kevin Tran",
+    "title": "Growth Marketing Manager",
+    "text": "Growth idea for the Big Game: 'Deposit $50, get a $100 bonus bet' on Instagram stories to drive sign-ups?",
+    "reactions": []
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-11-11",
+    "ts": "1794433920.000044",
+    "user": "U04DO",
+    "author": "Daniel Okafor",
+    "title": "Head of Performance Marketing",
+    "text": "Can't run offers on public social, that's the H06/H07 lesson. Opted-in email/SMS only, and no 'free'.",
+    "reactions": [
+      {
+        "name": "+1",
+        "users": [
+          "U03EC",
+          "U05SM"
+        ],
+        "count": 2
+      }
+    ]
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-11-12",
+    "ts": "1794508200.000047",
+    "user": "U05SM",
+    "author": "Sofia Marchetti",
+    "title": "Brand Manager",
+    "text": "NorthPlay Limits launch: Marcus Doyle hero line will be quote (3) 'Set your limit before the puck drops.' Amira is on the creative.",
+    "reactions": [
+      {
+        "name": "+1",
+        "users": [
+          "U06AH",
+          "U02PN"
+        ],
+        "count": 2
+      }
+    ]
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-11-13",
+    "ts": "1794583200.000048",
+    "user": "U06AH",
+    "author": "Amira Haddad",
+    "title": "Creative Lead",
+    "text": "Sharing three Q1 drafts for agent review next week: Hockey Night Live hero, a Big Game parlay builder spot, and the Limits launch with Marcus.",
+    "reactions": [
+      {
+        "name": "eyes",
+        "users": [
+          "U04DO",
+          "U05SM"
+        ],
+        "count": 2
+      }
+    ]
+  },
+  {
+    "channel": "marketing",
+    "date": "2026-11-13",
+    "ts": "1794583860.000049",
+    "user": "U04DO",
+    "author": "Daniel Okafor",
+    "title": "Head of Performance Marketing",
+    "text": "Reminder that nothing traffics without an approval ID from the agent.",
+    "reactions": []
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-10-05",
+    "ts": "1791217860.000004",
+    "user": "U03EC",
+    "author": "Ethan Cho",
+    "title": "Senior Counsel, Legal & Compliance",
+    "text": "FYI, the 'win it all back Monday' concept (H10) is rejected and I agree with the agent. Loss-chasing language is a hard no. Please don't re-submit variations like 'bounce back' or 'redemption bet'.",
+    "reactions": [
+      {
+        "name": "+1",
+        "users": [
+          "U07KT",
+          "U04DO"
+        ],
+        "count": 2
+      }
+    ]
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-10-05",
+    "ts": "1791218640.000005",
+    "user": "U07KT",
+    "author": "Kevin Tran",
+    "title": "Growth Marketing Manager",
+    "text": "Understood. Is a neutral game preview for Monday night OK?",
+    "reactions": []
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-10-05",
+    "ts": "1791219120.000006",
+    "user": "U03EC",
+    "author": "Ethan Cho",
+    "title": "Senior Counsel, Legal & Compliance",
+    "text": "Yes, a neutral game preview with odds and the full disclaimer is fine.",
+    "reactions": []
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-10-14",
+    "ts": "1791990900.000011",
+    "user": "U03EC",
+    "author": "Ethan Cho",
+    "title": "Senior Counsel, Legal & Compliance",
+    "text": "Week 6 opted-in email (H05) is approved. Terms are up front and the unsubscribe link is in place. This is the template for any offer going forward.",
+    "reactions": [
+      {
+        "name": "+1",
+        "users": [
+          "U04DO"
+        ],
+        "count": 1
+      }
+    ]
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-10-20",
+    "ts": "1792507200.000015",
+    "user": "U03EC",
+    "author": "Ethan Cho",
+    "title": "Senior Counsel, Legal & Compliance",
+    "text": "Heads up on the Big Game in February. We do NOT hold NFL marks. Never say 'Super Bowl' in any creative, copy, hashtag or audio. Use 'the Big Game'. Same for team names and logos across NFL and NHL: city names only (e.g. 'Toronto vs. Montreal'). No logos, no jerseys.",
+    "reactions": [
+      {
+        "name": "pushpin",
+        "users": [
+          "U04DO",
+          "U05SM",
+          "U06AH"
+        ],
+        "count": 3
+      }
+    ]
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-10-20",
+    "ts": "1792507620.000016",
+    "user": "U06AH",
+    "author": "Amira Haddad",
+    "title": "Creative Lead",
+    "text": "Does that include the team colours on the odds cards?",
+    "reactions": []
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-10-20",
+    "ts": "1792508100.000017",
+    "user": "U03EC",
+    "author": "Ethan Cho",
+    "title": "Senior Counsel, Legal & Compliance",
+    "text": "Generic colours are fine. Avoid anything that looks like a team logo or uniform.",
+    "reactions": []
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-10-30",
+    "ts": "1793383500.000024",
+    "user": "U03EC",
+    "author": "Ethan Cho",
+    "title": "Senior Counsel, Legal & Compliance",
+    "text": "IMPORTANT: The Jake Moreau partnership is terminated as of today. Do not use his name, image, likeness, voice or quotes in ANY creative, including Play Smart / responsible gambling messaging. Pull anything in flight. Any submission featuring him must be rejected.",
+    "reactions": [
+      {
+        "name": "white_check_mark",
+        "users": [
+          "U02PN",
+          "U04DO",
+          "U05SM",
+          "U06AH",
+          "U07KT"
+        ],
+        "count": 5
+      }
+    ]
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-10-30",
+    "ts": "1793383920.000025",
+    "user": "U06AH",
+    "author": "Amira Haddad",
+    "title": "Creative Lead",
+    "text": "We had a Play Smart cut with Jake drafted for December ('take a break between periods'). Killing it.",
+    "reactions": []
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-10-30",
+    "ts": "1793384100.000026",
+    "user": "U03EC",
+    "author": "Ethan Cho",
+    "title": "Senior Counsel, Legal & Compliance",
+    "text": "Correct. Even though an RG-only athlete message would normally pass AGCO rules, we don't have the rights. Reject.",
+    "reactions": []
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-11-02",
+    "ts": "1793632800.000027",
+    "user": "U05SM",
+    "author": "Sofia Marchetti",
+    "title": "Brand Manager",
+    "text": "Marcus Doyle question: can we write new quotes for him for the Limits launch?",
+    "reactions": []
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-11-02",
+    "ts": "1793634060.000028",
+    "user": "U03EC",
+    "author": "Ethan Cho",
+    "title": "Senior Counsel, Legal & Compliance",
+    "text": "Not without his written sign-off. His renewed contract (through Dec 2027) limits us to the approved quote bank. Approved quotes: (1) 'Set a budget before kickoff. Take breaks. Know when to walk away.' (2) 'The best fans know their limits.' (3) 'Set your limit before the puck drops.' Anything else needs his agent's written approval before it goes to the agent for review.",
+    "reactions": [
+      {
+        "name": "pushpin",
+        "users": [
+          "U05SM",
+          "U06AH"
+        ],
+        "count": 2
+      }
+    ]
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-11-04",
+    "ts": "1793824200.000029",
+    "user": "U03EC",
+    "author": "Ethan Cho",
+    "title": "Senior Counsel, Legal & Compliance",
+    "text": "We received an inquiry from the AGCO about 'free' language in the market. Effective immediately, NorthPlay will not use the word 'free' (or 'on us', 'no risk', 'risk-free') in ANY marketing, including on-site banners and opted-in emails, even where the regs would technically allow it. Use 'bonus bets' with full terms.",
+    "reactions": [
+      {
+        "name": "rotating_light",
+        "users": [
+          "U02PN",
+          "U04DO"
+        ],
+        "count": 2
+      },
+      {
+        "name": "+1",
+        "users": [
+          "U07KT"
+        ],
+        "count": 1
+      }
+    ]
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-11-04",
+    "ts": "1793824920.000030",
+    "user": "U04DO",
+    "author": "Daniel Okafor",
+    "title": "Head of Performance Marketing",
+    "text": "Does this apply to the H05-style opted-in email template?",
+    "reactions": []
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-11-04",
+    "ts": "1793825220.000031",
+    "user": "U03EC",
+    "author": "Ethan Cho",
+    "title": "Senior Counsel, Legal & Compliance",
+    "text": "Yes. H05 is fine because it says 'bonus bets', not 'free'. Keep it that way.",
+    "reactions": []
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-11-10",
+    "ts": "1794337200.000040",
+    "user": "U07KT",
+    "author": "Kevin Tran",
+    "title": "Growth Marketing Manager",
+    "text": "Idea for holiday: World Juniors creative over Boxing Day? Huge hockey moment in Ontario.",
+    "reactions": []
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-11-10",
+    "ts": "1794338520.000041",
+    "user": "U03EC",
+    "author": "Ethan Cho",
+    "title": "Senior Counsel, Legal & Compliance",
+    "text": "No. World Juniors and all junior hockey (OHL/CHL, U18, World Juniors) are off-limits in any NorthPlay creative. Most of those players are under 19, so it puts minors at the centre of a gambling ad. That includes odds graphics, game previews and 'watch with us' posts. Senior national team and NHL only.",
+    "reactions": [
+      {
+        "name": "pushpin",
+        "users": [
+          "U02PN",
+          "U04DO",
+          "U05SM",
+          "U06AH"
+        ],
+        "count": 4
+      }
+    ]
+  },
+  {
+    "channel": "legal-marketing",
+    "date": "2026-11-10",
+    "ts": "1794338700.000042",
+    "user": "U07KT",
+    "author": "Kevin Tran",
+    "title": "Growth Marketing Manager",
+    "text": "Got it, scrapping.",
+    "reactions": []
+  }
+]

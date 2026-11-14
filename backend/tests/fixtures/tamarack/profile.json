@@ -1,0 +1,54 @@
+{
+  "brand": "Tamarack Bank",
+  "description": "Tamarack Bank, a Canadian bank advertising its cashback credit card",
+  "product": "credit_card",
+  "region": "CA",
+  "teams": [
+    "national",
+    "quebec"
+  ],
+  "claim_types": {
+    "approval": "anything about being approved, accepted or qualifying (\"guaranteed approval\", \"everyone qualifies\")",
+    "intro_rate": "a promotional or introductory interest rate, with or without its duration",
+    "rewards_bonus": "a welcome bonus, cash back or rewards amount",
+    "annual_fee": "any statement about the annual fee, including \"no annual fee\"",
+    "superlative": "best, lowest, number one, favourite, or a comparison with other cards or banks",
+    "testimonial": "a named or quoted customer, or an endorsement by a person"
+  },
+  "memory": {
+    "per_query": 3,
+    "budget": 3
+  },
+  "banner": {
+    "header": null,
+    "background": [
+      16,
+      60,
+      44
+    ],
+    "text": [
+      245,
+      241,
+      230
+    ],
+    "accent": [
+      214,
+      178,
+      94
+    ],
+    "headline": "amount"
+  },
+  "fine_print_patterns": [
+    "subject to credit approval",
+    "conditions apply",
+    "sous réserve",
+    "des conditions s.appliquent",
+    "unsubscribe",
+    "se désabonner"
+  ],
+  "decision_labels": {
+    "pass": "approved",
+    "needs_changes": "approved_with_changes",
+    "blocked": "rejected"
+  }
+}

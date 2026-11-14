@@ -36,7 +36,7 @@ The demo uses **NorthPlay**, a fictional Ontario sportsbook. Its data, generated
 - A Slack export with internal decisions that are newer and stricter than the decks
 - 3 ads for the live demo
 
-The planning documents in [`docs/`](docs/) and [AGENTS.md](AGENTS.md) were written with a fictional bank example; the flows are the same.
+The planning documents in [`docs/`](docs/) were written with a fictional bank example; the flows are the same. [docs/BACKEND.md](docs/BACKEND.md) describes the backend as built on the NorthPlay data.
 
 ## Built on MongoDB Atlas
 
@@ -51,7 +51,9 @@ Next.js · FastAPI · LangGraph / LangChain · Claude (verdict and fast models) 
 
 ## Status
 
-In progress during the event.
+The backend is built and the `greenlight` database on Atlas is loaded with the NorthPlay data. The web app is in progress.
+
+Checked so far: 52 offline tests pass; 14 of the 15 past ads come back with their recorded decision when reviewed without the memory of that decision; the three demo ads come out as intended; and 38 of 39 live end-to-end checks passed on Atlas, with the one failure fixed and re-checked. Details, limits and how to run it are in [docs/BACKEND.md](docs/BACKEND.md).
 
 ## Documents
 
@@ -59,6 +61,7 @@ In progress during the event.
 |---|---|
 | [AGENTS.md](AGENTS.md) | Guidance for every coding agent: ownership, rules, branching |
 | [docs/PLAN.md](docs/PLAN.md) | Execution plan: streams, tasks, time boxes, checks |
+| [docs/BACKEND.md](docs/BACKEND.md) | The backend as built: the NorthPlay data, how to run it, what is verified, API notes for the web app |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Tech stack, infrastructure diagram, core mechanisms |
 | [docs/FLOWS.md](docs/FLOWS.md) | Operational flows: auth, memory, token use |
 | [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md) | One ad followed from policy to release, with sample JSON |
