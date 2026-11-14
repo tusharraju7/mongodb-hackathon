@@ -12,3 +12,5 @@ Sign in, choose Use Hockey ad / Use Bonus ad / Use Play Smart ad (or attach your
 For local startup, run `npm run preview` in frontend after `npm run build`, and `.venv/Scripts/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000` in backend. The backend uses the signed-in local Codex CLI and Voyage retrieval. `npm run dev` also proxies `/api` to FastAPI.
 
 The browser API wrapper calls fetch through a function, avoiding the illegal receiver binding that prevented live requests. A regression test covers this. Saved demos remain an optional separate mode; they are not the live application.
+
+Local model profile: assessments use `codex:gpt-6.1-sol` with low reasoning; smaller steps retain the configured Luna model. `CODEX_SERVICE_TIER=fast` requests Codex Fast mode for CLI calls. Fast mode consumes more plan usage; end-to-end latency still includes retrieval and storage. Set the variable empty for Standard mode.

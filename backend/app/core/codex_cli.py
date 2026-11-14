@@ -65,6 +65,9 @@ class CodexModel:
                         "-c", "features.shell_tool=false", "-c", "features.apps=false",
                         "-c", "features.browser_use=false", "-c", "features.hooks=false",
                         "-c", "features.skill_search=false", "-c", "features.skip_host_skill_discovery=true"]
+                tier = os.environ.get("CODEX_SERVICE_TIER", "").strip()
+                if tier == "fast":
+                    args.extend(["-c", 'service_tier="fast"', "-c", "features.fast_mode=true"])
                 for path in images:
                     args.extend(["--image", str(path)])
                 args.append("-")
