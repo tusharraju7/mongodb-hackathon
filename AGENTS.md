@@ -124,6 +124,7 @@ cd backend && python3.13 -m venv .venv && source .venv/bin/activate && pip insta
 pytest                           # 77 offline tests, no keys or database needed
 python -m scripts.dry_run --suite   # live: every past ad against its recorded decision, no database needed
 python -m scripts.dry_run --image ../northplay-demo-data/demo_ads/demo_03_play_smart_breaks.png --channel "Instagram (paid social)"
+python -m scripts.dry_run --video ../northplay-demo-data/demo_ads/demo_04_hockey_night_video.mp4 --channel "YouTube (paid video)"
 uvicorn app.main:app --reload --port 8000     # API on http://localhost:8000, docs at /docs
 python -m scripts.smoke          # live end to end; run it against a scratch database, it writes test ads
 

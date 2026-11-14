@@ -207,6 +207,7 @@ def main() -> None:
     p.add_argument("--ad", help="ref of a seeded ad in backend/seed/campaigns.json")
     p.add_argument("--text", help="ad copy to review")
     p.add_argument("--image", help="path to an image ad to read and review")
+    p.add_argument("--video", help="path to a video ad (mp4, mov, webm) to read and review")
     p.add_argument("--offer", default=None)
     p.add_argument("--region", default=profile["region"])
     p.add_argument("--channel", default="unspecified")
@@ -238,9 +239,16 @@ def main() -> None:
         text = reading["text"]
         ctx.update(modality="image", visual_notes=reading["visual_notes"], fine_print_legible=reading["fine_print_legible"])
         print(f"read from image: {text}\nnotes: {reading['visual_notes']}\ndisclaimer easy to read: {reading['fine_print_legible']}")
+    if args.video:
+        path = pathlib.Path(args.video)
+        mime = {".mov": "video/quicktime", ".webm": "video/webm"}.get(path.suffix.lower(), "video/mp4")
+        reading = media.read_video_bytes(path.read_bytes(), mime, usage=usage)
+        text = reading["text"]
+        ctx.update(modality="video", visual_notes=reading["visual_notes"], fine_print_legible=reading["fine_print_legible"])
+        print(f"{reading['seconds']} s, {reading['frames']} frames read\nspoken: {reading['spoken']}\non screen: {reading['on_screen']}\nnotes: {reading['visual_notes']}\ndisclaimer easy to read: {reading['fine_print_legible']}")
     if not text:
-        p.error("give --suite, --ad, --text or --image")
-    run(text, ctx, identity, SeedSources(), use_memory=not args.no_memory, title=args.image or "submitted ad", as_json=args.json, usage=usage)
+        p.error("give --suite, --ad, --text, --image or --video")
+    run(text, ctx, identity, SeedSources(), use_memory=not args.no_memory, title=args.image or args.video or "submitted ad", as_json=args.json, usage=usage)
 
 
 if __name__ == "__main__":

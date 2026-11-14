@@ -104,6 +104,7 @@ A lane declares its steps up front; all are checked before the first runs, and t
 | Conflict (demo 3, live) | Recorded: `REG-03` (whose exception would allow a retired athlete in a responsible-gambling message) against the Slack decision; the Slack decision won |
 | Flaw highlights, by eye | Demo 2, demo 3 and `NP-H12`: each box sat on the words or element the finding is about. Three ads is a small sample |
 | Video (a 7-second test clip made for this, with speech and on-screen text) | Speech transcribed (21 words), 6 frames read, rejected on `REG-12` twice, `REG-13` and the Slack ban on "risk-free"; filed as a video; a follow-up question answered from it; regenerate declined as designed. 35 s |
+| The demo video `demo_04_hockey_night_video.mp4` (15 s, `scripts/dry_run.py --video`, no database) | 6 frames read, the voice-over transcribed, approved with no findings. Confidence 75 because of the video discount, which is under the bar of 80, so it is routed to a person. 12 s after reading. The frames show the word "Honda" on the rink boards; worth a look by the data owner, since the data set is meant to carry no real brands |
 | The agent asked to approve (a manager, in chat, live) | Refused, with `decided_by: initiator` on the ledger |
 | Consolidation (live) | Four drafts from the seeded past verdicts (`REG-14` from 7, `REG-12` from 5, `REG-09` from 4, `REG-06` from 3). Each read as a fair summary; none was saved |
 | Regenerate | Demo 3 is regenerated as a new banner without the athlete and passes the same review |
