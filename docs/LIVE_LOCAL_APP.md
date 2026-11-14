@@ -9,8 +9,8 @@ The ignored `.env` selects the isolated Atlas database `greenlight_rulan_live`. 
 
 Sign in, choose Use Hockey ad / Use Bonus ad / Use Play Smart ad (or attach your own image), then click Review ad. These controls upload the actual image through `/assets` and run `/compliance/check`; they do not load the saved comparison reports. Submit files the assessed project in Atlas. The lawyer can open it under Saved backend reviews. Approval and rejection use authenticated server routes.
 
-For local startup, run `npm run preview` in frontend after `npm run build`, and `.venv/Scripts/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000` in backend. The backend uses the signed-in local Codex CLI and Voyage retrieval. `npm run dev` also proxies `/api` to FastAPI.
+For local startup, run `npm run preview` in frontend after `npm run build`, and `.venv/Scripts/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000` in backend. The active local backend uses the Claude API and Voyage retrieval; the Codex CLI adapter remains available as an optional provider. `npm run dev` also proxies `/api` to FastAPI.
 
 The browser API wrapper calls fetch through a function, avoiding the illegal receiver binding that prevented live requests. A regression test covers this. Saved demos remain an optional separate mode; they are not the live application.
 
-Local model profile: assessments use `codex:gpt-6.1-sol` with low reasoning; smaller steps retain the configured Luna model. `CODEX_SERVICE_TIER=fast` requests Codex Fast mode for CLI calls. Fast mode consumes more plan usage; end-to-end latency still includes retrieval and storage. Set the variable empty for Standard mode.
+Local model profile: assessments use `anthropic:claude-opus-5-5`; smaller steps use `anthropic:claude-haiku-5-5`, both at low effort. Configure `ANTHROPIC_API_KEY` in the ignored local `.env` and restart FastAPI after changing providers. Historical Codex reports remain comparison records.
