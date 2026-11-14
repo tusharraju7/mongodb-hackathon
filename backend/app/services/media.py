@@ -42,21 +42,25 @@ def kind_of(mime: str) -> str:
 # ---------------------------------------------------------------- storage (GridFS)
 
 
-def store(data: bytes, mime: str, filename: str = "upload", db=None) -> str:
-    b = bucket() if db is None else __import__("gridfs").GridFSBucket(db)
-    return str(b.upload_from_stream(filename, io.BytesIO(data), metadata={"mime": mime}))
+def bucket_for(db=None):
+    """GridFS bucket of the given database, or of the configured one."""
+    import gridfs
+
+    return bucket() if db is None else gridfs.GridFSBucket(db)
+
+
+def store(data: bytes, mime: str, filename: str = "upload", db=None, metadata: Optional[dict] = None) -> str:
+    return str(bucket_for(db).upload_from_stream(filename, io.BytesIO(data), metadata={"mime": mime, **(metadata or {})}))
 
 
 def open_file(file_id: str, db=None) -> tuple[bytes, str]:
-    b = bucket() if db is None else __import__("gridfs").GridFSBucket(db)
-    stream = b.open_download_stream(oid(file_id))
+    stream = bucket_for(db).open_download_stream(oid(file_id))
     return stream.read(), (stream.metadata or {}).get("mime", "application/octet-stream")
 
 
 def delete(file_id: str, db=None) -> None:
-    b = bucket() if db is None else __import__("gridfs").GridFSBucket(db)
     try:
-        b.delete(oid(file_id))
+        bucket_for(db).delete(oid(file_id))
     except Exception:
         pass  # already gone
 
@@ -196,6 +200,9 @@ def render_image_bytes(copy: str, *, language: str = "en", card_name: str = "Tam
     if _font_path() is None and any(ord(ch) > 127 for ch in copy + card_name):
         raise UnsupportedMedia("No font with accented characters was found on this machine. Set BANNER_FONT to a .ttf file.")
 
+    # The template prints the card name as its header. Copy read from a banner often starts with that
+    # same header, so drop a leading repeat instead of printing the name twice. Nothing else is changed.
+    copy = re.sub(rf"^\s*{re.escape(card_name)}[\s.:–-]*", "", copy, flags=re.I)
     parts = layout(copy)
     img = Image.new("RGB", (WIDTH, HEIGHT), GREEN)
     draw = ImageDraw.Draw(img)

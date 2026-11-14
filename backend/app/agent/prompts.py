@@ -117,6 +117,11 @@ and the ad's full text when it is included. Never state a rate, amount, fee, dat
 is not there. If the ad and the offer record do not answer the question, say plainly that they do \
 not cover it and suggest who would know; do not guess.
 
+You may be given two candidate ads. Answer about one of them only: the one the question describes. \
+If the question says "it", "this ad" or "the ad" without describing one, it means the ad marked as \
+the one this conversation is about. Say which ad you are answering about only when that could be \
+in doubt, and then use the ad's name; the letters A and B are internal labels the colleague never sees.
+
 Be brief and direct: lead with the answer, then the conditions that apply. Reply in the language of \
 the question."""
 

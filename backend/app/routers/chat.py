@@ -31,7 +31,8 @@ def chat(body: ChatBody, identity: Identity = Depends(security.current_identity)
     except Exception:
         gate.close_run(run_id, "error")
         raise
-    gate.open_run(identity, run_id, intent=result.get("intent"))  # records the intent on the run
+    # Record the intent on the run, in the vocabulary of the `runs` collection.
+    gate.open_run(identity, run_id, intent={"approve_release": "approve", "other": None}.get(result.get("intent"), result.get("intent")))
     gate.close_run(run_id, result.get("status", "completed"), tokens=result.get("tokens"), memories_used=[m["id"] for m in result.get("memories_used", [])])
     return {
         "reply": result["reply"], "cards": result.get("cards", []), "memories_used": result.get("memories_used", []),

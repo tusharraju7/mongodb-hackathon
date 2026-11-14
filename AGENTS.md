@@ -121,11 +121,12 @@ pytest                           # 52 offline tests, no keys or database needed
 python -m scripts.dry_run        # live review of the running example, no database needed
 python -m scripts.dry_run --suite   # every seeded ad against its expected verdict
 uvicorn app.main:app --reload --port 8000     # API on http://localhost:8000, docs at /docs
-python -m scripts.smoke          # live end to end; needs the seeded database and SEED_PASSWORD
+python -m scripts.smoke          # live end to end; needs a seeded database and SEED_PASSWORD
+python -m scripts.smoke_extras   # live: image in and out, ledger stream, stop, conversation memory
 
-# data owner, not written yet
-python -m scripts.setup_db       # collections, validators, indexes (idempotent)
-python -m scripts.seed           # users, policies, offers, clauses, ads, memories
+# build and seed a database from docs/MONGODB_SETUP.md and backend/seed (refuses `greenlight` without --shared)
+python -m scripts.fake_data --db greenlight_test --password <test password>
+MONGODB_DB=greenlight_test SEED_PASSWORD=<test password> uvicorn app.main:app --port 8000
 ```
 
 ## Looking at the shared database from your agent

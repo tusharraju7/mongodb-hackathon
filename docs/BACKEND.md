@@ -18,7 +18,21 @@ Branch `agent/ai-flows`. Everything under `backend/` except the two data scripts
 | Audit, live stream, stop, rollback | `routers/audit.py`, `routers/runs.py` | Built. Verified offline, except the live stream |
 | API, 27 endpoints | `routers/*` | Built. Matches `CONTRACTS.md` section 7, with the differences listed below |
 
-**Not verified yet, because the `greenlight` database does not exist:** vector search in Atlas (clauses, memories, ads), conversation state in MongoDB, the ledger change stream behind `/audit/stream`, and file storage in GridFS. `scripts/smoke.py` checks all of these once the database is seeded.
+**Verified live on Atlas, against a scratch database.** The shared `greenlight` database does not exist yet, so `scripts/fake_data.py` built `greenlight_test` on the sandbox cluster from `docs/MONGODB_SETUP.md` and `backend/seed/`, and the whole backend was run against it:
+
+| Check | Result |
+|---|---|
+| `scripts/smoke.py --audio` | 36 of 36: review, regenerate, approve, stale release, rollback, questions, memory changing a verdict, team isolation, audio in and out |
+| Image in and out | A banner is read, reviewed with the same findings as its text version at lower confidence, and regenerated as a new banner |
+| Atlas vector search | Clauses, memories and ads, each with its team, role, region and status filters; a retired clause is never returned |
+| Live ledger stream | The allow decision reaches the stream while the review is still running; the stream closes when the run ends |
+| Stop | Requested mid-review; the run halted before filing and nothing was saved |
+| Conversation state | Stored in MongoDB; a follow-up "it" resolves to the ad just reviewed |
+| Expiry and validators | The five-minute memory was removed by the TTL index; the validators from `MONGODB_SETUP.md` accepted every document the backend wrote and rejected malformed ones |
+
+The image, stream, stop and conversation checks are saved as `scripts/smoke_extras.py`. That saved copy has one corrected expectation and has not itself been re-run.
+
+Not checked: that two users' same-named threads stay separate (it follows from how thread ids are built, but no test exercises it), and how traces look in LangSmith.
 
 **Not built:** reuse of a stored verdict for an unchanged ad (the key is stored, the lookup is not wired), the manager's "review our policies for gaps" request, a round-trip transcription check on regenerated audio, and turning reject feedback into a memory.
 
@@ -58,6 +72,13 @@ General clauses are always included because a similarity search on an English cr
 - **Banner font.** Banners need a font with accented letters. Common system fonts are found automatically; otherwise set `BANNER_FONT` to a `.ttf` file. Without one, a French banner is refused, not rendered wrongly.
 
 ## For the data owner
+
+`scripts/fake_data.py` is a working implementation of `MONGODB_SETUP.md` steps 2 to 6: it reads the validators and vector index definitions out of that document, loads `backend/seed/`, produces the seeded audio and banners, and upserts on natural keys. Use it as is, or as the reference for `setup_db.py` and `seed.py`:
+
+```bash
+python -m scripts.fake_data --db greenlight_test --password <test password>      # a scratch database
+python -m scripts.fake_data --db greenlight --shared --password <SEED_PASSWORD>  # the shared one
+```
 
 The backend reads the collections exactly as `CONTRACTS.md` and `MONGODB_SETUP.md` describe them. These details matter:
 

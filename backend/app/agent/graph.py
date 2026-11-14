@@ -94,6 +94,11 @@ def act(state: ChatState) -> dict:
     ad = dict(state.get("ad") or {})
     campaign_id = ad.get("campaign_id") or state.get("last_campaign_id")
     try:
+        # Deny before spending: a role that lacks the action is refused here, on the ledger, before
+        # the lane reads a file, searches or calls a model.
+        action = INTENT_ACTION.get(intent)
+        if action and not gate.permitted(identity, action):
+            gate.guarded(identity, action, {"via": "chat", "message": state["message"]}, run_id, lambda: None, thread_id=state.get("thread_id"))
         if intent == "review":
             text = ad.pop("text", None) or (state["message"] if not state.get("file_id") and not ad.get("campaign_id") and ad.get("offer_id") else None)
             if not text and not state.get("file_id") and not ad.get("campaign_id") and state.get("last_campaign_id"):

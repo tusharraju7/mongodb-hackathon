@@ -277,9 +277,12 @@ def ask_lane(identity: Identity, run_id: str, *, question: str, thread_campaign_
 
         labels = ["A", "B"]
         offer_cache = {c.get("offer_id"): offers.get(c.get("offer_id"), db) for c in candidates}
+        in_thread = thread_campaign_id and str(candidates[0]["_id"]) == str(thread_campaign_id)
 
         def ask(with_text: bool) -> Answer:
             blocks = "\n\n".join(_ad_block(labels[i], c, offer_cache.get(c.get("offer_id")), with_text) for i, c in enumerate(candidates))
+            if in_thread:
+                blocks += "\n\n<conversation>Ad A is the ad this conversation is about.</conversation>"
             return llm.call_structured(llm.fast_model(), Answer, system=prompts.ANSWER_SYSTEM, user=f"{blocks}\n\n<question>\n{question}\n</question>", label="answer_full_text" if with_text else "answer", usage=usage, run_id=run_id, intent="ask")
 
         result = ask(False)
