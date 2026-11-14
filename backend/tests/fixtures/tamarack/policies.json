@@ -1,0 +1,26 @@
+[
+  {
+    "_id": "manager",
+    "actions": [
+      "compliance.check", "campaign.submit", "asset.regenerate", "campaign.approve", "campaign.release",
+      "campaign.search", "campaign.ask",
+      "fundamentals.read", "fundamentals.update", "fundamentals.review",
+      "memory.read", "memory.write", "memory.forget",
+      "run.stop", "run.rollback", "audit.read"
+    ]
+  },
+  {
+    "_id": "marketer",
+    "actions": [
+      "compliance.check", "campaign.submit", "asset.regenerate", "campaign.release",
+      "campaign.search", "campaign.ask",
+      "fundamentals.read",
+      "memory.read", "memory.write", "memory.forget",
+      "run.stop", "audit.read"
+    ]
+  },
+  {
+    "_id": "sales",
+    "actions": ["campaign.search", "campaign.ask"]
+  }
+]

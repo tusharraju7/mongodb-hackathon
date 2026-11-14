@@ -1,0 +1,60 @@
+{
+  "brand": "NorthPlay",
+  "description": "NorthPlay, an online sportsbook licensed in Ontario, Canada",
+  "product": "sportsbook",
+  "region": "CA-ON",
+  "teams": [
+    "ontario",
+    "alberta"
+  ],
+  "claim_types": {
+    "inducement": "a bonus, bonus bet, deposit match, odds boost, credit, cash back, promo code, or any amount tied to an offer",
+    "free_or_risk_free": "the words free, risk-free, no risk or on us, or any promise that the player cannot lose money",
+    "odds_or_certainty": "a statement about odds, the chance of winning, or certainty of an outcome (lock, sure thing, guaranteed, can't lose, easy money)",
+    "endorsement": "a person or character who is named, quoted or pictured: an athlete, celebrity, influencer or mascot",
+    "income_or_problem_solving": "gambling presented as income, an investment, or a way to pay bills or fix money or personal problems",
+    "loss_chasing": "encouragement to win back losses or to keep betting after losing",
+    "status_or_peer": "gambling linked to status, attractiveness, success, coming of age, or pressure from friends",
+    "trademark_or_league": "a league, event, team name, logo or other mark the company may not hold rights to"
+  },
+  "memory": {
+    "per_query": 6,
+    "budget": 12,
+    "quotas": {
+      "binding": 5,
+      "guidance": 2,
+      "precedent": 3,
+      "background": 2
+    }
+  },
+  "banner": {
+    "header": "NORTHPLAY",
+    "background": [
+      11,
+      37,
+      54
+    ],
+    "text": [
+      240,
+      246,
+      244
+    ],
+    "accent": [
+      120,
+      222,
+      190
+    ],
+    "headline": "first"
+  },
+  "fine_print_patterns": [
+    "19\\+",
+    "ontario only",
+    "play responsibly",
+    "connexontario"
+  ],
+  "decision_labels": {
+    "pass": "approved",
+    "needs_changes": "approved_with_changes",
+    "blocked": "rejected"
+  }
+}

@@ -1,0 +1,177 @@
+[
+  {
+    "ref": "nat-email-fall-cashback",
+    "team": "national", "name": "Fall cashback email",
+    "product": "credit_card", "offer_id": "TCB-FALL-2026",
+    "region": "CA", "channel": "email", "language": "en", "modality": "text",
+    "budget": { "amount": 12000, "currency": "CAD" },
+    "text": "Enjoy 0% interest on purchases for 10 months, then 20.99%. Earn $300 cash back after $1,500 in purchases in your first 3 months. Subject to credit approval. Conditions apply. Apply today at tamarack.test/cashback. Unsubscribe: tamarack.test/unsubscribe",
+    "description": "An email offering $300 cash back and 0% interest for 10 months on the Tamarack Cashback Card.",
+    "summary": "Email for the fall cashback offer: 0% on purchases for 10 months then 20.99%, and $300 cash back after $1,500 in purchases in the first 3 months. Subject to credit approval.",
+    "facts": {
+      "claims": [
+        { "type": "intro_rate", "quote": "0% interest on purchases for 10 months, then 20.99%", "values": { "rate_percent": 0, "months": 10 } },
+        { "type": "rewards_bonus", "quote": "$300 cash back after $1,500 in purchases in your first 3 months", "values": { "amount": 300 } }
+      ],
+      "cta": "Apply today at tamarack.test/cashback", "tone": "plain", "language": "en"
+    },
+    "status": "released", "compliance": { "verdict": "pass", "route": "none" },
+    "created_by": "marketer.national@tamarack.test", "approved_by": "manager.national@tamarack.test"
+  },
+  {
+    "ref": "nat-banner-fall-cashback",
+    "team": "national", "name": "Fall cashback banner",
+    "product": "credit_card", "offer_id": "TCB-FALL-2026",
+    "region": "CA", "channel": "display", "language": "en", "modality": "image",
+    "budget": { "amount": 8000, "currency": "CAD" },
+    "text": "$300 cash back. After $1,500 in purchases in your first 3 months. 0% interest on purchases for 10 months, then 20.99%. Tamarack Cashback Card. Subject to credit approval. Conditions apply.",
+    "visual_notes": "Dark green banner. Large headline '$300 cash back'. A picture of the card on the right. Fine print along the bottom edge, legible. No people shown.",
+    "description": "A dark green web banner with '$300 cash back' in large type and a picture of the Tamarack Cashback Card.",
+    "summary": "Display banner for the fall cashback offer: $300 cash back after $1,500 in purchases in the first 3 months, 0% on purchases for 10 months then 20.99%.",
+    "facts": {
+      "claims": [
+        { "type": "rewards_bonus", "quote": "$300 cash back. After $1,500 in purchases in your first 3 months", "values": { "amount": 300 } },
+        { "type": "intro_rate", "quote": "0% interest on purchases for 10 months, then 20.99%", "values": { "rate_percent": 0, "months": 10 } }
+      ],
+      "cta": null, "tone": "plain", "language": "en"
+    },
+    "status": "released", "compliance": { "verdict": "pass", "route": "none" },
+    "created_by": "marketer.national@tamarack.test", "approved_by": "manager.national@tamarack.test"
+  },
+  {
+    "ref": "nat-radio-slow-mornings",
+    "team": "national", "name": "Slow mornings radio spot",
+    "product": "credit_card", "offer_id": "TCB-FALL-2026",
+    "region": "CA", "channel": "radio", "language": "en", "modality": "audio",
+    "budget": { "amount": 20000, "currency": "CAD" },
+    "text": "Mornings are better when they are not rushed. With the Tamarack Cashback Card, earn 300 dollars cash back after 1,500 dollars in purchases in your first 3 months. And pay 0 percent interest on purchases for 10 months, then 20.99 percent. Subject to credit approval. Conditions apply. Tamarack Bank.",
+    "description": "A calm radio spot about slow, unhurried mornings that ends with the $300 cash back offer on the Tamarack Cashback Card.",
+    "summary": "Radio spot for the fall cashback offer, themed on unhurried mornings: $300 cash back after $1,500 in purchases in the first 3 months, 0% for 10 months then 20.99%.",
+    "facts": {
+      "claims": [
+        { "type": "rewards_bonus", "quote": "earn 300 dollars cash back after 1,500 dollars in purchases in your first 3 months", "values": { "amount": 300 } },
+        { "type": "intro_rate", "quote": "0 percent interest on purchases for 10 months, then 20.99 percent", "values": { "rate_percent": 0, "months": 10 } }
+      ],
+      "cta": null, "tone": "calm", "language": "en"
+    },
+    "status": "approved", "compliance": { "verdict": "pass", "route": "none" },
+    "created_by": "marketer.national@tamarack.test", "approved_by": "manager.national@tamarack.test"
+  },
+  {
+    "ref": "nat-email-best-card",
+    "team": "national", "name": "Best card email draft",
+    "product": "credit_card", "offer_id": "TCB-FALL-2026",
+    "region": "CA", "channel": "email", "language": "en", "modality": "text",
+    "budget": { "amount": 5000, "currency": "CAD" },
+    "text": "Canada's best cashback card! Get $300 in free money just for signing up. No annual fee. Apply now.",
+    "description": "A draft email calling the card Canada's best cashback card and promising $300 for signing up.",
+    "summary": "Draft email with an unsupported superlative, a 'free money' claim and a bonus stated without its conditions.",
+    "facts": {
+      "claims": [
+        { "type": "superlative", "quote": "Canada's best cashback card" },
+        { "type": "rewards_bonus", "quote": "Get $300 in free money just for signing up", "values": { "amount": 300 } },
+        { "type": "annual_fee", "quote": "No annual fee", "values": { "fee": 0 } }
+      ],
+      "cta": "Apply now", "tone": "promotional", "language": "en"
+    },
+    "status": "pending_review", "compliance": { "verdict": "blocked", "route": "human_review" },
+    "created_by": "marketer.national@tamarack.test"
+  },
+  {
+    "ref": "nat-social-rewards-switch",
+    "team": "national", "name": "Rewards card switch post",
+    "product": "credit_card", "offer_id": "TRC-WINTER-2026",
+    "region": "CA", "channel": "social", "language": "en", "modality": "text",
+    "budget": { "amount": 3000, "currency": "CAD" },
+    "text": "Tired of Northgate Bank? Switch to the Tamarack Rewards Card and get $150 cash back. No annual fee.",
+    "description": "A social post telling customers of another bank to switch to the Tamarack Rewards Card for $150 cash back.",
+    "summary": "Social post that names a competitor, states no annual fee where the offer has a $99 fee, and omits the bonus conditions.",
+    "facts": {
+      "claims": [
+        { "type": "rewards_bonus", "quote": "get $150 cash back", "values": { "amount": 150 } },
+        { "type": "annual_fee", "quote": "No annual fee", "values": { "fee": 0 } }
+      ],
+      "cta": "Switch to the Tamarack Rewards Card", "tone": "promotional", "language": "en"
+    },
+    "status": "rejected", "compliance": { "verdict": "blocked", "route": "human_review" },
+    "review_feedback": "Names a competitor and misstates the annual fee. Do not resubmit in this form.",
+    "created_by": "marketer.national@tamarack.test", "rejected_by": "manager.national@tamarack.test"
+  },
+  {
+    "ref": "qc-radio-remises",
+    "team": "quebec", "name": "Message radio remises d'automne",
+    "product": "credit_card", "offer_id": "TCB-FALL-2026",
+    "region": "CA-QC", "channel": "radio", "language": "fr", "modality": "audio",
+    "budget": { "amount": 10000, "currency": "CAD" },
+    "text": "Avec la Carte Remises Tamarack, obtenez 300 dollars de remise en argent après 1 500 dollars d'achats au cours de vos 3 premiers mois. Profitez aussi d'un taux d'intérêt de 0 pour cent sur les achats pendant 10 mois, puis de 20,99 pour cent. Sous réserve de l'approbation du crédit. Des conditions s'appliquent. Banque Tamarack.",
+    "description": "Un message radio en français qui annonce 300 $ de remise en argent avec la Carte Remises Tamarack.",
+    "summary": "French radio spot for the fall cashback offer: $300 cash back after $1,500 in purchases in the first 3 months, 0% for 10 months then 20.99%. Subject to credit approval.",
+    "facts": {
+      "claims": [
+        { "type": "rewards_bonus", "quote": "300 dollars de remise en argent après 1 500 dollars d'achats au cours de vos 3 premiers mois", "values": { "amount": 300 } },
+        { "type": "intro_rate", "quote": "taux d'intérêt de 0 pour cent sur les achats pendant 10 mois, puis de 20,99 pour cent", "values": { "rate_percent": 0, "months": 10 } }
+      ],
+      "cta": null, "tone": "calm", "language": "fr"
+    },
+    "status": "released", "compliance": { "verdict": "pass", "route": "none" },
+    "created_by": "marketer.quebec@tamarack.test", "approved_by": "manager.quebec@tamarack.test"
+  },
+  {
+    "ref": "qc-email-remises",
+    "team": "quebec", "name": "Courriel remises d'automne",
+    "product": "credit_card", "offer_id": "TCB-FALL-2026",
+    "region": "CA-QC", "channel": "email", "language": "fr", "modality": "text",
+    "budget": { "amount": 6000, "currency": "CAD" },
+    "text": "Obtenez 300 $ de remise en argent après 1 500 $ d'achats au cours de vos 3 premiers mois. Taux d'intérêt de 0 % sur les achats pendant 10 mois, puis 20,99 %. Des conditions s'appliquent. Faites votre demande dès aujourd'hui. Se désabonner : tamarack.test/desabonnement",
+    "description": "Un courriel en français qui annonce 300 $ de remise en argent et un taux de 0 % pendant 10 mois.",
+    "summary": "French email for the fall cashback offer. Passes today. It does not contain the line 'Sous réserve de l'approbation du crédit.', so it is the ad used to show a new Quebec team instruction changing the verdict.",
+    "facts": {
+      "claims": [
+        { "type": "rewards_bonus", "quote": "300 $ de remise en argent après 1 500 $ d'achats au cours de vos 3 premiers mois", "values": { "amount": 300 } },
+        { "type": "intro_rate", "quote": "Taux d'intérêt de 0 % sur les achats pendant 10 mois, puis 20,99 %", "values": { "rate_percent": 0, "months": 10 } }
+      ],
+      "cta": "Faites votre demande dès aujourd'hui", "tone": "plain", "language": "fr"
+    },
+    "status": "pending_review", "compliance": { "verdict": "pass", "route": "none" },
+    "created_by": "marketer.quebec@tamarack.test"
+  },
+  {
+    "ref": "qc-banner-remises",
+    "team": "quebec", "name": "Bannière remises d'automne",
+    "product": "credit_card", "offer_id": "TCB-FALL-2026",
+    "region": "CA-QC", "channel": "display", "language": "fr", "modality": "image",
+    "budget": { "amount": 5000, "currency": "CAD" },
+    "text": "300 $ de remise en argent. Après 1 500 $ d'achats au cours de vos 3 premiers mois. Taux d'intérêt de 0 % sur les achats pendant 10 mois, puis 20,99 %. Carte Remises Tamarack. Sous réserve de l'approbation du crédit. Des conditions s'appliquent.",
+    "visual_notes": "Dark green banner. Large headline '300 $ de remise en argent'. A picture of the card on the right. Fine print along the bottom edge, legible. No people shown.",
+    "description": "Une bannière web vert foncé avec « 300 $ de remise en argent » en gros caractères et une image de la Carte Remises Tamarack.",
+    "summary": "French display banner for the fall cashback offer: $300 cash back after $1,500 in purchases in the first 3 months, 0% for 10 months then 20.99%.",
+    "facts": {
+      "claims": [
+        { "type": "rewards_bonus", "quote": "300 $ de remise en argent. Après 1 500 $ d'achats au cours de vos 3 premiers mois", "values": { "amount": 300 } },
+        { "type": "intro_rate", "quote": "Taux d'intérêt de 0 % sur les achats pendant 10 mois, puis 20,99 %", "values": { "rate_percent": 0, "months": 10 } }
+      ],
+      "cta": null, "tone": "plain", "language": "fr"
+    },
+    "status": "approved", "compliance": { "verdict": "pass", "route": "none" },
+    "created_by": "marketer.quebec@tamarack.test", "approved_by": "manager.quebec@tamarack.test"
+  },
+  {
+    "ref": "qc-email-english-only",
+    "team": "quebec", "name": "English email sent to Quebec list",
+    "product": "credit_card", "offer_id": "TCB-FALL-2026",
+    "region": "CA-QC", "channel": "email", "language": "en", "modality": "text",
+    "budget": { "amount": 4000, "currency": "CAD" },
+    "text": "Get $300 cash back with the Tamarack Cashback Card after $1,500 in purchases in your first 3 months. 0% interest on purchases for 10 months, then 20.99%. Conditions apply. Unsubscribe: tamarack.test/unsubscribe",
+    "description": "An English-only email about $300 cash back, addressed to the Quebec mailing list.",
+    "summary": "English-only email for the fall cashback offer, targeted at Quebec. Its terms are correct but it is not in French.",
+    "facts": {
+      "claims": [
+        { "type": "rewards_bonus", "quote": "$300 cash back with the Tamarack Cashback Card after $1,500 in purchases in your first 3 months", "values": { "amount": 300 } },
+        { "type": "intro_rate", "quote": "0% interest on purchases for 10 months, then 20.99%", "values": { "rate_percent": 0, "months": 10 } }
+      ],
+      "cta": null, "tone": "plain", "language": "en"
+    },
+    "status": "pending_review", "compliance": { "verdict": "blocked", "route": "human_review" },
+    "created_by": "marketer.quebec@tamarack.test"
+  }
+]

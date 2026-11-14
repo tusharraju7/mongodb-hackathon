@@ -36,3 +36,6 @@ exports/
 *.wav
 *.m4a
 backend/seed/media/
+
+# Local caches
+backend/.cache/

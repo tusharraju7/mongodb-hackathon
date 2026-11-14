@@ -1,13 +1,59 @@
-# Greenlight — a marketing agent you can audit, with memory you can govern
+# Greenlight
 
-MongoDB hackathon project. Team of 4, built in 4 hours.
+**A marketing agent you can audit, with memory you can govern.**
 
-Greenlight is a marketing agent for an organisation. It reviews existing ad creative, as text, audio or image, against policy clauses and the approved offer record. On request it regenerates a version that passes the same review, in the ad's own form (ElevenLabs for audio, a brand template for images), and it gates release on a current approval. It lets the marketing manager update what the agent knows and remembers, and answers questions about an ad by returning the ad itself. The examples use a fictional Canadian bank advertising a cashback credit card, with a national team and a Quebec team. MongoDB Atlas is the identity, policy, audit and memory layer:
+MongoDB hackathon project · Team of 4 · Built in 4 hours
 
-- **Agents You Can Audit** — every action is tied to an identity, checked against policy before it runs, and written to an append-only ledger. Runs can be stopped and rolled back.
-- **Memory You Can Govern** — memory lives in Atlas with Vector Search (Voyage embeddings), scoped per team and role, with expiry, correction and forgetting, and a visible trace of which memories changed a result.
+Every ad a regulated business runs has to clear legal review. Today that means a lawyer reading each ad against the regulations, past decisions, the brand plan and whatever was agreed in Slack last week. Greenlight is an agent that does the first pass, shows its work, and hands the final call to the lawyer.
 
-**Status:** planning complete; implementation starts at kickoff. This repo currently contains the plan and the guidance for the team's coding agents.
+## What it does
+
+A marketer uploads an ad as **text, audio or image**. The agent:
+
+1. **Reads it.** Audio is transcribed (ElevenLabs Scribe) and images are read once. Every format becomes text and goes through the same review.
+2. **Gathers the right context.** It picks which regulations apply, then searches past ad decisions, strategy decks and team Slack decisions, scoped to the marketer's team.
+3. **Reasons across conflicts.** When sources disagree (the regulation allows it, a past ad was approved, but Legal banned it in Slack last week), it says so and explains which source wins.
+4. **Recommends and acts.** It returns a verdict with findings that each cite their source, drafts a compliant version on request, and routes the ad.
+5. **Hands off to a human.** The marketer submits to Legal: a green **Submit** at 90% confidence or higher, a red **Submit anyway** below 90%. Only the lawyer can approve or reject, and release is blocked until a current approval exists.
+
+Every step is tied to an identity, checked against policy before it runs, and written to the ledger.
+
+## Two screens
+
+| Marketer | Lawyer (lawyer role only) |
+|---|---|
+| Upload on the left; the agent's live step trace, findings and recommendation on the right; confidence and Submit at the bottom | The same view of the submitted ad and the agent's analysis, plus **Approve** / **Reject** of the final recommendation |
+
+Confidence is **evidence strength, computed in code** from how the findings are supported. It is not a probability, and it can only make the route stricter, never looser.
+
+## Demo scenario
+
+The demo uses **NorthPlay**, a fictional Ontario sportsbook. Its data, generated as test data for the event, is in [`northplay-demo-data/`](northplay-demo-data/):
+
+- 15 sportsbook advertising rules: fictional, modelled on Ontario-style standards, not legal advice
+- 15 past ad decisions with rationale
+- 2 strategy decks (2027 strategy, Q1 2027 marketing plan)
+- A Slack export with internal decisions that are newer and stricter than the decks
+- 3 ads for the live demo
+
+The planning documents in [`docs/`](docs/) were written with a fictional bank example; the flows are the same. [docs/BACKEND.md](docs/BACKEND.md) describes the backend as built on the NorthPlay data.
+
+## Built on MongoDB Atlas
+
+Atlas is the identity, policy, audit and memory layer, and covers both problem statements:
+
+- **Agents You Can Audit:** every action is tied to an identity, checked against policy before it runs, and written to a ledger that is append-only by design. Runs can be stopped and rolled back.
+- **Memory You Can Govern:** memory lives in Atlas with Vector Search (Voyage embeddings), scoped per team and role. It expires, can be corrected or forgotten, and each result shows which memories changed it.
+
+## Stack
+
+Next.js · FastAPI · LangGraph / LangChain · Claude (verdict and fast models) · MongoDB Atlas (Vector Search, change streams, schema validation, TTL, GridFS) · Voyage AI embeddings · ElevenLabs (Scribe speech-to-text, text-to-speech) · MongoDB MCP server
+
+## Status
+
+The backend is built and the `greenlight` database on Atlas is loaded with the NorthPlay data. The web app is in progress.
+
+Checked so far: 52 offline tests pass; 14 of the 15 past ads come back with their recorded decision when reviewed without the memory of that decision; the three demo ads come out as intended; and 38 of 39 live end-to-end checks passed on Atlas, with the one failure fixed and re-checked. Details, limits and how to run it are in [docs/BACKEND.md](docs/BACKEND.md).
 
 ## Documents
 
@@ -15,22 +61,19 @@ Greenlight is a marketing agent for an organisation. It reviews existing ad crea
 |---|---|
 | [AGENTS.md](AGENTS.md) | Guidance for every coding agent: ownership, rules, branching |
 | [docs/PLAN.md](docs/PLAN.md) | Execution plan: streams, tasks, time boxes, checks |
+| [docs/BACKEND.md](docs/BACKEND.md) | The backend as built: the NorthPlay data, how to run it, what is verified, API notes for the web app |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Tech stack, infrastructure diagram, core mechanisms |
-| [docs/FLOWS.md](docs/FLOWS.md) | Operational flows for the three use cases: auth, memory, token use |
-| [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md) | One credit card ad followed from policy document to release, with sample JSON |
+| [docs/FLOWS.md](docs/FLOWS.md) | Operational flows: auth, memory, token use |
+| [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md) | One ad followed from policy to release, with sample JSON |
 | [docs/CONTRACTS.md](docs/CONTRACTS.md) | Schemas, indexes, RBAC matrix, API, service signatures |
-| [docs/MONGODB_SETUP.md](docs/MONGODB_SETUP.md) | Collections, validators, indexes, creation order and seed data |
+| [docs/MONGODB_SETUP.md](docs/MONGODB_SETUP.md) | Collections, validators, indexes, creation order, seed data |
 | [docs/SETUP.md](docs/SETUP.md) | Shared Atlas Sandbox access, environment, MCP |
 | [docs/DEMO.md](docs/DEMO.md) | Demo script and rules checklist |
-
-## Stack
-
-Next.js · FastAPI · LangGraph / LangChain · MongoDB Atlas (Vector Search, change streams, schema validation, TTL, GridFS) · Voyage AI embeddings · ElevenLabs · MongoDB MCP server
 
 ## Built during the hackathon
 
 Everything in this repository was written during the event. To be completed before submission:
 
 - **What we built:** _list the features shown in the demo_
-- **Third-party libraries and services used:** _list_
+- **Third-party libraries and services used:** _see Stack; confirm before submitting_
 - **Team:** _names_
