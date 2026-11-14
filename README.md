@@ -7,7 +7,7 @@ Greenlight is a marketing agent for an organisation. It reviews existing ad crea
 - **Agents You Can Audit** — every action is tied to an identity, checked against policy before it runs, and written to an append-only ledger. Runs can be stopped and rolled back.
 - **Memory You Can Govern** — memory lives in Atlas with Vector Search (Voyage embeddings), scoped per team and role, with expiry, correction and forgetting, and a visible trace of which memories changed a result.
 
-**Status:** planning complete; implementation starts at kickoff. This repo currently contains the plan and the guidance for the team's coding agents.
+**Status:** the backend is built on the `agent/ai-flows` branch and verified offline (52 tests) and, for the review itself, live against the seed files. The database and the web app are in progress. See [docs/BACKEND.md](docs/BACKEND.md).
 
 ## Documents
 
@@ -18,6 +18,7 @@ Greenlight is a marketing agent for an organisation. It reviews existing ad crea
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Tech stack, infrastructure diagram, core mechanisms |
 | [docs/FLOWS.md](docs/FLOWS.md) | Operational flows for the three use cases: auth, memory, token use |
 | [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md) | One credit card ad followed from policy document to release, with sample JSON |
+| [docs/BACKEND.md](docs/BACKEND.md) | The backend as built: how to run it, what is verified, what data and the web app must match |
 | [docs/CONTRACTS.md](docs/CONTRACTS.md) | Schemas, indexes, RBAC matrix, API, service signatures |
 | [docs/MONGODB_SETUP.md](docs/MONGODB_SETUP.md) | Collections, validators, indexes, creation order and seed data |
 | [docs/SETUP.md](docs/SETUP.md) | Shared Atlas Sandbox access, environment, MCP |

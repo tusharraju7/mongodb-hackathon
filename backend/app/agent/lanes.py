@@ -59,8 +59,9 @@ def review_lane(
     if ctx.get("campaign_id") and not text and not file_id:
         existing = campaigns.get(identity, ctx["campaign_id"], db)
         text, modality = existing["text"], existing.get("modality", "text")
+        # The stored ad's own context rules; a form default must not turn a Quebec ad into a national one.
         for key in ("product", "offer_id", "region", "channel", "language", "budget", "visual_notes"):
-            ctx[key] = ctx.get(key) or existing.get(key)
+            ctx[key] = existing.get(key) or ctx.get(key)
         ctx["name"] = ctx.get("name") or existing.get("name")
 
     # A file is turned into text once. The file itself is never sent to a model again.

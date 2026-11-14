@@ -338,7 +338,8 @@ Hallucination guard, before scoring:
 Finding score
     basis "code" (budget cap, banned term, required line, offer mismatch)   start 100
     basis "model"                                                           start 55
-        + 20   the cited clause is mandatory for a claim type present in the ad
+        + 20   the cited clause is mandatory: tied to a claim type the ad makes, or with no claim
+               type and so applying to every ad in scope; or it is a standing team instruction
         + 10   otherwise: the clause came from the per-claim similarity search
         + 10   the quote was verified word for word in the ad text
         + 10   certainty "clear"   |   0 "likely"   |   - 20 "unclear"
