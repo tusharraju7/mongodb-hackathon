@@ -1,10 +1,10 @@
 # REG-14: Required Disclaimers: Responsible Gambling Message, 19+ and Ontario Only
 
-> Demo policy document for the NorthPlay legal approver agent (NorthPlay is a fictional operator). Paraphrased from Ontario's AGCO Registrar's Standards for Internet Gaming for hackathon use only; not legal advice and not the official text.
+> Demo policy document for the NorthPlay legal approver agent (NorthPlay is a fictional operator). Fictional rules modelled on Ontario-style internet gaming advertising standards, written for hackathon use only; not legal advice and not any regulator's official text.
 
 - **Rule ID:** REG-14
 - **Category:** Required Disclosures
-- **Source:** AGCO Registrar's Standards for Internet Gaming (Ontario), responsible gambling requirement (all advertising must contain a responsible gambling message); iGaming Ontario Marketing & Advertising Policy (Ontario-only); NorthPlay house standard
+- **Source:** NorthPlay Advertising Policy (modelled on Ontario-style iGaming advertising standards), responsible gambling requirement (all advertising must contain a responsible gambling message); provincial marketing policy (Ontario-only); NorthPlay house standard
 - **Severity:** major
 - **Jurisdiction:** Ontario, Canada
 
@@ -19,7 +19,7 @@ Every ad must remind players of risk and where to get help.
 - Missing '19+' age statement
 - Missing 'Ontario only' where reach may extend beyond Ontario
 - Disclaimer too small, low contrast, or (audio) read too fast to understand
-- Recommended house wording: '19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.'
+- Recommended house wording: '19+. Ontario only. Please play responsibly. Concerned about your gambling? Call the NorthPlay Play Smart Line 1-800-555-0142.'
 
 ## Non-compliant examples
 - Static social ad with no disclaimer

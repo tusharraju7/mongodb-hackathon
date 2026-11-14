@@ -1,10 +1,10 @@
 # REG-06: No Exploiting or Enticing High-Risk Persons
 
-> Demo policy document for the NorthPlay legal approver agent (NorthPlay is a fictional operator). Paraphrased from Ontario's AGCO Registrar's Standards for Internet Gaming for hackathon use only; not legal advice and not the official text.
+> Demo policy document for the NorthPlay legal approver agent (NorthPlay is a fictional operator). Fictional rules modelled on Ontario-style internet gaming advertising standards, written for hackathon use only; not legal advice and not any regulator's official text.
 
 - **Rule ID:** REG-06
 - **Category:** Responsible Gambling
-- **Source:** AGCO Registrar's Standards for Internet Gaming (Ontario), Standard 2.03, Req. 7 and Req. 8
+- **Source:** NorthPlay Advertising Policy (modelled on Ontario-style iGaming advertising standards), Section 2.03, Req. 7 and Req. 8
 - **Severity:** major
 - **Jurisdiction:** Ontario, Canada
 

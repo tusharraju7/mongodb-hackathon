@@ -1,5 +1,5 @@
 # Q1 2027 Marketing & Brand Plan
-*Hockey Night Live, NFL playoffs and the Play Smart refresh*
+*Puck Drop Live, football playoffs and the Play Smart refresh*
 
 Marketing Team | Internal | v1.0 | October 28, 2026
 > NorthPlay is a fictional operator. All figures are illustrative demo data.
@@ -9,15 +9,15 @@ Marketing Team | Internal | v1.0 | October 28, 2026
 
 - Grow active players to 225K (+6% QoQ)
 - Launch the NorthPlay Limits hub with a responsible gambling brand campaign
-- Own hockey: be the most-recalled sportsbook brand among Ontario NHL fans
+- Own hockey: be the most-recalled sportsbook brand among Ontario hockey fans
 - Keep acquisition cost under $130 with no public bonus advertising
 
 ## Slide 3: Campaign calendar
 
 | Campaign | Dates | Focus |
 |---|---|---|
-| Hockey Night Live | Jan 3 - Mar 28 | Live odds, NHL micro-markets |
-| NFL Playoffs + the Big Game | Jan 9 - Feb 7 | Parlay builder, live betting |
+| Puck Drop Live | Jan 3 - Mar 28 | Live odds, hockey micro-markets |
+| Football Playoffs + the Big Game | Jan 9 - Feb 7 | Parlay builder, live betting |
 | Play Smart refresh | Jan 15 - Feb 28 | NorthPlay Limits launch, Marcus Doyle |
 | Basketball tip-off | Feb 13 - Mar 31 | Player props |
 
@@ -54,14 +54,14 @@ Marketing Team | Internal | v1.0 | October 28, 2026
 
 ## Slide 8: Ambassadors and partnerships
 
-- Marcus Doyle (retired CFL lineman): Play Smart ambassador, responsible gambling messaging only, no odds or betting CTAs in his creative
+- Marcus Doyle (retired pro football lineman): Play Smart ambassador, responsible gambling messaging only, no odds or betting CTAs in his creative
 - No other athlete ambassadors in Q1
-- Team and league marks may only be used under a signed license. We hold no NHL or NFL licenses
+- Team and league marks may only be used under a signed license. We hold no league licenses
 - Influencer and creator partnerships are not planned for Q1
 
 ## Slide 9: Mandatory creative elements
 
-- Full disclaimer on every asset: '19+. Ontario only. Please play responsibly. Concerned about your gambling? Contact ConnexOntario 1-866-531-2600.'
+- Full disclaimer on every asset: '19+. Ontario only. Please play responsibly. Concerned about your gambling? Call the NorthPlay Play Smart Line 1-800-555-0142.'
 - Minimum disclaimer size: 24px on 1080x1080 and 1080x1920; 18px on 1200x628
 - Audio: the disclaimer is read at normal pace, never sped up
 - Offers appear only in opted-in email/SMS and on-site, with full terms at first presentation

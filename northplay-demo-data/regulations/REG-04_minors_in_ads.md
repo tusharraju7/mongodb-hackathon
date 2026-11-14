@@ -1,10 +1,10 @@
 # REG-04: No Minors or People Who Appear to Be Minors
 
-> Demo policy document for the NorthPlay legal approver agent (NorthPlay is a fictional operator). Paraphrased from Ontario's AGCO Registrar's Standards for Internet Gaming for hackathon use only; not legal advice and not the official text.
+> Demo policy document for the NorthPlay legal approver agent (NorthPlay is a fictional operator). Fictional rules modelled on Ontario-style internet gaming advertising standards, written for hackathon use only; not legal advice and not any regulator's official text.
 
 - **Rule ID:** REG-04
 - **Category:** Protection of Minors
-- **Source:** AGCO Registrar's Standards for Internet Gaming (Ontario), Standard 2.03, Req. 5
+- **Source:** NorthPlay Advertising Policy (modelled on Ontario-style iGaming advertising standards), Section 2.03, Req. 5
 - **Severity:** blocker
 - **Jurisdiction:** Ontario, Canada
 

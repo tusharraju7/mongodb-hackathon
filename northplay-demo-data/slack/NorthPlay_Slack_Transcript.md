@@ -36,7 +36,7 @@ Decision: we are pausing ALL paid TikTok and Snapchat activity, effective today,
 Board asked about compliance. Ethan, can you confirm we've had zero regulatory findings this year?
 
     ↳ **Ethan Cho** (Senior Counsel, Legal & Compliance) · Nov 12, 2026 09:40 AM  
-    ↳ Zero findings. One AGCO inquiry (the 'free' language one, industry-wide) and we responded same day. The agent is catching the bulk of issues pre-launch.
+    ↳ Zero findings. One regulator inquiry (the 'free' language one, industry-wide) and we responded same day. The agent is catching the bulk of issues pre-launch.
 
 ## #marketing
 *Campaign planning, creative and media*
@@ -63,7 +63,7 @@ Okay, the Pucky mascot test (H12) got destroyed by the agent. Cartoon + slang = 
 Ottawa vs. Edmonton (H13) came back 'approved with changes': we forgot the disclaimer entirely. Amira, footer added, re-trafficking today.
 
 **Priya Nair** (Chief Marketing Officer) · Oct 26, 2026 10:00 AM  
-Q1 2027 Marketing & Brand Plan draft is coming together. Calendar: Hockey Night Live, NFL playoffs + the Big Game, Play Smart refresh with NorthPlay Limits, basketball tip-off.
+Q1 2027 Marketing & Brand Plan draft is coming together. Calendar: Puck Drop Live, football playoffs + the Big Game, Play Smart refresh with NorthPlay Limits, basketball tip-off.
 
 **Priya Nair** (Chief Marketing Officer) · Oct 28, 2026 04:45 PM  
 Q1 plan v1.0 is posted. Channel mix is Meta, YouTube/CTV, programmatic, TikTok/Snap (25+ only), radio/podcast and opted-in email/SMS.
@@ -81,7 +81,7 @@ Team: TikTok and Snapchat are paused for all paid creative, effective today. Do 
     ↳ Pulling the two TikTok cuts we had in the queue.
 
 **Amira Haddad** (Creative Lead) · Nov 09, 2026 10:05 AM  
-Starting Hockey Night Live Q1 concepts. Thinking 'Puck drops at 7' as the hero line with live odds cards. Same layout as H01.
+Starting Puck Drop Live Q1 concepts. Thinking 'Puck drops at 7' as the hero line with live odds cards. Same layout as H01.
 
     ↳ **Sofia Marchetti** (Brand Manager) · Nov 09, 2026 10:12 AM  
     ↳ Love it. Keep it city names only and the full disclaimer at 24px+.
@@ -96,7 +96,7 @@ Growth idea for the Big Game: 'Deposit $50, get a $100 bonus bet' on Instagram s
 NorthPlay Limits launch: Marcus Doyle hero line will be quote (3) 'Set your limit before the puck drops.' Amira is on the creative.
 
 **Amira Haddad** (Creative Lead) · Nov 13, 2026 10:20 AM  
-Sharing three Q1 drafts for agent review next week: Hockey Night Live hero, a Big Game parlay builder spot, and the Limits launch with Marcus.
+Sharing three Q1 drafts for agent review next week: Puck Drop Live hero, a Big Game parlay builder spot, and the Limits launch with Marcus.
 
     ↳ **Daniel Okafor** (Head of Performance Marketing) · Nov 13, 2026 10:31 AM  
     ↳ Reminder that nothing traffics without an approval ID from the agent.
@@ -117,7 +117,7 @@ FYI, the 'win it all back Monday' concept (H10) is rejected and I agree with the
 Week 6 opted-in email (H05) is approved. Terms are up front and the unsubscribe link is in place. This is the template for any offer going forward.
 
 **Ethan Cho** (Senior Counsel, Legal & Compliance) · Oct 20, 2026 09:40 AM  
-Heads up on the Big Game in February. We do NOT hold NFL marks. Never say 'Super Bowl' in any creative, copy, hashtag or audio. Use 'the Big Game'. Same for team names and logos across NFL and NHL: city names only (e.g. 'Toronto vs. Montreal'). No logos, no jerseys.
+Heads up on the Big Game in February. We do NOT hold any league licenses. Never use the championship game's trademarked name in any creative, copy, hashtag or audio. Use 'the Big Game'. Same for league names, team names and logos across football and hockey: city names only (e.g. 'Toronto vs. Montreal'). No logos, no jerseys.
 
     ↳ **Amira Haddad** (Creative Lead) · Oct 20, 2026 09:47 AM  
     ↳ Does that include the team colours on the odds cards?
@@ -132,7 +132,7 @@ IMPORTANT: The Jake Moreau partnership is terminated as of today. Do not use his
     ↳ We had a Play Smart cut with Jake drafted for December ('take a break between periods'). Killing it.
 
     ↳ **Ethan Cho** (Senior Counsel, Legal & Compliance) · Oct 30, 2026 01:15 PM  
-    ↳ Correct. Even though an RG-only athlete message would normally pass AGCO rules, we don't have the rights. Reject.
+    ↳ Correct. Even though an RG-only athlete message would normally pass the regulations, we don't have the rights. Reject.
 
 **Sofia Marchetti** (Brand Manager) · Nov 02, 2026 10:20 AM  
 Marcus Doyle question: can we write new quotes for him for the Limits launch?
@@ -141,7 +141,7 @@ Marcus Doyle question: can we write new quotes for him for the Limits launch?
     ↳ Not without his written sign-off. His renewed contract (through Dec 2027) limits us to the approved quote bank. Approved quotes: (1) 'Set a budget before kickoff. Take breaks. Know when to walk away.' (2) 'The best fans know their limits.' (3) 'Set your limit before the puck drops.' Anything else needs his agent's written approval before it goes to the agent for review.
 
 **Ethan Cho** (Senior Counsel, Legal & Compliance) · Nov 04, 2026 03:30 PM  
-We received an inquiry from the AGCO about 'free' language in the market. Effective immediately, NorthPlay will not use the word 'free' (or 'on us', 'no risk', 'risk-free') in ANY marketing, including on-site banners and opted-in emails, even where the regs would technically allow it. Use 'bonus bets' with full terms.
+We received an inquiry from the provincial regulator about 'free' language in the market. Effective immediately, NorthPlay will not use the word 'free' (or 'on us', 'no risk', 'risk-free') in ANY marketing, including on-site banners and opted-in emails, even where the regs would technically allow it. Use 'bonus bets' with full terms.
 
     ↳ **Daniel Okafor** (Head of Performance Marketing) · Nov 04, 2026 03:42 PM  
     ↳ Does this apply to the H05-style opted-in email template?
@@ -150,10 +150,10 @@ We received an inquiry from the AGCO about 'free' language in the market. Effect
     ↳ Yes. H05 is fine because it says 'bonus bets', not 'free'. Keep it that way.
 
 **Kevin Tran** (Growth Marketing Manager) · Nov 10, 2026 02:00 PM  
-Idea for holiday: World Juniors creative over Boxing Day? Huge hockey moment in Ontario.
+Idea for holiday: junior hockey tournament creative over Boxing Day? Huge hockey moment in Ontario.
 
     ↳ **Ethan Cho** (Senior Counsel, Legal & Compliance) · Nov 10, 2026 02:22 PM  
-    ↳ No. World Juniors and all junior hockey (OHL/CHL, U18, World Juniors) are off-limits in any NorthPlay creative. Most of those players are under 19, so it puts minors at the centre of a gambling ad. That includes odds graphics, game previews and 'watch with us' posts. Senior national team and NHL only.
+    ↳ No. All junior hockey (junior leagues, under-18 and under-20 tournaments) is off-limits in any NorthPlay creative. Most of those players are under 19, so it puts minors at the centre of a gambling ad. That includes odds graphics, game previews and 'watch with us' posts. Professional and senior national team hockey only.
 
     ↳ **Kevin Tran** (Growth Marketing Manager) · Nov 10, 2026 02:25 PM  
     ↳ Got it, scrapping.

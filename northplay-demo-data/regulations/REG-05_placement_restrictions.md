@@ -1,10 +1,10 @@
 # REG-05: Placement Restrictions: Youth Media and Locations
 
-> Demo policy document for the NorthPlay legal approver agent (NorthPlay is a fictional operator). Paraphrased from Ontario's AGCO Registrar's Standards for Internet Gaming for hackathon use only; not legal advice and not the official text.
+> Demo policy document for the NorthPlay legal approver agent (NorthPlay is a fictional operator). Fictional rules modelled on Ontario-style internet gaming advertising standards, written for hackathon use only; not legal advice and not any regulator's official text.
 
 - **Rule ID:** REG-05
 - **Category:** Protection of Minors
-- **Source:** AGCO Registrar's Standards for Internet Gaming (Ontario), Standard 2.03, Req. 2 and Req. 6
+- **Source:** NorthPlay Advertising Policy (modelled on Ontario-style iGaming advertising standards), Section 2.03, Req. 2 and Req. 6
 - **Severity:** blocker
 - **Jurisdiction:** Ontario, Canada
 

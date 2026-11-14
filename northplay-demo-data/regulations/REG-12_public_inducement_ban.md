@@ -1,10 +1,10 @@
 # REG-12: No Public Advertising of Bonuses, Credits or Inducements
 
-> Demo policy document for the NorthPlay legal approver agent (NorthPlay is a fictional operator). Paraphrased from Ontario's AGCO Registrar's Standards for Internet Gaming for hackathon use only; not legal advice and not the official text.
+> Demo policy document for the NorthPlay legal approver agent (NorthPlay is a fictional operator). Fictional rules modelled on Ontario-style internet gaming advertising standards, written for hackathon use only; not legal advice and not any regulator's official text.
 
 - **Rule ID:** REG-12
 - **Category:** Inducements
-- **Source:** AGCO Registrar's Standards for Internet Gaming (Ontario), Standard 2.05
+- **Source:** NorthPlay Advertising Policy (modelled on Ontario-style iGaming advertising standards), Section 2.05
 - **Severity:** blocker
 - **Jurisdiction:** Ontario, Canada
 
