@@ -129,7 +129,7 @@ def read_image_bytes(data: bytes, mime: str, *, usage: Optional[llm.TokenUsage] 
     return reading.model_dump()
 
 
-def read_image_and_claims(data: bytes, mime: str, ctx: dict, *, usage=None, run_id=None, scope=None) -> dict:
+def read_image_and_claims(data: bytes, mime: str, ctx: dict, *, usage=None, run_id=None, scope=None, require_cached=False) -> dict:
     """Read pixels and extract grounded claims in a single fast-model call."""
     from app.models import Extraction
     from app.services.compliance_rules import quote_in_text
@@ -139,6 +139,7 @@ def read_image_and_claims(data: bytes, mime: str, ctx: dict, *, usage=None, run_
     key=review_cache.digest([hashlib.sha256(data).hexdigest(),mime,ctx.get("channel"),scope,review_cache.configuration()])
     hit=review_cache.readings.get(key)
     if hit is not None:return hit
+    if require_cached:raise review_cache.StaleAssessment("Image assessment expired or changed. Run the review again before submitting.")
 
     class ImageAssessmentInput(ImageReading):
         extraction: Extraction

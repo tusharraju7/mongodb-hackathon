@@ -46,7 +46,7 @@ def _episodic_text(identity: Identity, ctx: dict, report: ComplianceReport, name
 def review_lane(
     identity: Identity, run_id: str, *, text: Optional[str], file_id: Optional[str], ctx: dict, use_memory: bool = True,
     usage: Optional[llm.TokenUsage] = None, thread_id: Optional[str] = None, save: bool = True,
-    sources: Optional[Sources] = None, db=None,
+    sources: Optional[Sources] = None, db=None, assessment_key: Optional[str] = None,
 ) -> dict:
     db = db if db is not None else get_db()
     sources = sources or default_sources()
@@ -70,6 +70,9 @@ def review_lane(
         data, mime = media.open_file(file_id, db)
         modality = media.kind_of(mime)
         if modality == "audio":
+            if assessment_key:
+                from app.core.review_cache import StaleAssessment
+                raise StaleAssessment("Audio submission reuse is not available yet; use a text or image review.")
             text = gate.guarded(
                 identity, "compliance.check", {"step": "transcribe", "file_id": file_id, "bytes": len(data)}, run_id,
                 lambda: media.transcribe_bytes(data), thread_id=thread_id, db=db,
@@ -78,7 +81,7 @@ def review_lane(
         else:
             reading = gate.guarded(
                 identity, "compliance.check", {"step": "read_image", "file_id": file_id, "bytes": len(data)}, run_id,
-                lambda: media.read_image_and_claims(data, mime, ctx, usage=usage, run_id=run_id, scope=identity.model_dump()), thread_id=thread_id, db=db,
+                lambda: media.read_image_and_claims(data, mime, ctx, usage=usage, run_id=run_id, scope=identity.model_dump(), require_cached=bool(assessment_key)), thread_id=thread_id, db=db,
                 summarize=lambda r: {"status": "ok", "summary": f"Read {len(r['text'].split())} words from the image"},
             )
             extraction = Extraction.model_validate(reading["extraction"])
@@ -93,7 +96,7 @@ def review_lane(
     result: compliance.ReviewResult = gate.guarded(
         identity, "compliance.check",
         {"step": "review", "modality": modality, "offer_id": ctx.get("offer_id"), "region": ctx.get("region"), "channel": ctx.get("channel"), "text": text},
-        run_id, lambda: compliance.review(text, ctx, identity, run_id, use_memory=use_memory, sources=sources, usage=usage, extraction=extraction),
+        run_id, lambda: compliance.review(text, ctx, identity, run_id, use_memory=use_memory, sources=sources, usage=usage, extraction=extraction, expected_cache_key=assessment_key),
         thread_id=thread_id, db=db,
         policy_refs=lambda r: r.report.checked_fundamentals, memories_used=lambda r: r.report.memories_used,
         summarize=_report_outcome, tokens=usage.as_dict,
@@ -129,7 +132,7 @@ def review_lane(
         reply += " It is filed as pending review and needs a manager's approval before release." if save else ""
     else:
         reply += f" Next step: {report.route.replace('_', ' ')}." + (" You can regenerate a compliant version." if report.corrected_copy else "")
-    return {"reply": reply, "cards": cards, "memories_used": chips, "status": "completed", "campaign_id": str(campaign["_id"]) if campaign else None}
+    return {"reply": reply, "cards": cards, "memories_used": chips, "status": "completed", "assessment_key": result.cache_key, "campaign_id": str(campaign["_id"]) if campaign else None}
 
 
 def _first_asset(existing: Optional[dict]) -> Optional[str]:

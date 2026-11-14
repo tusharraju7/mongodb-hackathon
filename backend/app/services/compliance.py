@@ -190,6 +190,7 @@ def review(
     usage: Optional[llm.TokenUsage] = None,
     extraction: Optional[Extraction] = None,
     cached_report: Optional[callable] = None,
+    expected_cache_key: Optional[str] = None,
 ) -> ReviewResult:
     """Review one ad. `ctx` is the AdContext as a dict, plus `team` taken from the identity."""
     sources = sources or default_sources()
@@ -209,6 +210,7 @@ def review(
     extraction_key=review_cache.digest([text,ctx.get("channel"),ctx.get("modality"),identity.model_dump(),review_cache.configuration()])
     extraction = extraction or review_cache.extractions.get(extraction_key)
     if extraction is None:
+        if expected_cache_key:raise review_cache.StaleAssessment("Assessment expired or inputs changed. Run the review again before submitting.")
         extraction=extract_claims(text, ctx, usage=usage, run_id=run_id)
     extraction=extraction.model_copy(deep=True)
     extraction.claims=[c for c in extraction.claims if rules.quote_in_text(c.quote,text)]
@@ -265,12 +267,17 @@ def review(
 
     # 6. A stored verdict for exactly this text, offer, clause versions and memories skips the judge.
     key = _cache_key(text, offer, applicable, memories, ctx, identity, extraction, use_memory)
+    if expected_cache_key and key != expected_cache_key:
+        raise review_cache.StaleAssessment("Ad, placement, policy or memory changed. Run the review again before submitting.")
     cached_report = cached_report or review_cache.reports.get
     if cached_report is not None:
         hit = cached_report(key)
         if hit is not None:
             hit.cached = True
             return ReviewResult(report=hit, extraction=extraction, offer=offer, cache_key=key, code_clauses=code_clauses)
+
+    if expected_cache_key:
+        raise review_cache.StaleAssessment("Assessment expired. Run the review again before submitting.")
 
     # 7. The verdict.
     # The instructions and the clauses are the same from one review to the next, so they go in the

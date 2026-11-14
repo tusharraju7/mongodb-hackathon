@@ -116,14 +116,15 @@ export default function App() {
     if(!context.channel.trim()){setError('Enter the ad placement or channel.');return;}
     if(!file&&!fileId&&!review.text?.trim()&&!review.campaignId){setError('Attach an image or paste the ad copy first.');return;}
     if(save&&!canSubmit(review,ack))return;
+    if(save&&!review.assessmentKey){setError("Run a current assessment before submitting.");return;}
     setError('');setNotice('');setBusy(save?'Submitting for legal review':'Reading the ad and assessing policies');
     const id=makeId(),controller=new AbortController();running.current={id,controller};
     try {
       const api=backend();let fid=fileId;
       if(file&&!fid){setBusy('Uploading image');fid=(await api.upload(file,controller.signal)).file_id;setFileId(fid);uploadIds.current.set(active,fid);setBusy('Assessing applicable policies');}
-      const result=await api.check({...context,name:review.name,campaign_id:review.campaignId,text:review.text||undefined,file_id:fid,save,use_memory:true,run_id:id},controller.signal);
+      const result=await api.check({...context,name:review.name,campaign_id:review.campaignId,text:review.text||undefined,file_id:fid,assessment_key:save?review.assessmentKey:undefined,save,use_memory:true,run_id:id},controller.signal);
       const report=normalizeReport(result);if(!report)throw new Error('The backend did not return an assessment. Check the ad and required context.');
-      update(r=>({...r,report,readiness:report.readiness_score?.value,campaignId:result.campaign?.id??r.campaignId,version:result.campaign?.version??r.version,status:result.campaign?.status??r.status,trail:[...r.trail,{at:time(),text:`${save?'Submitted and rechecked':'Assessed'}: ${readable(report.verdict)}. Run ${id}.`}],messages:[...r.messages,message('assistant',save?result.campaign?'Submitted for legal review. The server rechecked the ad; the latest assessment is shown above.':'The backend did not file this ad. Resolve the missing information before submitting.':report.summary)]}));
+      update(r=>({...r,report,assessmentKey:result.assessment_key,readiness:report.readiness_score?.value,campaignId:result.campaign?.id??r.campaignId,version:result.campaign?.version??r.version,status:result.campaign?.status??r.status,trail:[...r.trail,{at:time(),text:`${save?'Submitted existing assessment':'Assessed'}: ${readable(report.verdict)}. Run ${id}.`}],messages:[...r.messages,message('assistant',save?result.campaign?'Submitted for legal review using the existing assessment. The server verified that its inputs and evidence are still current.':'The backend did not file this ad. Resolve the missing information before submitting.':report.summary)]}));
       if(save)setAck(false);
     }catch(e){fail(e);}finally{setBusy('');running.current=undefined;}
   }

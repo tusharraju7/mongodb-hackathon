@@ -6,6 +6,9 @@ import json
 import threading
 import time
 
+class StaleAssessment(Exception):
+    """Reviewed inputs changed or the local assessment expired; reassess explicitly."""
+
 VERSION = "combined-review-v1"
 
 def digest(value):

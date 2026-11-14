@@ -337,3 +337,24 @@ def test_repeated_assessment_reuses_models_but_checks_current_policy(api):
     api.db.fundamentals.update_one({"key":"credit.bonus_conditions"},{"$set":{"text":"A changed policy with the same version"}})
     third=check()
     assert not third["cached"] and third["tokens"]["in"]>0
+
+
+def test_submission_reuses_assessment_and_stale_submission_spends_no_tokens(api,monkeypatch):
+    body={**AD,"text":FIXED,"save":False}
+    headers=api.as_["marketer_national"]
+    first=api.post("/compliance/check",headers=headers,json=body).json()
+    assert first["assessment_key"]
+    def forbidden(*args,**kwargs):raise AssertionError("Submission must not call any model")
+    monkeypatch.setattr(llm,"call_structured",forbidden)
+    saved=api.post("/compliance/check",headers=headers,json={**body,"save":True,"assessment_key":first["assessment_key"]})
+    assert saved.status_code==200,saved.text
+    assert saved.json()["cached"] and saved.json()["tokens"]["in"]==0
+    assert saved.json()["campaign"]["status"]=="pending_review"
+    before=api.db.campaigns.count_documents({})
+    api.db.fundamentals.update_one({"key":"credit.bonus_conditions"},{"$set":{"text":"Changed"}})
+    stale=api.post("/compliance/check",headers=headers,json={**body,"save":True,"assessment_key":first["assessment_key"]})
+    assert stale.status_code==409 and stale.json()["error"]=="stale_assessment"
+    assert api.db.campaigns.count_documents({})==before
+    for changes in ({"text":"changed ad"},{"channel":"social"}):
+        denied=api.post("/compliance/check",headers=headers,json={**body,**changes,"save":True,"assessment_key":first["assessment_key"]})
+        assert denied.status_code==409

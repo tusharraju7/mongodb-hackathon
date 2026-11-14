@@ -32,7 +32,7 @@ export class Backend {
   campaigns() {return this.request<Campaign[]>('/campaigns');}
   campaign(id: string) {return this.request<FullCampaign>(`/campaigns/${encodeURIComponent(id)}`);}
   upload(file: File,signal?: AbortSignal) {const body=new FormData();body.append('file',file);return this.request<{file_id: string; type: string}>('/assets',{method:'POST',body,signal});}
-  check(input: AdContext & {text?: string; file_id?: string; save: boolean; use_memory: boolean; run_id: string},signal?: AbortSignal) {return this.post<CheckResult>('/compliance/check',input,signal);}
+  check(input: AdContext & {text?: string; file_id?: string; assessment_key?: string; save: boolean; use_memory: boolean; run_id: string},signal?: AbortSignal) {return this.post<CheckResult>('/compliance/check',input,signal);}
   chat(input: {thread_id: string; run_id: string; message: string; ad?: AdContext & {text?: string}; use_memory: boolean},signal?: AbortSignal) {return this.post<ChatResult>('/chat',input,signal);}
   decision(id: string,decision: 'approve'|'reject',feedback: string) {return this.post<Campaign>(`/campaigns/${encodeURIComponent(id)}/${decision}`,{feedback});}
   stop(id: string) {return this.post<{stop_requested: boolean}>(`/runs/${encodeURIComponent(id)}/stop`,{});}
