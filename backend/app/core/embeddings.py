@@ -33,7 +33,7 @@ class EmbeddingRateLimited(Exception):
 
 @lru_cache
 def _client() -> voyageai.Client:
-    return voyageai.Client(api_key=get_settings().voyage_api_key, max_retries=0)
+    return voyageai.Client(api_key=get_settings().voyage_api_key, max_retries=0, timeout=30)
 
 
 def _request(texts: list[str], model: str, input_type: str) -> list[list[float]]:

@@ -16,7 +16,7 @@ MANAGER = Identity(user_id="u-manager", email="manager.national@tamarack.test", 
 @pytest.fixture
 def db():
     database = mongomock.MongoClient().greenlight
-    database.policies.insert_many(json.loads((SEED_DIR / "policies.json").read_text()))
+    database.policies.insert_many(json.loads((SEED_DIR / "policies.json").read_text(encoding="utf-8")))
     return database
 
 

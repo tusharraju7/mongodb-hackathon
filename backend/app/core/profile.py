@@ -20,6 +20,8 @@ DEFAULTS = {
     "memory": {"per_query": 3, "budget": 3},
     "banner": {"header": None, "background": [16, 60, 44], "text": [245, 241, 230], "accent": [214, 178, 94], "headline": "first"},
     "fine_print_patterns": [],
+    "guidance": [],
+    "channel_classes": {},
     "decision_labels": {"pass": "approved", "needs_changes": "approved_with_changes", "blocked": "rejected"},
 }
 
@@ -27,8 +29,21 @@ DEFAULTS = {
 @lru_cache
 def get_profile() -> dict:
     path = SEED_DIR / "profile.json"
-    loaded = json.loads(path.read_text()) if path.exists() else {}
+    loaded = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
     return {**DEFAULTS, **loaded}
+
+
+def channel_class(channel: str) -> str:
+    """Whether a channel is public advertising, the company's own surface, or direct messages to people who opted in.
+
+    Decided in code from the channel's name, so a rule that depends on it never rests on a model's guess.
+    """
+    text = (channel or "").lower()
+    classes = get_profile().get("channel_classes") or {}
+    for name in ("direct", "owned", "public"):  # the most specific description wins
+        if any(word in text for word in classes.get(name, [])):
+            return name
+    return "unknown"
 
 
 def claim_types() -> list[str]:

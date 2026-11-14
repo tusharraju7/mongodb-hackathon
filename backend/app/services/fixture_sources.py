@@ -22,7 +22,7 @@ CACHE_FILE = BACKEND_ROOT / ".cache" / "seed_embeddings.json"
 
 
 def load_seed(name: str) -> list[dict]:
-    return json.loads((SEED_DIR / f"{name}.json").read_text())
+    return json.loads((SEED_DIR / f"{name}.json").read_text(encoding="utf-8"))
 
 
 def _date(value: Optional[str]) -> Optional[datetime]:
@@ -45,7 +45,7 @@ def _digest(text: str) -> str:
 
 
 def embed_with_disk_cache(texts: list[str]) -> list[list[float]]:
-    cache = json.loads(CACHE_FILE.read_text()) if CACHE_FILE.exists() else {}
+    cache = json.loads(CACHE_FILE.read_text(encoding="utf-8")) if CACHE_FILE.exists() else {}
     missing = [t for t in dict.fromkeys(texts) if _digest(t) not in cache]
     if missing:
         for text, vector in zip(missing, embeddings.embed_documents(missing)):

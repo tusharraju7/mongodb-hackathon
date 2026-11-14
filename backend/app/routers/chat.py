@@ -39,3 +39,11 @@ def chat(body: ChatBody, identity: Identity = Depends(security.current_identity)
         "run_id": run_id, "intent": result.get("intent"), "status": result.get("status", "completed"),
         "tokens": result.get("tokens", {"in": 0, "out": 0}), "grounding": result.get("grounding"),
     }
+
+@router.get("/chat/{thread_id}")
+def history(thread_id: str, identity: Identity = Depends(security.current_identity)) -> dict:
+    # Caller identity always namespaces the lookup; it is never a request field.
+    if thread_id.startswith("project-"):
+        from app.services import campaigns
+        campaigns.get(identity, thread_id[len("project-"):])
+    return {"messages": graph.read_history(identity, thread_id), "retained_turns": graph.HISTORY_TURNS}

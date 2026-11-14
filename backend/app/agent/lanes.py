@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 from app.agent import prompts
 from app.core import embeddings, gate, llm
 from app.core.db import get_db
-from app.models import ComplianceReport, Grounding, Identity
+from app.models import ComplianceReport, Extraction, Grounding, Identity
 from app.services import campaigns, compliance, fundamentals, media, memory, offers
 from app.services.compliance import Sources, default_sources
 
@@ -46,7 +46,7 @@ def _episodic_text(identity: Identity, ctx: dict, report: ComplianceReport, name
 def review_lane(
     identity: Identity, run_id: str, *, text: Optional[str], file_id: Optional[str], ctx: dict, use_memory: bool = True,
     usage: Optional[llm.TokenUsage] = None, thread_id: Optional[str] = None, save: bool = True,
-    sources: Optional[Sources] = None, db=None,
+    sources: Optional[Sources] = None, db=None, assessment_key: Optional[str] = None,
 ) -> dict:
     db = db if db is not None else get_db()
     sources = sources or default_sources()
@@ -54,14 +54,15 @@ def review_lane(
     ctx = {**ctx, "team": identity.team}
     modality, mime = "text", None
     existing = None
+    extraction = None
 
     # An ad already in the library: review its stored text; nothing is read again.
     if ctx.get("campaign_id") and not text and not file_id:
         existing = campaigns.get(identity, ctx["campaign_id"], db)
         text, modality = existing["text"], existing.get("modality", "text")
         # The stored ad's own context rules; a form default must not turn a Quebec ad into a national one.
-        for key in ("product", "offer_id", "region", "channel", "language", "budget", "visual_notes"):
-            ctx[key] = existing.get(key) or ctx.get(key)
+        for key in ("product", "offer_id", "region", "channel", "language", "budget", "visual_notes", "fine_print_legible"):
+            ctx[key] = existing[key] if key in existing and existing[key] is not None else ctx.get(key)
         ctx["name"] = ctx.get("name") or existing.get("name")
 
     # A file is turned into text once. The file itself is never sent to a model again.
@@ -69,6 +70,9 @@ def review_lane(
         data, mime = media.open_file(file_id, db)
         modality = media.kind_of(mime)
         if modality == "audio":
+            if assessment_key:
+                from app.core.review_cache import StaleAssessment
+                raise StaleAssessment("Audio submission reuse is not available yet; use a text or image review.")
             text = gate.guarded(
                 identity, "compliance.check", {"step": "transcribe", "file_id": file_id, "bytes": len(data)}, run_id,
                 lambda: media.transcribe_bytes(data), thread_id=thread_id, db=db,
@@ -77,9 +81,10 @@ def review_lane(
         else:
             reading = gate.guarded(
                 identity, "compliance.check", {"step": "read_image", "file_id": file_id, "bytes": len(data)}, run_id,
-                lambda: media.read_image_bytes(data, mime, usage=usage, run_id=run_id), thread_id=thread_id, db=db,
+                lambda: media.read_image_and_claims(data, mime, ctx, usage=usage, run_id=run_id, scope=identity.model_dump(), require_cached=bool(assessment_key)), thread_id=thread_id, db=db,
                 summarize=lambda r: {"status": "ok", "summary": f"Read {len(r['text'].split())} words from the image"},
             )
+            extraction = Extraction.model_validate(reading["extraction"])
             text = reading["text"]
             ctx["visual_notes"] = reading["visual_notes"]
             ctx["fine_print_legible"] = reading["fine_print_legible"]
@@ -91,7 +96,7 @@ def review_lane(
     result: compliance.ReviewResult = gate.guarded(
         identity, "compliance.check",
         {"step": "review", "modality": modality, "offer_id": ctx.get("offer_id"), "region": ctx.get("region"), "channel": ctx.get("channel"), "text": text},
-        run_id, lambda: compliance.review(text, ctx, identity, run_id, use_memory=use_memory, sources=sources, usage=usage),
+        run_id, lambda: compliance.review(text, ctx, identity, run_id, use_memory=use_memory, sources=sources, usage=usage, extraction=extraction, expected_cache_key=assessment_key),
         thread_id=thread_id, db=db,
         policy_refs=lambda r: r.report.checked_fundamentals, memories_used=lambda r: r.report.memories_used,
         summarize=_report_outcome, tokens=usage.as_dict,
@@ -115,7 +120,7 @@ def review_lane(
             identity, run_id, name=ctx.get("name"), text=text, ctx=ctx, facts=ex.facts().model_dump(), summary=ex.summary,
             description=ex.description, modality=modality, file_id=file_id or _first_asset(existing), mime=mime or _first_mime(existing),
             compliance=report, cache_key=result.cache_key, campaign_id=ctx.get("campaign_id"), vector=ad_vector, db=db,
-        ) if not existing or existing.get("text") != text else _refresh_report(existing, report, result.cache_key, db)
+        ) if not existing or existing.get("text") != text else gate.guarded(identity,"campaign.submit",{"campaign_id":str(existing["_id"]),"step":"refresh_assessment"},run_id,lambda: _refresh_report(existing, report, result.cache_key, db),db=db)
         if report.verdict != "pass" and use_memory:
             memory.remember(
                 identity, run_id, kind="episodic", text=episodic, scope={"team": identity.team, "user_id": None},
@@ -127,7 +132,7 @@ def review_lane(
         reply += " It is filed as pending review and needs a manager's approval before release." if save else ""
     else:
         reply += f" Next step: {report.route.replace('_', ' ')}." + (" You can regenerate a compliant version." if report.corrected_copy else "")
-    return {"reply": reply, "cards": cards, "memories_used": chips, "status": "completed", "campaign_id": str(campaign["_id"]) if campaign else None}
+    return {"reply": reply, "cards": cards, "memories_used": chips, "status": "completed", "assessment_key": result.cache_key, "campaign_id": str(campaign["_id"]) if campaign else None}
 
 
 def _first_asset(existing: Optional[dict]) -> Optional[str]:

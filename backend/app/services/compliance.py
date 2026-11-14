@@ -12,8 +12,8 @@ from datetime import datetime, timezone
 from typing import Optional, Protocol
 
 from app.agent import prompts
-from app.core import embeddings, llm
-from app.core.profile import get_profile
+from app.core import embeddings, llm, review_cache
+from app.core.profile import channel_class, get_profile
 from app.models import (
     ComplianceReport,
     Extraction,
@@ -107,19 +107,6 @@ def _offer_block(offer: dict) -> str:
     return "\n".join(lines)
 
 
-def _clause_block(clause: dict, languages: list[str], mandatory_types: list[str]) -> str:
-    body = clause["text"] if len(clause.get("text", "")) <= FULL_TEXT_LIMIT else clause.get("summary", "")
-    head = f"- {clause['key']} (version {clause.get('version', 1)}, {clause.get('materiality')})"
-    if mandatory_types:
-        head += f" [applies to the ad's {', '.join(mandatory_types)} claim]"
-    out = f"{head}: {body}"
-    wording = clause.get("approved_fix") or {}
-    for language in languages:
-        if wording.get(language):
-            out += f"\n  Approved wording ({language}): {wording[language]}"
-    return out
-
-
 def _required_lines_block(code_clauses: list[dict], ctx: dict, languages: list[str]) -> str:
     """The lines the corrected copy must carry, so the judge writes them in the right language."""
     lines = []
@@ -139,9 +126,10 @@ def _judge_user(
     language = ctx.get("language") or extraction.language
     # A Quebec ad may need to be rewritten in French, so the judge sees French wording as well.
     languages = list(dict.fromkeys([language] + (["fr"] if ctx.get("region") == "CA-QC" else [])))
-    form = {"audio": "transcript of a spoken ad", "image": "text read from an image"}.get(ctx.get("modality"), "typed text")
+    form = {"audio": "transcript of a spoken ad", "image": "text read from an image", "video": "spoken words and on-screen text of a video"}.get(ctx.get("modality"), "typed text")
     parts = [
-        f"<ad region=\"{ctx.get('region')}\" channel=\"{ctx.get('channel')}\" language=\"{language}\" form=\"{form}\">\n{text}\n</ad>",
+        f"<ad region=\"{ctx.get('region')}\" channel=\"{ctx.get('channel')}\" channel_class=\"{ctx.get('channel_class', 'unknown')}\" "
+        f"language=\"{language}\" form=\"{form}\">\n{text}\n</ad>",
     ]
     if ctx.get("visual_notes"):
         parts.append(f"<image_notes>\n{ctx['visual_notes']}\n</image_notes>")
@@ -152,7 +140,8 @@ def _judge_user(
     found = [f"- {f['fundamental_key']}: {f['explanation']} Fix: {f['fix']}" for f in code_findings] or ["- none"]
     parts.append("<already_found_by_automated_checks>\n" + "\n".join(found) + "\n</already_found_by_automated_checks>")
     parts.append(_required_lines_block(code_clauses, ctx, languages))
-    parts.append("<policy_clauses>\n" + "\n".join(_clause_block(c, languages, m) for c, m in clauses) + "\n</policy_clauses>")
+    tied = [f"- {c['key']}: tied to the ad's {', '.join(m)} claim" for c, m in clauses if m] or ["- none"]
+    parts.append("<clauses_tied_to_this_ads_claims>\n" + "\n".join(tied) + "\n</clauses_tied_to_this_ads_claims>")
     mem = []
     for m in memories:
         where = ", ".join(x for x in (m.get("source_label"), m.get("date")) if x)
@@ -178,15 +167,16 @@ def _missing_offer_report(offer_id: Optional[str]) -> ComplianceReport:
     )
 
 
-def _cache_key(text: str, offer: Optional[dict], clauses: list[dict], memories: list[dict], ctx: dict) -> str:
-    payload = {
-        "text": rules.norm(text),
-        "offer": [offer["_id"], offer.get("version", 1)] if offer else None,
-        "clauses": sorted([c["key"], c.get("version", 1)] for c in clauses),
-        "memories": sorted(m["id"] for m in memories),
-        "ctx": [ctx.get("region"), ctx.get("channel"), ctx.get("language"), ctx.get("team"), (ctx.get("budget") or {}).get("amount"), ctx.get("visual_notes")],
-    }
-    return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
+def _cache_key(text, offer, clauses, memories, ctx, identity=None, extraction=None, use_memory=True):
+    # Hash complete current evidence, not only IDs or nominal versions. Retrieval and hard rules
+    # still run on every request, so expiry, forgetting, corrections and new retrieved memories count.
+    def stable(doc):
+        return {k:v for k,v in doc.items() if k not in {"embedding","use_count","last_used_at"}}
+    return review_cache.digest({"text":text,"offer":stable(offer) if offer else None,
+        "clauses":sorted([stable(c) for c in clauses],key=lambda c:c["key"]),
+        "memories":memories,"context":{k:v for k,v in ctx.items() if k not in {"name","campaign_id"}},
+        "identity":identity.model_dump() if identity else None,"extraction":extraction.model_dump() if extraction else None,
+        "memory_enabled":use_memory,"configuration":review_cache.configuration()})
 
 
 def review(
@@ -200,6 +190,7 @@ def review(
     usage: Optional[llm.TokenUsage] = None,
     extraction: Optional[Extraction] = None,
     cached_report: Optional[callable] = None,
+    expected_cache_key: Optional[str] = None,
 ) -> ReviewResult:
     """Review one ad. `ctx` is the AdContext as a dict, plus `team` taken from the identity."""
     sources = sources or default_sources()
@@ -216,11 +207,19 @@ def review(
             return ReviewResult(report=_missing_offer_report(ctx["offer_id"]))
 
     # 2. Claims, once.
-    extraction = extraction or extract_claims(text, ctx, usage=usage, run_id=run_id)
+    extraction_key=review_cache.digest([text,ctx.get("channel"),ctx.get("modality"),identity.model_dump(),review_cache.configuration()])
+    extraction = extraction or review_cache.extractions.get(extraction_key)
+    if extraction is None:
+        if expected_cache_key:raise review_cache.StaleAssessment("Assessment expired or inputs changed. Run the review again before submitting.")
+        extraction=extract_claims(text, ctx, usage=usage, run_id=run_id)
+    extraction=extraction.model_copy(deep=True)
+    extraction.claims=[c for c in extraction.claims if rules.quote_in_text(c.quote,text)]
+    review_cache.extractions.put(extraction_key,extraction)
     ctx["language"] = ctx.get("language") or extraction.language
     claims = [c.model_dump() for c in extraction.facts().claims]
 
     # 3. Checks in code.
+    ctx["channel_class"] = channel_class(ctx.get("channel", ""))
     ctx["region"] = ctx.get("region") or profile["region"]
     ctx["product"] = ctx.get("product") or profile["product"]
     regions = regions_for(ctx["region"])
@@ -267,18 +266,28 @@ def review(
     )
 
     # 6. A stored verdict for exactly this text, offer, clause versions and memories skips the judge.
-    key = _cache_key(text, offer, consulted, memories, ctx)
+    key = _cache_key(text, offer, applicable, memories, ctx, identity, extraction, use_memory)
+    if expected_cache_key and key != expected_cache_key:
+        raise review_cache.StaleAssessment("Ad, placement, policy or memory changed. Run the review again before submitting.")
+    cached_report = cached_report or review_cache.reports.get
     if cached_report is not None:
         hit = cached_report(key)
         if hit is not None:
             hit.cached = True
             return ReviewResult(report=hit, extraction=extraction, offer=offer, cache_key=key, code_clauses=code_clauses)
 
+    if expected_cache_key:
+        raise review_cache.StaleAssessment("Assessment expired. Run the review again before submitting.")
+
     # 7. The verdict.
+    # The instructions and the clauses are the same from one review to the next, so they go in the
+    # system prompt in a fixed order and are cached. Everything about this ad goes in the user message.
+    clause_languages = list(dict.fromkeys([ctx["language"]] + (["fr"] if ctx.get("region") == "CA-QC" else [])))
+    system = llm.cached_system([prompts.judge_system(), prompts.clauses_block(shown, clause_languages, FULL_TEXT_LIMIT)])
     judged: JudgeOutput = llm.call_structured(
         llm.main_model(),
         JudgeOutput,
-        system=prompts.judge_system(),
+        system=system,
         user=_judge_user(text, ctx, extraction, offer, code_findings, code_clauses, [(c, mandatory_types(c)) for c in shown], memories),
         label="judge",
         usage=usage,
@@ -339,6 +348,23 @@ def review(
     if dropped:
         passed.append({"check": "dropped_findings", "detail": dropped})
 
+    # Where the judge says the sources disagree. A conflict naming a source that was not in front
+    # of it is dropped, the same way a finding is.
+    def source_ref(ref: str) -> Optional[dict]:
+        if ref in by_key or any(c["key"] == ref for c in code_clauses):
+            return {"type": "policy", "ref": ref, "label": ref}
+        if ref in by_memory:
+            m = by_memory[ref]
+            return {"type": "memory", "ref": ref, "label": ", ".join(x for x in (STANDING[authority_of(m)], m.get("source_label"), m.get("date")) if x)}
+        return None
+
+    conflicts = []
+    for c in judged.conflicts:
+        between = [r for r in (source_ref(x) for x in dict.fromkeys(c.between)) if r]
+        winner = source_ref(c.winner)
+        if len(between) >= 2 and winner:
+            conflicts.append({"between": between, "winner": winner, "explanation": c.explanation})
+
     # 9. Verdict, confidence and route, all in code.
     verdict, route, reason = conf.base_verdict(violations, [])
     coverage, uncovered = conf.claim_coverage(claims, consulted, best_for_claim)
@@ -362,6 +388,9 @@ def review(
         confidence=confidence,
         passed_checks=passed,
         violations=violations,
+        conflicts=conflicts,
+        channel_class=ctx["channel_class"],
+        prompt_version=prompts.PROMPT_VERSION,
         corrected_copy=corrected,
         corrected_language=corrected_language,
         checked_fundamentals=[{"key": c["key"], "version": c.get("version", 1)} for c in consulted],
@@ -370,6 +399,7 @@ def review(
         # The ones a finding rests on are also named on that finding as `memory_id`.
         memories_used=[m["id"] for m in memories],
     )
+    review_cache.reports.put(key,report)
     return ReviewResult(report=report, extraction=extraction, offer=offer, cache_key=key, code_clauses=code_clauses)
 
 

@@ -43,6 +43,21 @@ PROFILE = {
     "banner": {"header": "NORTHPLAY", "background": [11, 37, 54], "text": [240, 246, 244], "accent": [120, 222, 190], "headline": "first"},
     "fine_print_patterns": [r"19\+", "ontario only", "play responsibly", "connexontario"],
     "decision_labels": {"pass": "approved", "needs_changes": "approved_with_changes", "blocked": "rejected"},
+    # Domain notes given to the reviewer. They restate the regulations in plain words; they never encode
+    # an internal decision, which must reach the review through memory so that it can be traced and changed.
+    "guidance": [
+        "Channels come in three classes. Public: paid social, programmatic display, video platforms, TV, radio, podcasts, outdoor and search. Owned: the company's own site and app. Direct: email, SMS and push to players who have actively opted in.",
+        "An inducement is any bonus, bonus bet, deposit match, odds boost, credit, cash back or promo code, or any dollar amount tied to an offer. Inducements themselves are legal; advertising them is allowed only on owned channels and in direct marketing to opted-in players.",
+        "The legal age is 19. A person who is or looks under 19, and anything that would appeal mainly to people under 19, is a problem wherever it appears.",
+        "Showing odds as facts is allowed. Suggesting that a win is certain, likely or easy is not.",
+        "An active or retired athlete may appear only in a message whose sole purpose is responsible gambling, with no call to bet.",
+        "Every ad must carry a responsible gambling message and '19+'. That is checked automatically, so do not report it yourself.",
+    ],
+    "channel_classes": {
+        "direct": ["email", "sms", "push", "opted-in", "opted in", "direct marketing"],
+        "owned": ["on-site", "onsite", "website", "in-app", "app banner", "own site"],
+        "public": ["social", "instagram", "facebook", "tiktok", "snapchat", "youtube", "display", "programmatic", "tv", "radio", "podcast", "billboard", "outdoor", "search", "x (", "twitter"],
+    },
 }
 
 # Clauses tied to a kind of claim. The rest apply to every ad.
@@ -79,7 +94,7 @@ def write(name: str, data) -> None:
 
 def clauses() -> list[dict]:
     out = []
-    for r in json.loads((SRC / "regulations" / "regulations.json").read_text()):
+    for r in json.loads((SRC / "regulations" / "regulations.json").read_text(encoding="utf-8")):
         key = r["rule_id"]
         checks = r["check_for"] if isinstance(r["check_for"], list) else [r["check_for"]]
         clause = {
@@ -102,7 +117,7 @@ def clauses() -> list[dict]:
 
 def ads_and_precedents(by_key: dict, readings: dict) -> tuple[list[dict], list[dict]]:
     ads, memories = [], []
-    for a in json.loads((SRC / "historical_ads" / "historical_ads.json").read_text()):
+    for a in json.loads((SRC / "historical_ads" / "historical_ads.json").read_text(encoding="utf-8")):
         verdict, route, status = VERDICT[a["status"]]
         cited = [c["rule_id"] for c in a["rules_cited"]]
         violations = [] if verdict == "pass" else [
@@ -144,13 +159,13 @@ def ads_and_precedents(by_key: dict, readings: dict) -> tuple[list[dict], list[d
 
 def slack_memories() -> tuple[list[dict], list[dict]]:
     root = SRC / "slack" / "slack_export"
-    people = {u["id"]: u for u in json.loads((root / "users.json").read_text())}
+    people = {u["id"]: u for u in json.loads((root / "users.json").read_text(encoding="utf-8"))}
     logins = {u["slack_id"]: u["email"] for u in USERS if u.get("slack_id")}
     memories, raw = [], []
-    for channel in json.loads((root / "channels.json").read_text()):
+    for channel in json.loads((root / "channels.json").read_text(encoding="utf-8")):
         name = channel["name"]
         for day in sorted((root / name).glob("*.json")):
-            messages = json.loads(day.read_text())
+            messages = json.loads(day.read_text(encoding="utf-8"))
             lines, authors, titles = [], [], []
             for m in messages:
                 person = people.get(m["user"], {})
@@ -186,7 +201,7 @@ def slack_memories() -> tuple[list[dict], list[dict]]:
 def deck_memories() -> tuple[list[dict], list[dict]]:
     memories, raw = [], []
     for path in sorted((SRC / "strategy_decks").glob("*.md")):
-        text = path.read_text()
+        text = path.read_text(encoding="utf-8")
         title = re.search(r"^# (.+)$", text, re.M).group(1).strip()
         found = re.search(r"(\w+ \d{1,2}, \d{4})", text[:600])
         date = datetime.strptime(found.group(1), "%B %d, %Y").date().isoformat() if found else None
@@ -205,10 +220,10 @@ def deck_memories() -> tuple[list[dict], list[dict]]:
 def read_images(force: bool) -> dict:
     """What a vision model sees in each past ad. Kept in the seed folder so it is done once."""
     cache = OUT / "image_readings.json"
-    readings = json.loads(cache.read_text()) if cache.exists() else {}
+    readings = json.loads(cache.read_text(encoding="utf-8")) if cache.exists() else {}
     from app.services import media
 
-    for a in json.loads((SRC / "historical_ads" / "historical_ads.json").read_text()):
+    for a in json.loads((SRC / "historical_ads" / "historical_ads.json").read_text(encoding="utf-8")):
         if a["ad_id"] in readings and not force:
             continue
         data = (SRC / "historical_ads" / "images" / a["file"]).read_bytes()
@@ -226,12 +241,12 @@ def main() -> None:
     args = p.parse_args()
 
     write("profile", PROFILE)
-    readings = read_images(args.force) if args.read_images else (json.loads((OUT / "image_readings.json").read_text()) if (OUT / "image_readings.json").exists() else {})
+    readings = read_images(args.force) if args.read_images else (json.loads((OUT / "image_readings.json").read_text(encoding="utf-8")) if (OUT / "image_readings.json").exists() else {})
     rules = clauses()
     ads, precedents = ads_and_precedents({c["key"]: c for c in rules}, readings)
     slack, raw_slack = slack_memories()
     decks, raw_decks = deck_memories()
-    policies = json.loads((BACKEND_ROOT / "tests" / "fixtures" / "tamarack" / "policies.json").read_text())
+    policies = json.loads((BACKEND_ROOT / "tests" / "fixtures" / "tamarack" / "policies.json").read_text(encoding="utf-8"))
 
     write("users", USERS)
     write("policies", policies)

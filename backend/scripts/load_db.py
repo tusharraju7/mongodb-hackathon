@@ -59,12 +59,12 @@ def date(value):
 
 def seed(name: str) -> list:
     path = SEED_DIR / f"{name}.json"
-    return json.loads(path.read_text()) if path.exists() else []
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
 
 
 def from_doc() -> tuple[dict, dict]:
     """Validators and vector index definitions, taken from the setup document itself."""
-    text = DOC.read_text()
+    text = DOC.read_text(encoding="utf-8")
     validators = {m.group(1): (m.group(2), json.loads(m.group(3))) for m in re.finditer(r"\*\*`(\w+)`\*\* \((strict|warn)\)\n```json\n(.*?)```", text, re.S)}
     vectors = {m.group(1): (m.group(2), json.loads(m.group(3))) for m in re.finditer(r"\*\*`(\w+_vec)`\*\* on `(\w+)`\n```json\n(.*?)```", text, re.S)}
     return validators, vectors
@@ -206,8 +206,8 @@ def load(db, password: str, with_media: bool) -> None:
     }
     source_dir = SOURCE_DATA_DIR
     if (source_dir / "regulations" / "regulations.json").exists():
-        raw["regulations"] = (json.loads((source_dir / "regulations" / "regulations.json").read_text()), lambda d: {"rule_id": d["rule_id"]})
-        raw["ad_decisions"] = (json.loads((source_dir / "historical_ads" / "historical_ads.json").read_text()), lambda d: {"ad_id": d["ad_id"]})
+        raw["regulations"] = (json.loads((source_dir / "regulations" / "regulations.json").read_text(encoding="utf-8")), lambda d: {"rule_id": d["rule_id"]})
+        raw["ad_decisions"] = (json.loads((source_dir / "historical_ads" / "historical_ads.json").read_text(encoding="utf-8")), lambda d: {"ad_id": d["ad_id"]})
     for name, (docs, key) in raw.items():
         for d in docs:
             db[name].replace_one(key(d), d, upsert=True)

@@ -5,9 +5,10 @@ import importlib
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 
 from app.core import gate, llm, security
+from app.core.review_cache import StaleAssessment
 from app.core.config import get_settings
 from app.core.embeddings import EmbeddingRateLimited
 from app.services import campaigns, fundamentals, media, memory
@@ -27,6 +28,10 @@ for name in ("auth", "chat", "compliance", "campaigns", "assets", "fundamentals"
     app.include_router(importlib.import_module(f"app.routers.{name}").router)
 
 
+@app.get("/", include_in_schema=False)
+def website():
+    return RedirectResponse("http://127.0.0.1:3000/", status_code=307)
+
 @app.get("/health")
 def health() -> dict:
     s = get_settings()
@@ -43,6 +48,7 @@ def health() -> dict:
 
 # Domain errors and the statuses they map to (docs/CONTRACTS.md section 7).
 ERRORS: dict[type, tuple[int, str]] = {
+    StaleAssessment: (409, "stale_assessment"),
     gate.Denied: (403, "denied"),
     gate.RunStopped: (409, "stopped"),
     security.StepUpFailed: (401, "step_up_failed"),

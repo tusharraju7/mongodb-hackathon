@@ -115,7 +115,7 @@ def submit(
         report = {**compliance.model_dump(), "checked_at": _now(), "cache_key": cache_key}
         assets = [{"type": modality, "file_id": file_id, "mime": mime}] if file_id and modality in ("audio", "image") else []
         fields = {
-            "text": text, "visual_notes": ctx.get("visual_notes"), "summary": summary, "description": description, "facts": facts,
+            "text": text, "visual_notes": ctx.get("visual_notes"), "fine_print_legible": ctx.get("fine_print_legible"), "summary": summary, "description": description, "facts": facts,
             "assets": assets, "modality": modality, "language": ctx.get("language") or facts.get("language") or "en",
             "source": source, "derived_from": derived_from, "status": "pending_review", "compliance": report,
             "embedding": vector or embeddings.embed_documents([search_document(description, summary)])[0],
